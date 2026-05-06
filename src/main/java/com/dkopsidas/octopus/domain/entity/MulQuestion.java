@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,12 @@ public class MulQuestion {
             orphanRemoval = true//Removing an answer from the list deletes it from DB
     )
     private List<MulAnswer> mulAnswers = new ArrayList<>();
+
+    @Column(name = "created", updatable = false, nullable = false)
+    private Instant created;
+
+    @Column(name = "updated", nullable = false)
+    private Instant updated;
 
     public void addAnswer(MulAnswer a) {
         mulAnswers.add(a);

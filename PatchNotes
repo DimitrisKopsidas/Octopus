@@ -4,9 +4,10 @@ Version 0.1.0
 - (+) Add MulQuestion obj
 - (+) Add MulAnswer obj and relation to MulQuestion
 - (X) Add MulBundle obj
-- (4) Create repos, service requests, service methods, dto + mapper, endpoints
+- (+) Create repos, service requests, service methods, dto + mapper, endpoints FOR COURSE
+- (5) Create repos, service requests, service methods, dto + mapper, endpoints FOR MULs
 - (X) Save "pre-made" bundles
-- (5) Create "random" bundle
+- (6) Create "random" bundle
 
 Version 0.2.0
 [] Implement multiple choice question solving
