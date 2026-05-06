@@ -1,0 +1,26 @@
+Version 0.1.0
+[] Implement multiple choice uploading
+- (1) Add Course obj
+- (2) Add MulQuestion obj
+- (3) Add MulAnswer obj
+- (4) Add MulBundle obj
+- (5) Save "premade" bundles
+- (6) Create "random" bundle
+
+Version 0.2.0
+[] Implement multiple choice question solving
+
+Version 0.3.0
+[] Implement loose user signup and login
+
+Version 0.4.0
+[] Implement user history and score saving
+
+Version 0.5.0
+[] Implement general message to admin
+
+Version 1.0.0
+[] Implement basic user interface
+
+Version 1.1.0
+[] Report questions

@@ -7,18 +7,18 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: dimitris
-#  ui:
-#    image: ghcr.io/devtiro/devtiro-build-task-app:latest
-#    ports:
-#      - "3000:3000"
-#    environment:
-#      - BACKEND_HOST=host.docker.internal
-#      - BACKEND_PORT=8080
-#    extra_hosts:
-#      - "host.docker.internal:host-gateway"
-  backend:
-    build: .
+  ui:
+    image: ghcr.io/devtiro/devtiro-build-task-app:latest
     ports:
-      - "8080:8080"
-    depends_on:
-      - db
+      - "3000:3000"
+    environment:
+      - BACKEND_HOST=host.docker.internal
+      - BACKEND_PORT=8080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+#  backend:
+#    build: .
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
