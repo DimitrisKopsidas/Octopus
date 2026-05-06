@@ -16,9 +16,9 @@ import java.util.UUID;
 public class Course {//TODO add type
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -29,7 +29,7 @@ public class Course {//TODO add type
     public Course() {
     }
 
-    public Course(UUID id, String name, int semester) {
+    public Course(Long id, String name, int semester) {
         this.id = id;
         this.name = name;
         this.semester = semester;
