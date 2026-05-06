@@ -2,11 +2,11 @@ Version 0.1.0
 [] Implement multiple choice uploading
 - (+) Added Course obj
 - (+) Add MulQuestion obj
-- (3) Add MulAnswer obj and relation to MulQuestion
-- (4) Add MulBundle obj
-- (5) Create endpoints
-- (6) Save "premade" bundles
-- (7) Create "random" bundle
+- (+) Add MulAnswer obj and relation to MulQuestion
+- (X) Add MulBundle obj
+- (4) Create repos, service requests, service methods, dto + mapper, endpoints
+- (X) Save "pre-made" bundles
+- (5) Create "random" bundle
 
 Version 0.2.0
 [] Implement multiple choice question solving

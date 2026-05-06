@@ -5,46 +5,40 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
-@ToString
 @Entity
-@Table(name = "mulquestion")
+@Table(name = "mul_question")
 public class MulQuestion {
 
     @Id
     @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @Column(name = "course", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)//column name
     private Course course;
 
     @Column(name = "title", nullable = false)
     private String title;
 
-    public MulQuestion() {
+    @OneToMany(
+            mappedBy = "mulQuestion",//field not column
+            cascade = CascadeType.ALL,//Saving a Question also saves its Answers
+            orphanRemoval = true//Removing an answer from the list deletes it from DB
+    )
+    private List<MulAnswer> mulAnswers = new ArrayList<>();
+
+    public void addAnswer(MulAnswer a) {
+        mulAnswers.add(a);
+        a.setMulQuestion(this);
     }
 
-    public MulQuestion(Long id, Course course, String title) {
-        this.id = id;
-        this.course = course;
-        this.title = title;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MulQuestion mulQuestion = (MulQuestion) o;
-        return Objects.equals(id, mulQuestion.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
+    public void removeAnswer(MulAnswer a) {
+        mulAnswers.remove(a);
+        a.setMulQuestion(null);
     }
 }
