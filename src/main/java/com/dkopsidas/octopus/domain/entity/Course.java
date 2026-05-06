@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
 @Setter

@@ -1,11 +1,12 @@
 Version 0.1.0
 [] Implement multiple choice uploading
-- (1) Add Course obj
-- (2) Add MulQuestion obj
-- (3) Add MulAnswer obj
+- (+) Added Course obj
+- (+) Add MulQuestion obj
+- (3) Add MulAnswer obj and relation to MulQuestion
 - (4) Add MulBundle obj
-- (5) Save "premade" bundles
-- (6) Create "random" bundle
+- (5) Create endpoints
+- (6) Save "premade" bundles
+- (7) Create "random" bundle
 
 Version 0.2.0
 [] Implement multiple choice question solving
