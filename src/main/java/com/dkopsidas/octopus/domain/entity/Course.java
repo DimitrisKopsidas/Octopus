@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @ToString(exclude = "questions")
 @Entity
-@Table(name = "course")
+@Table(name = "courses")
 public class Course {//TODO add type
 
     @Id
