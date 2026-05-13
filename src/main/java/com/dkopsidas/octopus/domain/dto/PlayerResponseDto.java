@@ -5,7 +5,7 @@ import com.dkopsidas.octopus.domain.entity.PlayerType;
 import java.util.UUID;
 
 //response dto
-public record PlayerDto(
+public record PlayerResponseDto(
         UUID id,
         String name,
         String password,

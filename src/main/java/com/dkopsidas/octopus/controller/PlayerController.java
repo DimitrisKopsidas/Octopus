@@ -3,7 +3,7 @@ package com.dkopsidas.octopus.controller;
 import com.dkopsidas.octopus.domain.CreatePlayerRequest;
 import com.dkopsidas.octopus.domain.UpdatePlayerRequest;
 import com.dkopsidas.octopus.domain.dto.CreatePlayerRequestDto;
-import com.dkopsidas.octopus.domain.dto.PlayerDto;
+import com.dkopsidas.octopus.domain.dto.PlayerResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdatePlayerRequestDto;
 import com.dkopsidas.octopus.domain.entity.Player;
 import com.dkopsidas.octopus.mapper.PlayerMapper;
@@ -26,31 +26,31 @@ public class PlayerController {
     private final PlayerMapper playerMapper;
 
     @PostMapping
-    public ResponseEntity<PlayerDto> createPlayer(
+    public ResponseEntity<PlayerResponseDto> createPlayer(
             @Valid @RequestBody CreatePlayerRequestDto createPlayerRequestDto
     ) {
         CreatePlayerRequest createPlayerRequest= playerMapper.fromDto(createPlayerRequestDto);
         Player player = playerService.createPlayer(createPlayerRequest);//to service layer
-        PlayerDto createdPlayerDto = playerMapper.toDto(player);//back to dto to return as response
-        return new ResponseEntity<>(createdPlayerDto, HttpStatus.CREATED);
+        PlayerResponseDto createdPlayerResponseDto = playerMapper.toDto(player);//back to dto to return as response
+        return new ResponseEntity<>(createdPlayerResponseDto, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<PlayerDto>> listPlayers() {
+    public ResponseEntity<List<PlayerResponseDto>> listPlayers() {
         List<Player> players = playerService.listPlayers();
-        List<PlayerDto> playerDtos = players.stream().map(playerMapper::toDto).toList();
-        return ResponseEntity.ok(playerDtos);
+        List<PlayerResponseDto> playerResponseDtos = players.stream().map(playerMapper::toDto).toList();
+        return ResponseEntity.ok(playerResponseDtos);
     }
 
     @PutMapping(path = "/{playerId}")
-    public ResponseEntity<PlayerDto> updatePlayer(
+    public ResponseEntity<PlayerResponseDto> updatePlayer(
             @PathVariable UUID playerId,
             @Valid @RequestBody UpdatePlayerRequestDto updatePlayerRequestDto
     ) {
         UpdatePlayerRequest updatePlayerRequest = playerMapper.fromDto(updatePlayerRequestDto);
         Player player = playerService.updatePlayer(playerId, updatePlayerRequest);
-        PlayerDto playerDto = playerMapper.toDto(player);
-        return ResponseEntity.ok(playerDto);
+        PlayerResponseDto playerResponseDto = playerMapper.toDto(player);
+        return ResponseEntity.ok(playerResponseDto);
     }
 
     public ResponseEntity<Void> deletePlayer (@PathVariable UUID playerId) {

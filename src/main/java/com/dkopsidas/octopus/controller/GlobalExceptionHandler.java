@@ -1,6 +1,6 @@
 package com.dkopsidas.octopus.controller;
 
-import com.dkopsidas.octopus.domain.dto.ErrorDto;
+import com.dkopsidas.octopus.domain.dto.ErrorResponseDto;
 import com.dkopsidas.octopus.exception.PlayerNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -17,21 +17,21 @@ import java.util.UUID;
 public class GlobalExceptionHandler {
     //jimbi
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .orElse("Validation Failed.");
 
-        ErrorDto errorDto = new ErrorDto(errorMessage);
-        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMessage);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(PlayerNotFoundException.class)
-    public ResponseEntity<ErrorDto> handlePlayerNotFoundException(PlayerNotFoundException ex) {
+    public ResponseEntity<ErrorResponseDto> handlePlayerNotFoundException(PlayerNotFoundException ex) {
         UUID playerNotFoundId = ex.getId();
         String errorMessage = String.format("Player with ID '%s' not found", playerNotFoundId);
-        ErrorDto errorDto = new ErrorDto(errorMessage);
-        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMessage);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 }

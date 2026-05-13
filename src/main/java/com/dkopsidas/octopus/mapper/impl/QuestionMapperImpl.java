@@ -3,7 +3,7 @@ package com.dkopsidas.octopus.mapper.impl;
 import com.dkopsidas.octopus.domain.CreateQuestionRequest;
 import com.dkopsidas.octopus.domain.UpdateQuestionRequest;
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
-import com.dkopsidas.octopus.domain.dto.QuestionDto;
+import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.entity.Question;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
@@ -28,8 +28,8 @@ public class QuestionMapperImpl implements QuestionMapper {
     }
 
     @Override
-    public QuestionDto toDto(Question question) {
-        return new QuestionDto(
+    public QuestionResponseDto toDto(Question question) {
+        return new QuestionResponseDto(
             question.getId(),
             question.getTitle(),
             question.getAnswers(),

@@ -3,7 +3,7 @@ package com.dkopsidas.octopus.mapper.impl;
 import com.dkopsidas.octopus.domain.CreatePlayerRequest;
 import com.dkopsidas.octopus.domain.UpdatePlayerRequest;
 import com.dkopsidas.octopus.domain.dto.CreatePlayerRequestDto;
-import com.dkopsidas.octopus.domain.dto.PlayerDto;
+import com.dkopsidas.octopus.domain.dto.PlayerResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdatePlayerRequestDto;
 import com.dkopsidas.octopus.domain.entity.Player;
 import com.dkopsidas.octopus.mapper.PlayerMapper;
@@ -31,8 +31,8 @@ public class PlayerMapperImpl implements PlayerMapper {
     }
 
     @Override
-    public PlayerDto toDto(Player player) {
-        return new PlayerDto(
+    public PlayerResponseDto toDto(Player player) {
+        return new PlayerResponseDto(
             player.getId(),
             player.getName(),
             player.getPassword(),

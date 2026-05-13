@@ -4,7 +4,7 @@ import com.dkopsidas.octopus.domain.entity.Answer;
 
 import java.util.List;
 
-public record QuestionDto(
+public record QuestionResponseDto(
         Long id,
         String title,
         List<Answer> answers,
