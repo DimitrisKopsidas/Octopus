@@ -17,15 +17,15 @@ public class MulAnswer {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mul_question_id", nullable = false)//column name
-    private MulQuestion mulQuestion;
-
     @Column(name = "title", nullable = false)
     private String title;
 
     @Column(name = "is_correct", nullable = false)
     private boolean isCorrect;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mul_question_id", nullable = false)//column name
+    private MulQuestion mulQuestion;
 
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;

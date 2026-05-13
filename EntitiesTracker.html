@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot Entity Tracker</title>
+</head>
+<body>
+
+<h1>Spring Boot Entity Tracker</h1>
+
+<hr>
+
+<!-- ====================== -->
+<!-- Course Entity -->
+<!-- ====================== -->
+
+<h2>Entity: Course</h2>
+
+<h3>Variables</h3>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>Variable Name</th>
+        <th>Type</th>
+        <th>Annotations / Details</th>
+    </tr>
+
+    <tr>
+        <td>id</td>
+        <td>Long</td>
+        <td>
+            @Id <br>
+            @GeneratedValue <br>
+            @Column(name = "id", updatable = false, nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>name</td>
+        <td>String</td>
+        <td>
+            @Column(name = "name", nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>semester</td>
+        <td>int</td>
+        <td>
+            @Column(name = "semester", nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>mulQuestions</td>
+        <td>List&lt;MulQuestion&gt;</td>
+        <td>
+            @OneToMany(mappedBy = "course")
+        </td>
+    </tr>
+</table>
+
+<h3>Relationships</h3>
+
+<ul>
+    <li>One Course -> Many MulQuestions</li>
+</ul>
+
+<hr>
+
+<!-- ====================== -->
+<!-- MulQuestion Entity -->
+<!-- ====================== -->
+
+<h2>Entity: MulQuestion</h2>
+
+<h3>Variables</h3>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>Variable Name</th>
+        <th>Type</th>
+        <th>Annotations / Details</th>
+    </tr>
+
+    <tr>
+        <td>id</td>
+        <td>Long</td>
+        <td>
+            @Id <br>
+            @GeneratedValue
+        </td>
+    </tr>
+
+    <tr>
+        <td>title</td>
+        <td>String</td>
+        <td>
+            @Column(name = "title", nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>mulAnswers</td>
+        <td>List&lt;MulAnswer&gt;</td>
+        <td>
+            @OneToMany(mappedBy = "mulQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+        </td>
+    </tr>
+
+    <tr>
+        <td>course</td>
+        <td>Course</td>
+        <td>
+            @ManyToOne(fetch = FetchType.LAZY) <br>
+            @JoinColumn(name = "course_id", nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>created</td>
+        <td>Instant</td>
+        <td>
+            @Column(name = "created", updatable = false, nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>updated</td>
+        <td>Instant</td>
+        <td>
+            @Column(name = "updated", nullable = false)
+        </td>
+    </tr>
+</table>
+
+<h3>Relationships</h3>
+
+<ul>
+    <li>Many MulQuestions -> One Course</li>
+    <li>One MulQuestion -> Many MulAnswers</li>
+</ul>
+
+<hr>
+
+<!-- ====================== -->
+<!-- MulAnswer Entity -->
+<!-- ====================== -->
+
+<h2>Entity: MulAnswer</h2>
+
+<h3>Variables</h3>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>Variable Name</th>
+        <th>Type</th>
+        <th>Annotations / Details</th>
+    </tr>
+
+    <tr>
+        <td>id</td>
+        <td>Long</td>
+        <td>
+            @Id <br>
+            @GeneratedValue
+        </td>
+    </tr>
+
+    <tr>
+        <td>title</td>
+        <td>String</td>
+        <td>
+            @Column(name = "title", nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>isCorrect</td>
+        <td>boolean</td>
+        <td>
+            @Column(name = "is_correct", nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>mulQuestion</td>
+        <td>MulQuestion</td>
+        <td>
+            @ManyToOne(fetch = FetchType.LAZY) <br>
+            @JoinColumn(name = "mul_question_id", nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>created</td>
+        <td>Instant</td>
+        <td>
+            @Column(name = "created", updatable = false, nullable = false)
+        </td>
+    </tr>
+
+    <tr>
+        <td>updated</td>
+        <td>Instant</td>
+        <td>
+            @Column(name = "updated", nullable = false)
+        </td>
+    </tr>
+</table>
+
+<h3>Relationships</h3>
+
+<ul>
+    <li>Many MulAnswers -> One MulQuestion</li>
+</ul>
+
+<hr>
+
+<h2>Architecture Notes</h2>
+
+<ul>
+    <li>Course is the parent entity for MulQuestion.</li>
+    <li>MulQuestion is the parent entity for MulAnswer.</li>
+    <li>CascadeType.ALL on MulQuestion -> MulAnswer means answers are saved/deleted automatically with the question.</li>
+    <li>orphanRemoval = true removes answers from the database if removed from the list.</li>
+    <li>FetchType.LAZY delays loading related entities until accessed.</li>
+</ul>
+
+</body>
+</html>

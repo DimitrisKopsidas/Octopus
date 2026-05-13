@@ -2,6 +2,7 @@ package com.dkopsidas.octopus.controller;
 
 import com.dkopsidas.octopus.domain.dto.ErrorDto;
 import com.dkopsidas.octopus.exception.PlayerNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    //jimbo investigate each line and understand it
+    //jimbi
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()

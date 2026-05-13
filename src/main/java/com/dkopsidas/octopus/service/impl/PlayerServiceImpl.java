@@ -7,6 +7,7 @@ import com.dkopsidas.octopus.domain.entity.PlayerType;
 import com.dkopsidas.octopus.exception.PlayerNotFoundException;
 import com.dkopsidas.octopus.repository.PlayerRepository;
 import com.dkopsidas.octopus.service.PlayerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +15,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerRepository playerRepository;
-
-    public PlayerServiceImpl(PlayerRepository playerRepository) {
-        this.playerRepository = playerRepository;
-    }
 
     @Override
     public Player createPlayer(CreatePlayerRequest request) {

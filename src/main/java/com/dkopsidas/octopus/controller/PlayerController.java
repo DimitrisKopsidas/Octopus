@@ -9,6 +9,7 @@ import com.dkopsidas.octopus.domain.entity.Player;
 import com.dkopsidas.octopus.mapper.PlayerMapper;
 import com.dkopsidas.octopus.service.PlayerService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,17 +17,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/api/v1/players")
 public class PlayerController {
 
     private final PlayerService playerService;
     private final PlayerMapper playerMapper;
-
-    public PlayerController(PlayerService playerService, PlayerMapper playerMapper) {
-        this.playerService = playerService;
-        this.playerMapper = playerMapper;
-    }
 
     @PostMapping
     public ResponseEntity<PlayerDto> createPlayer(

@@ -7,7 +7,6 @@ import com.dkopsidas.octopus.domain.dto.PlayerDto;
 import com.dkopsidas.octopus.domain.dto.UpdatePlayerRequestDto;
 import com.dkopsidas.octopus.domain.entity.Player;
 import com.dkopsidas.octopus.mapper.PlayerMapper;
-import org.hibernate.annotations.CollectionIdMutability;
 import org.springframework.stereotype.Component;
 
 @Component
