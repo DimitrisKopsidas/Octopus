@@ -30,12 +30,12 @@ public class Course {//TODO add type
     @OneToMany(mappedBy = "course")//field not column
     private List<MulQuestion> mulQuestions = new ArrayList<>();
 
-    public void addAnswer(MulQuestion a) {
+    public void addQuestion(MulQuestion a) {
         mulQuestions.add(a);
         a.setCourse(this);
     }
 
-    public void removeAnswer(MulQuestion a) {
+    public void removeQuestion(MulQuestion a) {
         mulQuestions.remove(a);
         a.setCourse(null);
     }
