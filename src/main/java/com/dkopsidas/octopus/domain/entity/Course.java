@@ -5,13 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@ToString(exclude = "mulQuestions")
+@ToString(exclude = "questions")
 @Entity
 @Table(name = "course")
 public class Course {//TODO add type
@@ -28,15 +27,15 @@ public class Course {//TODO add type
     private int semester;
 
     @OneToMany(mappedBy = "course")//field not column
-    private List<MulQuestion> mulQuestions = new ArrayList<>();
+    private List<Question> questions = new ArrayList<>();
 
-    public void addQuestion(MulQuestion a) {
-        mulQuestions.add(a);
+    public void addQuestion(Question a) {
+        questions.add(a);
         a.setCourse(this);
     }
 
-    public void removeQuestion(MulQuestion a) {
-        mulQuestions.remove(a);
+    public void removeQuestion(Question a) {
+        questions.remove(a);
         a.setCourse(null);
     }
 }

@@ -1,6 +1,6 @@
 package com.dkopsidas.octopus.domain;
 
-public record UpdateMulQuestionRequest(
+public record UpdateQuestionRequest(
         String title
 ) {
 }

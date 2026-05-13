@@ -53,8 +53,8 @@
     </tr>
 
     <tr>
-        <td>mulQuestions</td>
-        <td>List&lt;MulQuestion&gt;</td>
+        <td>Questions</td>
+        <td>List&lt;Question&gt;</td>
         <td>
             @OneToMany(mappedBy = "course")
         </td>
@@ -64,16 +64,16 @@
 <h3>Relationships</h3>
 
 <ul>
-    <li>One Course -> Many MulQuestions</li>
+    <li>One Course -> Many Questions</li>
 </ul>
 
 <hr>
 
 <!-- ====================== -->
-<!-- MulQuestion Entity -->
+<!-- Question Entity -->
 <!-- ====================== -->
 
-<h2>Entity: MulQuestion</h2>
+<h2>Entity: Question</h2>
 
 <h3>Variables</h3>
 
@@ -102,10 +102,10 @@
     </tr>
 
     <tr>
-        <td>mulAnswers</td>
-        <td>List&lt;MulAnswer&gt;</td>
+        <td>answers</td>
+        <td>List&lt;Answer&gt;</td>
         <td>
-            @OneToMany(mappedBy = "mulQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+            @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
         </td>
     </tr>
 
@@ -138,17 +138,17 @@
 <h3>Relationships</h3>
 
 <ul>
-    <li>Many MulQuestions -> One Course</li>
-    <li>One MulQuestion -> Many MulAnswers</li>
+    <li>Many Questions -> One Course</li>
+    <li>One Question -> Many Answers</li>
 </ul>
 
 <hr>
 
 <!-- ====================== -->
-<!-- MulAnswer Entity -->
+<!-- Answer Entity -->
 <!-- ====================== -->
 
-<h2>Entity: MulAnswer</h2>
+<h2>Entity: Answer</h2>
 
 <h3>Variables</h3>
 
@@ -185,11 +185,11 @@
     </tr>
 
     <tr>
-        <td>mulQuestion</td>
-        <td>MulQuestion</td>
+        <td>question</td>
+        <td>Question</td>
         <td>
             @ManyToOne(fetch = FetchType.LAZY) <br>
-            @JoinColumn(name = "mul_question_id", nullable = false)
+            @JoinColumn(name = "question_id", nullable = false)
         </td>
     </tr>
 
@@ -213,7 +213,7 @@
 <h3>Relationships</h3>
 
 <ul>
-    <li>Many MulAnswers -> One MulQuestion</li>
+    <li>Many Answers -> One Question</li>
 </ul>
 
 <hr>
@@ -221,9 +221,9 @@
 <h2>Architecture Notes</h2>
 
 <ul>
-    <li>Course is the parent entity for MulQuestion.</li>
-    <li>MulQuestion is the parent entity for MulAnswer.</li>
-    <li>CascadeType.ALL on MulQuestion -> MulAnswer means answers are saved/deleted automatically with the question.</li>
+    <li>Course is the parent entity for Question.</li>
+    <li>Question is the parent entity for Answer.</li>
+    <li>CascadeType.ALL on Question -> Answer means answers are saved/deleted automatically with the question.</li>
     <li>orphanRemoval = true removes answers from the database if removed from the list.</li>
     <li>FetchType.LAZY delays loading related entities until accessed.</li>
 </ul>

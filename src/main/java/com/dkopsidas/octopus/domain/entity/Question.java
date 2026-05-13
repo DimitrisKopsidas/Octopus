@@ -2,9 +2,7 @@ package com.dkopsidas.octopus.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,8 +11,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "mul_question")
-public class MulQuestion {
+@Table(name = "question")
+public class Question {
 
     @Id
     @GeneratedValue
@@ -24,11 +22,11 @@ public class MulQuestion {
     private String title;
 
     @OneToMany(
-            mappedBy = "mulQuestion",//field not column
+            mappedBy = "question",//field not column
             cascade = CascadeType.ALL,//Saving a Question also saves its Answers
             orphanRemoval = true//Removing an answer from the list deletes it from DB
     )
-    private List<MulAnswer> mulAnswers = new ArrayList<>();
+    private List<Answer> answers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)//column name
@@ -40,23 +38,23 @@ public class MulQuestion {
     @Column(name = "updated", nullable = false)
     private Instant updated;
 
-    public void addAnswer(MulAnswer a) {
-        mulAnswers.add(a);
-        a.setMulQuestion(this);
+    public void addAnswer(Answer a) {
+        answers.add(a);
+        a.setQuestion(this);
     }
 
-    public void removeAnswer(MulAnswer a) {
-        mulAnswers.remove(a);
-        a.setMulQuestion(null);
+    public void removeAnswer(Answer a) {
+        answers.remove(a);
+        a.setQuestion(null);
     }
 
-    public MulQuestion() {
+    public Question() {
     }
 
-    public MulQuestion(Long id, String title, List<MulAnswer> mulAnswers, Course course, Instant created, Instant updated) {
+    public Question(Long id, String title, List<Answer> answers, Course course, Instant created, Instant updated) {
         this.id = id;
         this.title = title;
-        this.mulAnswers = mulAnswers;
+        this.answers = answers;
         this.course = course;
         this.created = created;
         this.updated = updated;

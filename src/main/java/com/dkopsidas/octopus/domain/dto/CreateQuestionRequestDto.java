@@ -1,19 +1,18 @@
 package com.dkopsidas.octopus.domain.dto;
 
-import com.dkopsidas.octopus.domain.entity.Course;
-import com.dkopsidas.octopus.domain.entity.MulAnswer;
+import com.dkopsidas.octopus.domain.entity.Answer;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
-public record CreateMulQuestionRequestDto(
+public record CreateQuestionRequestDto(
         @NotBlank(message = ERROR_MESSAGE_TITLE_LENGTH)
         @Length(max = 255, message = ERROR_MESSAGE_TITLE_LENGTH)
         String title,
         @Size(min = 3, max = 5, message = ERROR_MESSAGE_ANSWER_COUNT)
-        List<MulAnswer> mulAnswers,
+        List<Answer> answers,
         @NotBlank(message = ERROR_MESSAGE_COURSE_ATTACHED)
         Long courseId
 ) {

@@ -3,15 +3,14 @@ package com.dkopsidas.octopus.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "mul_answer")
-public class MulAnswer {
+@Table(name = "answer")
+public class Answer {
 
     @Id
     @GeneratedValue
@@ -24,8 +23,8 @@ public class MulAnswer {
     private boolean isCorrect;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mul_question_id", nullable = false)//column name
-    private MulQuestion mulQuestion;
+    @JoinColumn(name = "question_id", nullable = false)//column name
+    private Question question;
 
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;

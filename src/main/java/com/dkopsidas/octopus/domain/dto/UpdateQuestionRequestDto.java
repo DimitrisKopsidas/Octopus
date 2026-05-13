@@ -3,7 +3,7 @@ package com.dkopsidas.octopus.domain.dto;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
-public record UpdateMulQuestionRequestDto(
+public record UpdateQuestionRequestDto(
         @NotBlank(message = ERROR_MESSAGE_TITLE_LENGTH)
         @Length(max = 255, message = ERROR_MESSAGE_TITLE_LENGTH)
         String title

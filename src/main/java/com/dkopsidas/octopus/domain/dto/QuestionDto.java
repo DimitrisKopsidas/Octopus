@@ -1,13 +1,13 @@
 package com.dkopsidas.octopus.domain.dto;
 
-import com.dkopsidas.octopus.domain.entity.MulAnswer;
+import com.dkopsidas.octopus.domain.entity.Answer;
 
 import java.util.List;
 
-public record MulQuestionDto(
+public record QuestionDto(
         Long id,
         String title,
-        List<MulAnswer> mulAnswers,
+        List<Answer> answers,
         Long courseId//should this be here or ID? jimbo
 ) {
 }

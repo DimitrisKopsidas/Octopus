@@ -1,5 +1,4 @@
 Bu=Bundle, Qu=Question, An=Answer,
-Mul=Multiple Choice, Mat=Math, The=Theory
 Dark Souls type comments in Qu
 Search by Id
 For theory questions write only keywords and search in list for nouns/keywords matching
@@ -22,5 +21,3 @@ INSERT INTO COURSE(ID,NAME,SEMESTER) VALUES
 (1203, 'Τεχνική Συγγραφή, Παρουσίαση και Ορολογία Ξένης Γλώσσας', 2),
 (1204, 'Σχεδίαση Ψηφιακών Συστημάτων', 2),
 (1205, 'Αντικειμενοστρεφής Προγραμματισμός', 2);
-
-INSERT INTO MULQUESTION
