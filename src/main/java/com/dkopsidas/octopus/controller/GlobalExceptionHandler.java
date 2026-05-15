@@ -1,7 +1,7 @@
 package com.dkopsidas.octopus.controller;
 
 import com.dkopsidas.octopus.domain.dto.ErrorResponseDto;
-import com.dkopsidas.octopus.exception.PlayerNotFoundException;
+import com.dkopsidas.octopus.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -33,5 +33,10 @@ public class GlobalExceptionHandler {
         String errorMessage = String.format("Player with ID '%s' not found", playerNotFoundId);
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMessage);
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SimpleException.class)
+    public ResponseEntity<String> handleSimpleExceptions(SimpleException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }

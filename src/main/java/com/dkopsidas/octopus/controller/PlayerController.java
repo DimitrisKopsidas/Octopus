@@ -53,7 +53,9 @@ public class PlayerController {
         return ResponseEntity.ok(playerResponseDto);
     }
 
-    public ResponseEntity<Void> deletePlayer (@PathVariable UUID playerId) {
+    @DeleteMapping(path = "/{playerId}")
+    public ResponseEntity<Void> deletePlayer (
+            @PathVariable UUID playerId) {
         playerService.deletePlayer(playerId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

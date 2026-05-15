@@ -1,7 +1,7 @@
 package com.dkopsidas.octopus.domain.dto;
 
-import com.dkopsidas.octopus.domain.entity.Answer;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
 
@@ -12,8 +12,8 @@ public record CreateQuestionRequestDto(
         @Length(max = 255, message = ERROR_MESSAGE_TITLE_LENGTH)
         String title,
         @Size(min = 3, max = 5, message = ERROR_MESSAGE_ANSWER_COUNT)
-        List<Answer> answers,
-        @NotBlank(message = ERROR_MESSAGE_COURSE_ATTACHED)
+        List<AnswerRequestDto> answers,
+        @NotNull(message = ERROR_MESSAGE_COURSE_ATTACHED)
         Long courseId
 ) {
     private static final String ERROR_MESSAGE_TITLE_LENGTH = "Title must be between 1 and 255 characters";

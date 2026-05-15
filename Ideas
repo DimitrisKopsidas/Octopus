@@ -10,7 +10,7 @@ For theory questions write only keywords and search in list for nouns/keywords m
 
 
 
-INSERT INTO COURSE(ID,NAME,SEMESTER) VALUES
+INSERT INTO COURSES(ID,NAME,SEMESTER) VALUES
 (1101, 'Μαθηματικά Ι', 1),
 (1102, 'Δομημένος Προγραμματισμός', 1),
 (1103, 'Εισαγωγή στην Επιστήμη των Υπολογιστών', 1),
@@ -22,12 +22,12 @@ INSERT INTO COURSE(ID,NAME,SEMESTER) VALUES
 (1204, 'Σχεδίαση Ψηφιακών Συστημάτων', 2),
 (1205, 'Αντικειμενοστρεφής Προγραμματισμός', 2);
 
-INSERT INTO QUESTIONS (id, course_id, title, created ,updated)
-VALUES (1, 1103, 'What does JVM stand for?', now(), now());
+INSERT INTO QUESTIONS (id,course_id, title,created, updated)
+VALUES (1,1103, 'What does JVM stand for?',now(),now());
 
-INSERT INTO ANSWERS (question_id, title, is_correct, created ,updated)
+INSERT INTO ANSWERS (id, question_id, title, is_correct)
 VALUES
-    (1, 'Java Virtual Machine', true, now(), now()),
-    (1, 'Java Variable Method', false, now(), now()),
-    (1, 'Joint Vector Memory', false, now(), now()),
-    (1, 'Java Vendor Module', false, now(), now());
+    (1, 1, 'Java Virtual Machine', true),
+    (2, 1, 'Java Variable Method', false),
+    (3, 1, 'Joint Vector Memory', false),
+    (4, 1, 'Java Vendor Module', false);

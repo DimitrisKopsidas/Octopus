@@ -1,5 +1,6 @@
 package com.dkopsidas.octopus.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class Question {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @JsonManagedReference
     @OneToMany(
             mappedBy = "question",//field not column
             cascade = CascadeType.ALL,//Saving a Question also saves its Answers
@@ -46,6 +48,11 @@ public class Question {
     public void removeAnswer(Answer a) {
         answers.remove(a);
         a.setQuestion(null);
+    }
+
+    public void replaceAnswers(List<Answer> newAnswers) {
+        this.answers.clear(); // orphanRemoval deletes removed answers from DB
+        newAnswers.forEach(this::addAnswer); // sets back-reference on each
     }
 
     public Question() {

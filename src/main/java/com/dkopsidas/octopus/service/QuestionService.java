@@ -1,19 +1,19 @@
 package com.dkopsidas.octopus.service;
 
-import com.dkopsidas.octopus.domain.CreateQuestionRequest;
-import com.dkopsidas.octopus.domain.UpdateQuestionRequest;
-import com.dkopsidas.octopus.domain.entity.Course;
+import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
+import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
+import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.entity.Question;
 
 import java.util.List;
 
 public interface QuestionService {
 
-    Question createQuestion(CreateQuestionRequest request);
+    QuestionResponseDto createQuestion(CreateQuestionRequestDto dto);
 
-    List<Question> listQuestions(Course course);
+    List<QuestionResponseDto> listQuestions(Long courseId);
 
-    Question updateQuestion(Long questionId, UpdateQuestionRequest request);
+    QuestionResponseDto updateQuestion(Long questionId, UpdateQuestionRequestDto dto);
 
     void deleteQuestion(Long questionId);
 
