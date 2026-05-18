@@ -7,13 +7,13 @@ Version 0.1.0
 - (+) Create repos, service requests, service methods, dto + mapper, endpoints for Course
 - (+) Architecture restructure: Implement MapStruct AND REMOVE CQRS DOMAIN (non DTO request records)
 TODO|-> YouTube MapStruct, check what is to be deleted from wrongly implemented Question and Answer + Refactor 
-- (6) Create repos, service requests, dto + mapper, service methods, endpoints for Question and Answer
+- (+) Create repos, service requests, dto + mapper, service methods, endpoints for Question and Answer
 - (X) Save "pre-made" bundles
 - (X) Create "random" bundle
 
 Version 0.2.0
 [] Implement multiple choice question solving
-- (1) Create Bundle obj
+- (+) Create Bundle obj
 - (2) Create repos, service requests, dto + mapper, service methods, endpoints for Bundle
 - (3) Create service logic for handling correct/wrong answers and saving results of bundle
 
