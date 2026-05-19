@@ -15,8 +15,9 @@ Version 0.2.0
 [] Implement multiple choice question solving
 - (+) Create Bundle obj
 - (+) Rewrite of yml to include index page + addition of Dockerfile for backend + seed data
-- (3) Create repos, service requests, dto + mapper, service methods, endpoints for Bundle +
-- (4) Create service logic for handling correct/wrong answers and saving results of bundle
+- (+) Separation of backend and frontend + incorporation of React
+- (4) Create repos, service requests, dto + mapper, service methods, endpoints for Bundle +
+- (5) Create service logic for handling correct/wrong answers and saving results of bundle
 
 Version 0.3.0
 [] Implement token based session system

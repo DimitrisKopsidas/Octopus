@@ -1,0 +1,11 @@
+Bu=Bundle, Qu=Question, An=Answer,
+Dark Souls type comments in Qu
+Search by Id
+For theory questions write only keywords and search in list for nouns/keywords matching
+
+
+
+git fetch origin
+git reset --hard origin/main
+git clean -fd
+

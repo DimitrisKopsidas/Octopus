@@ -10,13 +10,20 @@ services:
       POSTGRES_PASSWORD: dimitris
 
   backend:
-    build: .
+    build: ./backend
     ports:
       - "8080:8080"
     depends_on:
       - db
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
-
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 
 #old-----------------------------------------------------
