@@ -1,9 +1,106 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { coursesApi } from '../lib/api'
+
 function Admin() {
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [query, setQuery] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    coursesApi.list()
+      .then(data => { if (!cancelled) setCourses(data) })
+      .catch(err => { if (!cancelled) setError(err.message || 'Σφάλμα φόρτωσης') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  const grouped = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const filtered = q
+      ? courses.filter(c => c.name.toLowerCase().includes(q) || String(c.id).includes(q))
+      : courses
+    const bySemester = new Map()
+    for (const course of filtered) {
+      if (!bySemester.has(course.semester)) bySemester.set(course.semester, [])
+      bySemester.get(course.semester).push(course)
+    }
+    return [...bySemester.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([semester, list]) => [semester, [...list].sort((a, b) => a.name.localeCompare(b.name, 'el'))])
+  }, [courses, query])
+
   return (
     <div>
-      <h1 className="text-3xl font-bold text-slate-900 mb-6">Admin dashboard</h1>
-      <p className="text-slate-600">Course list with "Add questions" actions (v0.5.0).</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Πίνακας διαχείρισης</h1>
+        <p className="text-slate-600 dark:text-slate-400">
+          Διάλεξε μάθημα για να προσθέσεις ή να επεξεργαστείς ερωτήσεις.
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Αναζήτηση μαθήματος…"
+          className="w-full max-w-md px-4 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
+        />
+      </div>
+
+      {loading && (
+        <p className="text-slate-500 dark:text-slate-400">Φόρτωση μαθημάτων…</p>
+      )}
+
+      {error && (
+        <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 text-rose-700 dark:text-rose-300">
+          Αδυναμία φόρτωσης μαθημάτων: {error}
+        </div>
+      )}
+
+      {!loading && !error && grouped.length === 0 && (
+        <p className="text-slate-500 dark:text-slate-400">Δεν βρέθηκαν μαθήματα.</p>
+      )}
+
+      <div className="space-y-10">
+        {grouped.map(([semester, list]) => (
+          <section key={semester}>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+              Εξάμηνο {semester}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {list.map(course => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
+  )
+}
+
+function CourseCard({ course }) {
+  return (
+    <Link
+      to={`/admin/courses/${course.id}`}
+      className="group block bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-600 transition-all"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="font-semibold text-slate-900 dark:text-white leading-snug group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors">
+            {course.name}
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Κωδικός: {course.id}
+          </p>
+        </div>
+        <span className="text-brand-600 dark:text-brand-400 text-xl shrink-0">→</span>
+      </div>
+    </Link>
   )
 }
 

@@ -6,6 +6,12 @@ Version 0.1.0
 - ( ) Layout component with top navbar (Home / Courses / Admin)
 - ( ) Page stubs: Home, Courses, CourseStart, Test, Results, Admin, AdminCourse
 - ( ) Home page basic content
+- () Teal+Coral palette as custom Tailwind @theme tokens
+- () Dark mode with localStorage persistence + FOUC-prevention script
+- () Greek translations + lang="el"
+- () Manrope font (Google Fonts, Greek subset)
+- () Reusable BackButton component
+- () Centralized API in lib/api.js (axios instance + namespaced endpoints)
 
 Version 0.2.0
 [] Student test flow (client-side state, no Bundle endpoint yet)
@@ -22,6 +28,7 @@ Version 0.3.0
 - ( ) Single "Add question" form: title + dynamic 3-5 answers + correct flag
 - ( ) Wire POST /api/v1/questions
 - ( ) Edit/delete existing questions (PUT/DELETE)
+- () Reusable Modal component (ESC, backdrop, scroll lock)
 
 Version 0.4.0
 [] Bulk CSV upload
