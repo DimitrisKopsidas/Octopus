@@ -35,6 +35,14 @@ public class QuestionController {
         return ResponseEntity.ok(questionResponseDtos);
     }
 
+    @GetMapping(path = "/{courseId}/count")
+    public ResponseEntity<Long> listQuestionsCount(
+            @PathVariable Long courseId
+    ) {
+        Long count = questionService.countQuestions(courseId);
+        return ResponseEntity.ok(count);
+    }
+
     @PutMapping(path = "/{questionId}")
     public ResponseEntity<QuestionResponseDto> updateQuestion(
             @PathVariable Long questionId,

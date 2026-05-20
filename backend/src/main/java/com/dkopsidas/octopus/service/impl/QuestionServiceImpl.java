@@ -71,4 +71,8 @@ public class QuestionServiceImpl implements QuestionService {
             throw new CorrectAnswerCountException(question.getId());
         }
     }
+
+    public Long countQuestions(Long courseId) {
+        return questionRepository.countByCourseId(courseId);
+    }
 }

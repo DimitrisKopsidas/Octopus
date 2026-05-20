@@ -17,4 +17,6 @@ public interface QuestionService {
 
     void deleteQuestion(Long questionId);
 
+    Long countQuestions(Long courseId);
+
 }
