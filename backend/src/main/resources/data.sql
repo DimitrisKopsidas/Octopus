@@ -93,12 +93,78 @@ INSERT INTO COURSES(ID,NAME,SEMESTER) VALUES
 (1969, 'Γραφικά Υπολογιστών', 9);
 
 
-INSERT INTO QUESTIONS (id,course_id, title,created, updated)
-VALUES (1,1103, 'What does JVM stand for?',now(),now());
+-- Questions for courseId 1103
+INSERT INTO questions (id, title, course_id, created, updated) VALUES
+(1001, 'What is a variable?', 1101, NOW(), NOW()),
+(1002, 'What is the difference between a stack and a queue?', 1101, NOW(), NOW()),
+(1003, 'What does JVM stand for and what does it do?', 1101, NOW(), NOW()),
+(1004, 'What is Big O notation?', 1101, NOW(), NOW()),
+(1005, 'What is encapsulation in OOP?', 1101, NOW(), NOW()),
+(1006, 'What is the difference between a primary key and a foreign key?', 1101, NOW(), NOW()),
+(1007, 'What is inheritance in OOP?', 1101, NOW(), NOW()),
+(1008, 'What is a REST API?', 1101, NOW(), NOW()),
+(1009, 'What is the difference between SQL and NoSQL?', 1101, NOW(), NOW()),
+(10010, 'What is recursion?', 1101, NOW(), NOW());
 
-INSERT INTO ANSWERS (id, question_id, title, is_correct)
-VALUES
-    (1, 1, 'Java Virtual Machine', true),
-    (2, 1, 'Java Variable Method', false),
-    (3, 1, 'Joint Vector Memory', false),
-    (4, 1, 'Java Vendor Module', false);
+-- Answers
+INSERT INTO answers (id, title, is_correct, question_id) VALUES
+-- Question 1: What is a variable?
+(1001,  'A named storage location in memory that holds a value', true,  1),
+(1002,  'A fixed constant that cannot change during execution',  false, 1),
+(1003,  'A function that returns a value',                       false, 1),
+(1004,  'A type of loop used to iterate over data',              false, 1),
+
+-- Question 2: Stack vs Queue
+(1005,  'A stack is LIFO, a queue is FIFO',                      true,  2),
+(1006,  'A stack is FIFO, a queue is LIFO',                      false, 2),
+(1007,  'Both are FIFO data structures',                         false, 2),
+(1008,  'Both are LIFO data structures',                         false, 2),
+
+-- Question 3: JVM
+(1009,  'Java Virtual Machine, executes Java bytecode',          true,  3),
+(1010, 'Java Variable Manager, manages memory allocation',      false, 3),
+(1011, 'Java Version Manager, handles Java installations',      false, 3),
+(1012, 'Java Verification Module, checks code syntax',          false, 3),
+
+-- Question 4: Big O notation
+(1013, 'A way to describe the time and space complexity of an algorithm', true,  4),
+(1014, 'A method for sorting algorithms efficiently',           false, 4),
+(1015, 'A notation for writing mathematical functions',         false, 4),
+(1016, 'A tool for measuring CPU usage of a program',           false, 4),
+
+-- Question 5: Encapsulation
+(1017, 'Bundling data and methods that operate on it into a single unit', true,  5),
+(1018, 'The ability of a class to inherit from multiple classes', false, 5),
+(1019, 'Hiding the implementation of an algorithm',             false, 5),
+(1020, 'A way to overload methods in a class',                  false, 5),
+
+-- Question 6: Primary key vs Foreign key
+(1021, 'A primary key uniquely identifies a row, a foreign key links to another table', true,  6),
+(1022, 'A primary key links tables together, a foreign key identifies a row', false, 6),
+(1023, 'Both are used to uniquely identify rows in a table',    false, 6),
+(1024, 'A foreign key must always match the primary key type',  false, 6),
+
+-- Question 7: Inheritance
+(1025, 'A mechanism where a class acquires properties and methods of another class', true,  7),
+(1026, 'A way to restrict access to class members',             false, 7),
+(1027, 'The process of creating multiple instances of a class', false, 7),
+(1028, 'A design pattern for creating objects',                 false, 7),
+
+-- Question 8: REST API
+(1029, 'An architectural style for building web services using HTTP methods', true,  8),
+(1030, 'A database query language for web applications',        false, 8),
+(1031, 'A JavaScript framework for building web interfaces',    false, 8),
+(1032, 'A protocol for securing web communications',            false, 8),
+
+-- Question 9: SQL vs NoSQL
+(1033, 'SQL is relational and structured, NoSQL is non-relational and flexible', true,  9),
+(1034, 'SQL is faster than NoSQL in all cases',                 false, 9),
+(1035, 'NoSQL databases always use JSON format',                false, 9),
+(1036, 'SQL and NoSQL are both relational database types',      false, 9),
+
+-- Question 10: Recursion
+(1037, 'A function that calls itself until a base case is reached', true,  10),
+(1038, 'A loop that iterates over a collection of items',       false, 10),
+(1039, 'A method for sorting arrays efficiently',               false, 10),
+(1040, 'A way to declare multiple variables at once',           false, 10);
+
