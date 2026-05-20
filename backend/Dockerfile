@@ -11,6 +11,6 @@ RUN chmod +x mvnw && ./mvnw package -DskipTests
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "target/octopus-0.6.0.jar"]
+CMD ["java", "-jar", "target/octopus-0.7.0.jar"]
 
 #jimbi
