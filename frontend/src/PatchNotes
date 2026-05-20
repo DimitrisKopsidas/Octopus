@@ -1,0 +1,55 @@
+Version 0.1.0
+[] Project skeleton + Tailwind + routing
+- ( ) Add Tailwind CSS v4 (via @tailwindcss/vite plugin)
+- ( ) Add react-router-dom
+- ( ) Folder structure: pages/, components/
+- ( ) Layout component with top navbar (Home / Courses / Admin)
+- ( ) Page stubs: Home, Courses, CourseStart, Test, Results, Admin, AdminCourse
+- ( ) Home page basic content
+- () Teal+Coral palette as custom Tailwind @theme tokens
+- () Dark mode with localStorage persistence + FOUC-prevention script
+- () Greek translations + lang="el"
+- () Manrope font (Google Fonts, Greek subset)
+- () Reusable BackButton component
+- () Centralized API in lib/api.js (axios instance + namespaced endpoints)
+
+Version 0.2.0
+[] Student test flow (client-side state, no Bundle endpoint yet)
+- ( ) Courses page: fetch GET /api/v1/courses + grid of cards
+- ( ) CourseStart page: choose number of questions (slider or input 1..max or "All")
+- ( ) Test page: one question at a time + progress bar, fetch GET /api/v1/questions/{courseId}, sample N client-side
+- ( ) Results page: score + per-question review (correct/wrong)
+- ( ) Empty/loading/error states
+
+Version 0.3.0
+[] Admin dashboard (no auth gate yet)
+- ( ) Admin page: list courses with "Add questions" action per course
+- ( ) AdminCourse page: list existing questions + "Add new"
+- ( ) Single "Add question" form: title + dynamic 3-5 answers + correct flag
+- ( ) Wire POST /api/v1/questions
+- ( ) Edit/delete existing questions (PUT/DELETE)
+- () Reusable Modal component (ESC, backdrop, scroll lock)
+
+Version 0.4.0
+[] Bulk CSV upload
+- ( ) CSV format: question,answer1,answer2,answer3,answer4,correctIndex
+- ( ) Upload UI + client-side parse + preview table
+- ( ) Submit N x POST /api/v1/questions with progress
+
+Version 0.5.0
+[] Login / Register pages (depends on backend auth)
+- ( ) Login page
+- ( ) Register page
+- ( ) Auth gate on /admin routes
+
+Version 0.6.0
+[] History / score page
+- ( ) Fetch player history (depends on backend Bundle history endpoint)
+- ( ) List of past attempts with scores
+
+Version 1.0.0
+[] Polish + responsive + error states
+- ( ) Mobile responsive review
+- ( ) Loading skeletons everywhere
+- ( ) Consistent error toasts
+- ( ) Empty states polish
