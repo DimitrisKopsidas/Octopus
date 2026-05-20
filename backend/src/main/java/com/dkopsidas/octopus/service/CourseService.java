@@ -11,4 +11,6 @@ public interface CourseService {
     List<CourseResponseDto> listCourses();
 
     List<CourseResponseDto> listCoursesBySemester(int semester);
+
+    List<CourseResponseDto> listCoursesWithQuestions();
 }

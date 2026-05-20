@@ -1,6 +1,5 @@
 package com.dkopsidas.octopus.repository;
 
-import com.dkopsidas.octopus.domain.entity.Course;
 import com.dkopsidas.octopus.domain.entity.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 

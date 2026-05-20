@@ -27,5 +27,8 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.toDto(courseRepository.findAllBySemester(semester));
     }
 
-
+    @Override
+    public List<CourseResponseDto> listCoursesWithQuestions() {
+        return courseMapper.toDto(courseRepository.findAllByQuestionsIsNotEmpty());
+    }
 }

@@ -26,10 +26,16 @@ public class CourseController {
     }
 
     @GetMapping(path = "/{semester}")
-    public ResponseEntity<List<CourseResponseDto>> listQuestions(
+    public ResponseEntity<List<CourseResponseDto>> listCourses(
             @PathVariable int semester
     ) {
         List<CourseResponseDto> courseResponseDtos = courseService.listCoursesBySemester(semester);
+        return ResponseEntity.ok(courseResponseDtos);
+    }
+
+    @GetMapping(path = "/with-content")
+    public ResponseEntity<List<CourseResponseDto>> listCoursesWithContent() {
+        List<CourseResponseDto> courseResponseDtos = courseService.listCoursesWithQuestions();
         return ResponseEntity.ok(courseResponseDtos);
     }
 }
