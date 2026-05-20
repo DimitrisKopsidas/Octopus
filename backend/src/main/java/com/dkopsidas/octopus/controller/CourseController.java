@@ -2,6 +2,7 @@ package com.dkopsidas.octopus.controller;
 
 
 import com.dkopsidas.octopus.domain.dto.CourseResponseDto;
+import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.entity.Course;
 import com.dkopsidas.octopus.mapper.CourseMapper;
 import com.dkopsidas.octopus.service.CourseService;
@@ -17,12 +18,18 @@ import java.util.List;
 public class CourseController {
 
     private final CourseService courseService;
-    private final CourseMapper courseMapper;
 
     @GetMapping
     public ResponseEntity<List<CourseResponseDto>> listCourses() {
-        List<Course> courses = courseService.listCourses();
-        List<CourseResponseDto> courseResponseDtos = courses.stream().map(courseMapper::toDto).toList();
+        List<CourseResponseDto> courseResponseDtos = courseService.listCourses();
+        return ResponseEntity.ok(courseResponseDtos);
+    }
+
+    @GetMapping(path = "/{semester}")
+    public ResponseEntity<List<CourseResponseDto>> listQuestions(
+            @PathVariable int semester
+    ) {
+        List<CourseResponseDto> courseResponseDtos = courseService.listCoursesBySemester(semester);
         return ResponseEntity.ok(courseResponseDtos);
     }
 }

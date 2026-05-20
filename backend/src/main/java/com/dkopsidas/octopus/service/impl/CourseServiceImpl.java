@@ -1,11 +1,11 @@
 package com.dkopsidas.octopus.service.impl;
 
-import com.dkopsidas.octopus.domain.entity.Course;
+import com.dkopsidas.octopus.domain.dto.CourseResponseDto;
 
+import com.dkopsidas.octopus.mapper.CourseMapper;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.service.CourseService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,9 +15,17 @@ import java.util.List;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
+    private final CourseMapper courseMapper;
 
     @Override
-    public List<Course> listCourses() {
-        return courseRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+    public List<CourseResponseDto> listCourses() {
+        return courseMapper.toDto(courseRepository.findAll());
     }
+
+    @Override
+    public List<CourseResponseDto> listCoursesBySemester(int semester) {
+        return courseMapper.toDto(courseRepository.findAllBySemester(semester));
+    }
+
+
 }
