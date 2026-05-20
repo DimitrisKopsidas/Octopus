@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { coursesApi, questionsApi } from '../lib/api'
 import Modal from '../components/Modal'
+import ConfirmModal from '../components/ConfirmModal'
 import QuestionForm from '../components/QuestionForm'
 import BackButton from '../components/BackButton'
 
@@ -12,7 +13,8 @@ function AdminCourse() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [modalState, setModalState] = useState({ open: false, editing: null })
-  const [deletingId, setDeletingId] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -46,16 +48,26 @@ function AdminCourse() {
     setModalState({ open: false, editing: null })
   }
 
-  async function handleDelete(questionId) {
-    if (!confirm('Διαγραφή ερώτησης;')) return
-    setDeletingId(questionId)
+  function requestDelete(question) {
+    setDeleteTarget(question)
+  }
+
+  function cancelDelete() {
+    if (deleting) return
+    setDeleteTarget(null)
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      await questionsApi.remove(questionId)
-      setQuestions(prev => prev.filter(q => q.id !== questionId))
+      await questionsApi.remove(deleteTarget.id)
+      setQuestions(prev => prev.filter(q => q.id !== deleteTarget.id))
+      setDeleteTarget(null)
     } catch (err) {
       alert('Αποτυχία διαγραφής: ' + (err.message || ''))
     } finally {
-      setDeletingId(null)
+      setDeleting(false)
     }
   }
 
@@ -109,8 +121,8 @@ function AdminCourse() {
             index={idx + 1}
             question={q}
             onEdit={() => openEdit(q)}
-            onDelete={() => handleDelete(q.id)}
-            deleting={deletingId === q.id}
+            onDelete={() => requestDelete(q)}
+            deleting={deleting && deleteTarget?.id === q.id}
           />
         ))}
       </div>
@@ -129,6 +141,32 @@ function AdminCourse() {
           onCancel={closeModal}
         />
       </Modal>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Διαγραφή ερώτησης"
+        message={
+          deleteTarget && (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                Είσαι σίγουρος ότι θες να διαγράψεις την ερώτηση:
+              </p>
+              <p className="text-sm font-medium text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-md px-3 py-2">
+                «{deleteTarget.title}»
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Η ενέργεια δεν αναιρείται.
+              </p>
+            </div>
+          )
+        }
+        confirmLabel="Διαγραφή"
+        cancelLabel="Ακύρωση"
+        variant="danger"
+        confirming={deleting}
+      />
     </div>
   )
 }

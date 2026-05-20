@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { coursesApi } from '../lib/api'
+import ContentBadge from '../components/ContentBadge'
 
 function Admin() {
   const [courses, setCourses] = useState([])
+  const [withContentIds, setWithContentIds] = useState(() => new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [query, setQuery] = useState('')
@@ -14,6 +16,16 @@ function Admin() {
       .then(data => { if (!cancelled) setCourses(data) })
       .catch(err => { if (!cancelled) setError(err.message || 'Σφάλμα φόρτωσης') })
       .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    coursesApi.listWithContent()
+      .then(data => {
+        if (!cancelled) setWithContentIds(new Set(data.map(c => c.id)))
+      })
+      .catch(() => {})
     return () => { cancelled = true }
   }, [])
 
@@ -73,7 +85,11 @@ function Admin() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {list.map(course => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  hasContent={withContentIds.has(course.id)}
+                />
               ))}
             </div>
           </section>
@@ -83,11 +99,11 @@ function Admin() {
   )
 }
 
-function CourseCard({ course }) {
+function CourseCard({ course, hasContent }) {
   return (
     <Link
       to={`/admin/courses/${course.id}`}
-      className="group block bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-600 transition-all"
+      className="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-600 transition-all"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -99,6 +115,9 @@ function CourseCard({ course }) {
           </p>
         </div>
         <span className="text-brand-600 dark:text-brand-400 text-xl shrink-0">→</span>
+      </div>
+      <div className="mt-auto pt-4 flex justify-end">
+        <ContentBadge hasContent={hasContent} />
       </div>
     </Link>
   )

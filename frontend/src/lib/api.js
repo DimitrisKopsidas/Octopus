@@ -12,6 +12,8 @@ function unwrap(promise) {
 
 export const coursesApi = {
   list: () => unwrap(http.get('/courses')),
+  bySemester: (semester) => unwrap(http.get(`/courses/${semester}`)),
+  listWithContent: () => unwrap(http.get('/courses/with-content')),
 }
 
 export const questionsApi = {
