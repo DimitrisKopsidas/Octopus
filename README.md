@@ -1,4 +1,4 @@
-**Octopus, an academic exercise practice tool**
+**Octopus, an online academic exercise practice tool**
 
 The main goal of Octopus is to provide university students a precise and advanced tool for studying and testing their course knowledge.
 
