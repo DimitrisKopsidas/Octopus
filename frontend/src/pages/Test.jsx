@@ -11,31 +11,36 @@ function Test() {
   const sessionCourseId = useTestStore((s) => s.courseId)
   const currentIndex = useTestStore((s) => s.currentIndex)
   const answers = useTestStore((s) => s.answers)
+  const flaggedIds = useTestStore((s) => s.flaggedIds)
   const durationSeconds = useTestStore((s) => s.durationSeconds)
   const startedAt = useTestStore((s) => s.startedAt)
   const courseName = useTestStore((s) => s.courseName)
   const selectAnswer = useTestStore((s) => s.selectAnswer)
+  const clearAnswer = useTestStore((s) => s.clearAnswer)
+  const toggleFlag = useTestStore((s) => s.toggleFlag)
   const goNext = useTestStore((s) => s.goNext)
   const goPrev = useTestStore((s) => s.goPrev)
+  const goTo = useTestStore((s) => s.goTo)
   const finish = useTestStore((s) => s.finish)
   const reset = useTestStore((s) => s.reset)
 
   const [cancelOpen, setCancelOpen] = useState(false)
   const [remaining, setRemaining] = useState(null)
+  const [flash, setFlash] = useState(null) // 'saved' | 'cleared' | null
 
   const hasSession =
     sessionCourseId != null &&
     String(sessionCourseId) === String(courseId) &&
     questions.length > 0
 
-  // Guard: no active session for this course → bounce to start
+  // Guard: no active session → bounce to start
   useEffect(() => {
     if (!hasSession) {
       navigate(`/courses/${courseId}/start`, { replace: true })
     }
   }, [hasSession, courseId, navigate])
 
-  // Countdown timer
+  // Countdown
   useEffect(() => {
     if (!hasSession || !durationSeconds || !startedAt) {
       setRemaining(null)
@@ -60,7 +65,26 @@ function Test() {
   const selectedAnswerId = currentQuestion ? answers[currentQuestion.id] : undefined
   const isFirst = currentIndex === 0
   const isLast = currentIndex === total - 1
+  const isCurrentFlagged = currentQuestion ? flaggedIds.has(currentQuestion.id) : false
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers])
+
+  function handleSelect(questionId, answerId) {
+    selectAnswer(questionId, answerId)
+    setFlash('saved')
+  }
+
+  function handleClear(questionId) {
+    if (answers[questionId] == null) return
+    clearAnswer(questionId)
+    setFlash('cleared')
+  }
+
+  // Clear the flash pill after a short while
+  useEffect(() => {
+    if (!flash) return
+    const id = setTimeout(() => setFlash(null), 1500)
+    return () => clearTimeout(id)
+  }, [flash])
 
   function handleFinish() {
     finish()
@@ -71,6 +95,31 @@ function Test() {
     reset()
     navigate(`/courses/${courseId}/start`, { replace: true })
   }
+
+  // Keyboard shortcuts: arrows for nav, 1-5 to choose, f to flag
+  useEffect(() => {
+    if (!hasSession || !currentQuestion) return
+    function onKey(e) {
+      // Ignore if typing in an input/textarea (none currently, but defensive)
+      const tag = e.target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if (e.key === 'ArrowRight') {
+        if (!isLast) goNext()
+      } else if (e.key === 'ArrowLeft') {
+        if (!isFirst) goPrev()
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFlag(currentQuestion.id)
+      } else if (e.key === '0') {
+        handleClear(currentQuestion.id)
+      } else if (/^[1-5]$/.test(e.key)) {
+        const idx = Number(e.key) - 1
+        const choice = currentQuestion.answers[idx]
+        if (choice) handleSelect(currentQuestion.id, choice.id)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [hasSession, currentQuestion, isFirst, isLast, goNext, goPrev, toggleFlag])
 
   if (!hasSession || !currentQuestion) {
     return null
@@ -102,17 +151,31 @@ function Test() {
         </div>
       </header>
 
-      <div className="mb-6 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+      <div className="mb-4 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
         <div
           className="h-full bg-brand-600 transition-all duration-300"
           style={{ width: `${((currentIndex + 1) / total) * 100}%` }}
         />
       </div>
 
+      <QuestionNavigator
+        questions={questions}
+        currentIndex={currentIndex}
+        answers={answers}
+        flaggedIds={flaggedIds}
+        onJump={goTo}
+      />
+
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8">
-        <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white leading-snug mb-6">
-          {currentQuestion.title}
-        </h2>
+        <div className="flex items-start justify-between gap-3 mb-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white leading-snug">
+            {currentQuestion.title}
+          </h2>
+          <FlagButton
+            flagged={isCurrentFlagged}
+            onToggle={() => toggleFlag(currentQuestion.id)}
+          />
+        </div>
 
         <div className="space-y-2">
           {currentQuestion.answers.map((a, i) => (
@@ -121,9 +184,37 @@ function Test() {
               label={a.title}
               letter={String.fromCharCode(65 + i)}
               selected={selectedAnswerId === a.id}
-              onClick={() => selectAnswer(currentQuestion.id, a.id)}
+              onClick={() => handleSelect(currentQuestion.id, a.id)}
             />
           ))}
+        </div>
+
+        <div className="mt-4 h-5 flex items-center justify-between gap-3">
+          <span className="text-xs inline-flex items-center gap-1.5 min-w-0">
+            {flash === 'saved' && (
+              <span className="text-emerald-700 dark:text-emerald-400 font-medium inline-flex items-center gap-1.5">
+                <span aria-hidden="true">✓</span>
+                Η απάντηση αποθηκεύτηκε
+              </span>
+            )}
+            {flash === 'cleared' && (
+              <span className="text-slate-600 dark:text-slate-400 font-medium inline-flex items-center gap-1.5">
+                <span aria-hidden="true">↺</span>
+                Η επιλογή καθαρίστηκε
+              </span>
+            )}
+          </span>
+          {selectedAnswerId != null && (
+            <button
+              type="button"
+              onClick={() => handleClear(currentQuestion.id)}
+              title="Καθαρισμός επιλογής (0)"
+              className="shrink-0 text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium inline-flex items-center gap-1 transition-colors"
+            >
+              <span aria-hidden="true">×</span>
+              Καθαρισμός επιλογής
+            </button>
+          )}
         </div>
       </div>
 
@@ -166,6 +257,56 @@ function Test() {
         variant="danger"
       />
     </div>
+  )
+}
+
+function QuestionNavigator({ questions, currentIndex, answers, flaggedIds, onJump }) {
+  return (
+    <div className="mb-6 flex flex-wrap gap-1.5">
+      {questions.map((q, i) => {
+        const isCurrent = i === currentIndex
+        const isAnswered = answers[q.id] != null
+        const isFlagged = flaggedIds.has(q.id)
+        return (
+          <button
+            key={q.id}
+            type="button"
+            onClick={() => onJump(i)}
+            aria-label={`Μετάβαση στην ερώτηση ${i + 1}`}
+            aria-current={isCurrent ? 'true' : undefined}
+            className={`relative w-8 h-8 rounded-full text-xs font-semibold transition-all ${
+              isCurrent
+                ? 'bg-brand-600 text-white shadow-sm ring-2 ring-brand-300 dark:ring-brand-700'
+                : isAnswered
+                  ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600'
+            } ${isFlagged ? 'ring-2 ring-amber-400 dark:ring-amber-500 ring-offset-2 ring-offset-slate-50 dark:ring-offset-slate-950' : ''}`}
+          >
+            {i + 1}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function FlagButton({ flagged, onToggle }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={flagged}
+      aria-label={flagged ? 'Αφαίρεση σήμανσης' : 'Σήμανση για επανέλεγχο'}
+      title={flagged ? 'Αφαίρεση σήμανσης (F)' : 'Σήμανση για επανέλεγχο (F)'}
+      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+        flagged
+          ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-amber-700 dark:hover:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700'
+      }`}
+    >
+      <span aria-hidden="true">{flagged ? '🔖' : '🏷'}</span>
+      {flagged ? 'Σημειωμένη' : 'Σημείωση'}
+    </button>
   )
 }
 

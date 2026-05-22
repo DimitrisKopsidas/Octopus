@@ -1,0 +1,102 @@
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
+
+function Login() {
+  const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+  const login = useAuthStore((s) => s.login)
+
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    if (user) navigate('/', { replace: true })
+  }, [user, navigate])
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    if (!username.trim() || !password) {
+      setError('Συμπλήρωσε username και κωδικό.')
+      return
+    }
+    login({ username: username.trim(), password })
+    navigate('/')
+  }
+
+  return (
+    <div className="max-w-md mx-auto py-8">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <header className="text-center px-6 pt-8 pb-5">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/50 text-4xl mb-3">
+            🐙
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Καλώς ήρθες ξανά
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Μπες στον λογαριασμό σου για να συνεχίσεις.
+          </p>
+        </header>
+
+        <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
+          <Field
+            label="Username"
+            value={username}
+            onChange={setUsername}
+            placeholder="π.χ. giorgos"
+            autoFocus
+          />
+          <Field
+            label="Κωδικός"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            placeholder="••••••••"
+          />
+
+          {error && (
+            <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 px-3 py-2 text-sm text-rose-700 dark:text-rose-300">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="w-full px-4 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
+          >
+            Σύνδεση
+          </button>
+        </form>
+
+        <footer className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-center text-sm text-slate-600 dark:text-slate-400">
+          Δεν έχεις λογαριασμό;{' '}
+          <Link to="/register" className="text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">
+            Εγγραφή
+          </Link>
+        </footer>
+      </div>
+    </div>
+  )
+}
+
+function Field({ label, value, onChange, type = 'text', placeholder, autoFocus }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        autoFocus={autoFocus}
+        className="w-full px-3 py-2 rounded-md bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+      />
+    </div>
+  )
+}
+
+export default Login

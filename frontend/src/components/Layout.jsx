@@ -1,5 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
+import UserMenu from './UserMenu'
+import { useAuthStore } from '../store/authStore'
 
 const navLinkClass = ({ isActive }) =>
   `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -9,6 +11,8 @@ const navLinkClass = ({ isActive }) =>
   }`
 
 function Layout() {
+  const user = useAuthStore((s) => s.user)
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <header className="bg-brand-900 dark:bg-brand-950 shadow-lg">
@@ -22,6 +26,16 @@ function Layout() {
             <NavLink to="/courses" className={navLinkClass}>Μαθήματα</NavLink>
             <NavLink to="/admin" className={navLinkClass}>Διαχείριση</NavLink>
             <ThemeToggle />
+            {user ? (
+              <UserMenu />
+            ) : (
+              <NavLink
+                to="/login"
+                className="ml-1 px-3 py-2 rounded-md text-sm font-medium bg-brand-600 text-white hover:bg-brand-500 transition-colors"
+              >
+                Σύνδεση
+              </NavLink>
+            )}
           </div>
         </nav>
       </header>

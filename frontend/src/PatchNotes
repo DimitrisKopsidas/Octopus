@@ -20,6 +20,7 @@ Version 0.2.0
 - ( ) Test page: one question at a time + progress bar, fetch GET /api/v1/questions/{courseId}, sample N client-side
 - ( ) Results page: score + per-question review (correct/wrong)
 - ( ) Empty/loading/error states
+- ( ) Demo Auth state + zustand store
 
 Version 0.3.0
 [] Admin dashboard (no auth gate yet)

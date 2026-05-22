@@ -9,6 +9,7 @@ const initialState = {
   questions: [],
   currentIndex: 0,
   answers: {},           // { [questionId]: answerId }
+  flaggedIds: new Set(), // questionIds flagged for review
   startedAt: null,
   endedAt: null,
 }
@@ -26,6 +27,7 @@ export const useTestStore = create((set) => ({
       questions,
       currentIndex: 0,
       answers: {},
+      flaggedIds: new Set(),
       startedAt: Date.now(),
       endedAt: null,
     }),
@@ -34,6 +36,22 @@ export const useTestStore = create((set) => ({
     set((state) => ({
       answers: { ...state.answers, [questionId]: answerId },
     })),
+
+  clearAnswer: (questionId) =>
+    set((state) => {
+      if (state.answers[questionId] == null) return {}
+      const next = { ...state.answers }
+      delete next[questionId]
+      return { answers: next }
+    }),
+
+  toggleFlag: (questionId) =>
+    set((state) => {
+      const next = new Set(state.flaggedIds)
+      if (next.has(questionId)) next.delete(questionId)
+      else next.add(questionId)
+      return { flaggedIds: next }
+    }),
 
   goNext: () =>
     set((state) => ({
@@ -52,5 +70,5 @@ export const useTestStore = create((set) => ({
 
   finish: () => set({ endedAt: Date.now() }),
 
-  reset: () => set(initialState),
+  reset: () => set({ ...initialState, flaggedIds: new Set() }),
 }))
