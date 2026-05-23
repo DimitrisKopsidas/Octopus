@@ -13,6 +13,7 @@ function Results() {
   const startedAt = useTestStore((s) => s.startedAt)
   const endedAt = useTestStore((s) => s.endedAt)
   const courseName = useTestStore((s) => s.courseName)
+  const setIndex = useTestStore((s) => s.setIndex)
   const reset = useTestStore((s) => s.reset)
 
   const hasResults =
@@ -41,6 +42,27 @@ function Results() {
       durationMs: endedAt && startedAt ? endedAt - startedAt : 0,
     }
   }, [questions, answers, startedAt, endedAt])
+
+  // Persist completed systematic study sets to localStorage
+  useEffect(() => {
+    if (hasResults && setIndex !== null) {
+      try {
+        const saved = localStorage.getItem('octopus_completed_sets')
+        const data = saved ? JSON.parse(saved) : {}
+        if (!data[courseId]) {
+          data[courseId] = {}
+        }
+        data[courseId][setIndex] = {
+          score: correctCount,
+          total: total,
+          date: Date.now(),
+        }
+        localStorage.setItem('octopus_completed_sets', JSON.stringify(data))
+      } catch (e) {
+        console.error('Failed to save set progress', e)
+      }
+    }
+  }, [hasResults, setIndex, courseId, correctCount, total])
 
   function tryAgain() {
     reset()

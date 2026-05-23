@@ -1,41 +1,46 @@
 Version 0.1.0
-[] Project skeleton + Tailwind + routing
-- ( ) Add Tailwind CSS v4 (via @tailwindcss/vite plugin)
-- ( ) Add react-router-dom
-- ( ) Folder structure: pages/, components/
-- ( ) Layout component with top navbar (Home / Courses / Admin)
-- ( ) Page stubs: Home, Courses, CourseStart, Test, Results, Admin, AdminCourse
-- ( ) Home page basic content
-- () Teal+Coral palette as custom Tailwind @theme tokens
-- () Dark mode with localStorage persistence + FOUC-prevention script
-- () Greek translations + lang="el"
-- () Manrope font (Google Fonts, Greek subset)
-- () Reusable BackButton component
-- () Centralized API in lib/api.js (axios instance + namespaced endpoints)
+[x] Project skeleton + Tailwind + routing
+- (x) Add Tailwind CSS v4 (via @tailwindcss/vite plugin)
+- (x) Add react-router-dom
+- (x) Folder structure: pages/, components/
+- (x) Layout component with top navbar (Home / Courses / Admin)
+- (x) Page stubs: Home, Courses, CourseStart, Test, Results, Admin, AdminCourse
+- (x) Home page basic content
+- (x) Teal+Coral palette as custom Tailwind @theme tokens
+- (x) Dark mode with localStorage persistence + FOUC-prevention script
+- (x) Greek translations + lang="el"
+- (x) Manrope font (Google Fonts, Greek subset)
+- (x) Reusable BackButton component
+- (x) Centralized API in lib/api.js (axios instance + namespaced endpoints)
 
 Version 0.2.0
-[] Student test flow (client-side state, no Bundle endpoint yet)
-- ( ) Courses page: fetch GET /api/v1/courses + grid of cards
-- ( ) CourseStart page: choose number of questions (slider or input 1..max or "All")
-- ( ) Test page: one question at a time + progress bar, fetch GET /api/v1/questions/{courseId}, sample N client-side
-- ( ) Results page: score + per-question review (correct/wrong)
-- ( ) Empty/loading/error states
-- ( ) Demo Auth state + zustand store
+[x] Student test flow (client-side state, no Bundle endpoint yet)
+- (x) Courses page: fetch GET /api/v1/courses + grid of cards
+- (x) CourseStart page: choose number of questions (slider or input 1..max or "All")
+- (x) Test page: one question at a time + progress bar, fetch GET /api/v1/questions/{courseId}, sample N client-side
+- (x) Results page: score + per-question review (correct/wrong)
+- (x) Empty/loading/error states
+- (x) Demo Auth state + zustand store
 
 Version 0.3.0
-[] Admin dashboard (no auth gate yet)
-- ( ) Admin page: list courses with "Add questions" action per course
-- ( ) AdminCourse page: list existing questions + "Add new"
-- ( ) Single "Add question" form: title + dynamic 3-5 answers + correct flag
-- ( ) Wire POST /api/v1/questions
-- ( ) Edit/delete existing questions (PUT/DELETE)
-- () Reusable Modal component (ESC, backdrop, scroll lock)
+[x] Admin dashboard (no auth gate yet)
+- (x) Admin page: list courses with "Add questions" action per course
+- (x) AdminCourse page: list existing questions + "Add new"
+- (x) Single "Add question" form: title + dynamic 3-5 answers + correct flag
+- (x) Wire POST /api/v1/questions
+- (x) Edit/delete existing questions (PUT/DELETE)
+- (x) Reusable Modal component (ESC, backdrop, scroll lock)
 
 Version 0.4.0
-[] Bulk CSV upload
-- ( ) CSV format: question,answer1,answer2,answer3,answer4,correctIndex
-- ( ) Upload UI + client-side parse + preview table
-- ( ) Submit N x POST /api/v1/questions with progress
+[x] Systematic Study Mode (Fixed Question Sets) & UX Improvements
+- (x) Add tabbed navigation in CourseStart page (Systematic Study vs Custom Sandbox)
+- (x) Partition questions into fixed sets of 25 (e.g., 25/25/25/15)
+- (x) Systematic Study UI showing set cards with launch actions
+- (x) Track completed sets and coverage progress (completed / total questions) using localStorage
+- (x) Restrict customization in Systematic mode, keep it enabled in Custom Sandbox
+- (x) Educational explanation block for the division logic
+- (x) Multi-priority course sorting (Has Questions -> Semester -> Alphabetical)
+- (x) Responsive "Show More" course pagination (pages of 6) with auto-reset on search/filter changes
 
 Version 0.5.0
 [] Login / Register pages (depends on backend auth)

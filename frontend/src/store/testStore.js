@@ -12,12 +12,13 @@ const initialState = {
   flaggedIds: new Set(), // questionIds flagged for review
   startedAt: null,
   endedAt: null,
+  setIndex: null,        // null for custom test, number (0, 1, 2...) for fixed sets
 }
 
 export const useTestStore = create((set) => ({
   ...initialState,
 
-  startSession: ({ courseId, courseName, count, durationSeconds, order, questions }) =>
+  startSession: ({ courseId, courseName, count, durationSeconds, order, questions, setIndex = null }) =>
     set({
       courseId,
       courseName,
@@ -30,6 +31,7 @@ export const useTestStore = create((set) => ({
       flaggedIds: new Set(),
       startedAt: Date.now(),
       endedAt: null,
+      setIndex,
     }),
 
   selectAnswer: (questionId, answerId) =>

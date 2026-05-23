@@ -23,6 +23,14 @@ function Courses() {
   const [draftSemester, setDraftSemester] = useState('all')
   const [draftOnlyWithContent, setDraftOnlyWithContent] = useState(false)
 
+  // Pagination (UX Show More)
+  const [visibleCount, setVisibleCount] = useState(6)
+
+  // Reset pagination count when search terms or filters change
+  useEffect(() => {
+    setVisibleCount(6)
+  }, [query, semester, onlyWithContent])
+
   useEffect(() => {
     let cancelled = false
     setLoading(true)
@@ -54,7 +62,19 @@ function Courses() {
     return courses
       .filter(c => !onlyWithContent || withContentIds.has(c.id))
       .filter(c => !q || c.name.toLowerCase().includes(q) || String(c.id).includes(q))
-      .sort((a, b) => a.name.localeCompare(b.name, 'el'))
+      .sort((a, b) => {
+        const aHas = withContentIds.has(a.id) ? 1 : 0
+        const bHas = withContentIds.has(b.id) ? 1 : 0
+
+        // Priority 1: Has content (Yes comes before No, descending)
+        if (aHas !== bHas) return bHas - aHas
+
+        // Priority 2: Semester (ascending, e.g. 1st semester before 3rd)
+        if (a.semester !== b.semester) return a.semester - b.semester
+
+        // Priority 3: Alphabetical Greek name sorting
+        return a.name.localeCompare(b.name, 'el')
+      })
   }, [courses, query, onlyWithContent, withContentIds])
 
   const activeFilterCount =
@@ -128,7 +148,7 @@ function Courses() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map(course => {
+        {filtered.slice(0, visibleCount).map(course => {
           const hasContent = withContentIds.has(course.id)
           const disabled = withContentLoaded && !hasContent
           return (
@@ -141,6 +161,19 @@ function Courses() {
           )
         })}
       </div>
+
+      {filtered.length > visibleCount && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setVisibleCount(prev => prev + 6)}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-semibold hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-white shadow-sm transition-all cursor-pointer group"
+          >
+            <span>Εμφάνιση περισσότερων</span>
+            <span aria-hidden="true" className="text-xs transition-transform group-hover:translate-y-0.5">▼</span>
+          </button>
+        </div>
+      )}
 
       <Modal
         open={filterOpen}
