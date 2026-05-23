@@ -91,7 +91,7 @@ function AdminCourse() {
         <button
           type="button"
           onClick={openCreate}
-          className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium transition-colors shadow-sm"
+          className="ml-auto px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium transition-colors shadow-sm"
         >
           + Νέα ερώτηση
         </button>

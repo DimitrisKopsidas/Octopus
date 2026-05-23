@@ -36,20 +36,8 @@ function CourseStart() {
   const [count, setCount] = useState(10)
   const [durationSeconds, setDurationSeconds] = useState(null)
 
-  // Local storage persistence of completed systematic study sets
-  const [completedSets, setCompletedSets] = useState({})
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('octopus_completed_sets')
-      if (saved) {
-        const data = JSON.parse(saved)
-        setCompletedSets(data[courseId] || {})
-      }
-    } catch (e) {
-      console.error('Failed to load completed sets', e)
-    }
-  }, [courseId])
+  // Completed sets will come from the user model (backend) — interface only for now.
+  const completedSets = {}
 
   useEffect(() => {
     let cancelled = false
@@ -182,8 +170,8 @@ function CourseStart() {
       )}
 
       {!loading && !error && max > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          <div className="md:col-span-2 space-y-6">
             
             {/* Tabs for Systematic Study vs Custom Sandbox */}
             <div className="flex border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl p-1 gap-1">
@@ -219,7 +207,7 @@ function CourseStart() {
                   <h3 className="font-semibold text-brand-900 dark:text-brand-300 text-sm mb-1">
                     💡 Πώς λειτουργεί η Συστηματική Μελέτη;
                   </h3>
-                  <p className="text-xs text-brand-850 dark:text-brand-400 leading-relaxed">
+                  <p className="text-xs text-brand-800 dark:text-brand-400 leading-relaxed">
                     Η τελική εξέταση του μαθήματος αποτελείται από 25 ερωτήσεις. Χωρίσαμε τις συνολικά <strong>{max}</strong> ερωτήσεις του μαθήματος σε <strong>{totalSets}</strong> σταθερά, μη-επικαλυπτόμενα σετ. Ολοκληρώνοντας όλα τα σετ, εξασφαλίζεις ότι έχεις δει το <strong>100% της ύλης</strong>, χωρίς τυχαίες παραλείψεις ή επαναλήψεις!
                   </p>
                 </div>
@@ -256,8 +244,8 @@ function CourseStart() {
                         key={set.index}
                         className={`flex flex-col rounded-lg border p-4 shadow-sm transition-all ${
                           completed
-                            ? 'bg-slate-50/50 dark:bg-slate-900/30 border-slate-250 dark:border-slate-800'
-                            : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-850 hover:border-brand-300 dark:hover:border-brand-700'
+                            ? 'bg-slate-50/50 dark:bg-slate-900/30 border-slate-300 dark:border-slate-800'
+                            : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-700'
                         }`}
                       >
                         <div className="flex items-start justify-between mb-3">
@@ -270,7 +258,7 @@ function CourseStart() {
                             </p>
                           </div>
                           {completed && (
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-450 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
                               ✓ {completed.score}/{completed.total}
                             </span>
                           )}

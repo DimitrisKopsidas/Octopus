@@ -32,9 +32,10 @@ Version 0.3.0
 - (x) Reusable Modal component (ESC, backdrop, scroll lock)
 
 Version 0.4.0
-[x] Systematic Study Mode (Fixed Question Sets) & UX Improvements
+[x] Systematic Study Mode (Fixed Question Sets) & UX/UI Improvements
 - (x) Add tabbed navigation in CourseStart page (Systematic Study vs Custom Sandbox)
 - (x) Partition questions into fixed sets of 25 (e.g., 25/25/25/15)
+- (x) Mobile hamburger drawer with sliding sidebar, backdrop, scroll lock, auto-close
 - (x) Systematic Study UI showing set cards with launch actions
 - (x) Track completed sets and coverage progress (completed / total questions) using localStorage
 - (x) Restrict customization in Systematic mode, keep it enabled in Custom Sandbox
@@ -42,16 +43,29 @@ Version 0.4.0
 - (x) Multi-priority course sorting (Has Questions -> Semester -> Alphabetical)
 - (x) Responsive "Show More" course pagination (pages of 6) with auto-reset on search/filter changes
 
+
 Version 0.5.0
-[] Login / Register pages (depends on backend auth)
-- ( ) Login page
-- ( ) Register page
-- ( ) Auth gate on /admin routes
+[] Demo auth interface (no backend yet)
+- (x) Zustand authStore (in-memory only — interface scaffold)
+- (x) /login page with octopus-branded header
+- (x) /register page with role picker + conditional Helper code field (alphanumeric)
+- (x) UserMenu dropdown in navbar (avatar, displayName, role, logout)
+- (x) "Σύνδεση" CTA in navbar when logged out
 
 Version 0.6.0
+[] Real auth wiring (depends on backend endpoints)
+- ( ) httpOnly cookie session via /auth/login, /auth/register, /auth/me, /auth/logout
+- ( ) Add withCredentials to axios instance
+- ( ) authStore actions become real API calls + bootstrap() on app load
+- ( ) RequireAuth / RequireRole route guards
+- ( ) Vite dev proxy /api -> :8080 (avoid CORS pain in dev)
+- ( ) Hide /admin nav link for non-helpers
+
+Version 0.7.0
 [] History / score page
 - ( ) Fetch player history (depends on backend Bundle history endpoint)
 - ( ) List of past attempts with scores
+- ( ) Per-user completed-sets restored from backend (replaces removed localStorage)
 
 Version 1.0.0
 [] Polish + responsive + error states

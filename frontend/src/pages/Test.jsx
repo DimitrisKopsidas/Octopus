@@ -262,7 +262,7 @@ function Test() {
 
 function QuestionNavigator({ questions, currentIndex, answers, flaggedIds, onJump }) {
   return (
-    <div className="mb-6 flex flex-wrap gap-1.5">
+    <div className="mb-6 max-h-28 overflow-y-auto flex flex-wrap gap-1.5">
       {questions.map((q, i) => {
         const isCurrent = i === currentIndex
         const isAnswered = answers[q.id] != null
