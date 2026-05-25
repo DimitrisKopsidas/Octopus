@@ -2,6 +2,7 @@ package com.dkopsidas.octopus.service;
 
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
+import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.entity.Question;
 
@@ -17,6 +18,5 @@ public interface QuestionService {
 
     void deleteQuestion(Long questionId);
 
-    Long countQuestions(Long courseId);
-
+    SettingsInfoResponseDto listSettingsInfo(Long courseId);
 }

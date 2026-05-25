@@ -1,4 +1,4 @@
-package com.dkopsidas.octopus.domain;
+package com.dkopsidas.octopus.domain;//TODO REMOVE
 
 public record CreatePlayerRequest(
         String name,

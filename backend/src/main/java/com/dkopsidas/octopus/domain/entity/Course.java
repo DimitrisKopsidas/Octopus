@@ -13,7 +13,7 @@ import java.util.List;
 @ToString(exclude = "questions")
 @Entity
 @Table(name = "courses")
-public class Course {//TODO add type
+public class Course {
 
     @Id
     @GeneratedValue
@@ -28,6 +28,9 @@ public class Course {//TODO add type
 
     @OneToMany(mappedBy = "course")//field not column
     private List<Question> questions = new ArrayList<>();
+
+    @Column(name = "setQuestionCount", nullable = false)
+    private int setQuestionCount;
 
     public void addQuestion(Question a) {
         questions.add(a);

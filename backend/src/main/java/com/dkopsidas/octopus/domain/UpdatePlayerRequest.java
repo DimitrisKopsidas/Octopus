@@ -1,4 +1,4 @@
-package com.dkopsidas.octopus.domain;
+package com.dkopsidas.octopus.domain;//TODO REMOVE
 
 import com.dkopsidas.octopus.domain.entity.PlayerType;
 

@@ -2,6 +2,7 @@ package com.dkopsidas.octopus.controller;
 
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
+import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.service.QuestionService;
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    @PostMapping
+    @PostMapping //CREATE QUESTION
     public ResponseEntity<QuestionResponseDto> createQuestion(
             @Valid @RequestBody CreateQuestionRequestDto createQuestionRequestDto
     ) {
@@ -27,7 +28,7 @@ public class QuestionController {
         return new ResponseEntity<>(createdQuestion, HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/{courseId}")
+    @GetMapping(path = "/{courseId}") //GET ALL QUESTIONS OF COURSE
     public ResponseEntity<List<QuestionResponseDto>> listQuestions(
             @PathVariable Long courseId
     ) {
@@ -35,12 +36,12 @@ public class QuestionController {
         return ResponseEntity.ok(questionResponseDtos);
     }
 
-    @GetMapping(path = "/{courseId}/count")
-    public ResponseEntity<Long> listQuestionsCount(
+    @GetMapping(path = "/{courseId}/info")//GET INFORMATION NEEDED FOR SANDBOX SETTINGS
+    public ResponseEntity<SettingsInfoResponseDto> listQuestionsCount(
             @PathVariable Long courseId
     ) {
-        Long count = questionService.countQuestions(courseId);
-        return ResponseEntity.ok(count);
+        SettingsInfoResponseDto settingsInfoResponseDto = questionService.listSettingsInfo(courseId);
+        return ResponseEntity.ok(settingsInfoResponseDto);
     }
 
     @PutMapping(path = "/{questionId}")

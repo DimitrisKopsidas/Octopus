@@ -1,5 +1,6 @@
 package com.dkopsidas.octopus.service.impl;
 
+import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
 import com.dkopsidas.octopus.domain.entity.Answer;
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
@@ -62,6 +63,16 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.deleteById(questionId);
     }
 
+    @Override
+    public SettingsInfoResponseDto listSettingsInfo(Long courseId) {
+        Course courseFromDto = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFoundException(courseId));
+
+        return new SettingsInfoResponseDto(
+                questionRepository.countByCourseId(courseId),
+                courseFromDto.getSetQuestionCount()
+        );
+    }
+
     private void checkCorrectAnswerCount(Question question) {
         long correctCount = question.getAnswers().stream()
                 .filter(Answer::getIsCorrect)
@@ -70,9 +81,5 @@ public class QuestionServiceImpl implements QuestionService {
         if (correctCount != 1) {
             throw new CorrectAnswerCountException(question.getId());
         }
-    }
-
-    public Long countQuestions(Long courseId) {
-        return questionRepository.countByCourseId(courseId);
     }
 }
