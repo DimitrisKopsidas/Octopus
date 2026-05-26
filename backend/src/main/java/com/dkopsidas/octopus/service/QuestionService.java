@@ -4,7 +4,6 @@ import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
-import com.dkopsidas.octopus.domain.entity.Question;
 
 import java.util.List;
 
@@ -20,5 +19,7 @@ public interface QuestionService {
 
     SettingsInfoResponseDto listSettingsInfo(Long courseId);
 
-    List<QuestionResponseDto> listQuestionsByQuestionSet(Long courseId, Integer setNum);
+    List<QuestionResponseDto> listQuestionsBySetNum(Long courseId, Integer setNum);
+
+    List<QuestionResponseDto> listQuestionsByRandomCount(Long courseId, Integer randomCount);
 }

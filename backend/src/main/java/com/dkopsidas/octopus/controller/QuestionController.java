@@ -29,11 +29,20 @@ public class QuestionController {
     }
 
     @GetMapping(path = "/{courseId}/setNum={setNum}")
-    public ResponseEntity<List<QuestionResponseDto>> listQuestionsByQuestionSet(
+    public ResponseEntity<List<QuestionResponseDto>> listQuestionsBySetNum(
             @PathVariable Long courseId,
             @PathVariable Integer setNum
     ) {
-        List<QuestionResponseDto> questionResponseDtos = questionService.listQuestionsByQuestionSet(courseId, setNum);
+        List<QuestionResponseDto> questionResponseDtos = questionService.listQuestionsBySetNum(courseId, setNum);
+        return ResponseEntity.ok(questionResponseDtos);
+    }
+
+    @GetMapping(path = "/{courseId}/randomCount={randomCount}")
+    public ResponseEntity<List<QuestionResponseDto>> listQuestionsByRandomCount(
+            @PathVariable Long courseId,
+            @PathVariable Integer randomCount
+    ) {
+        List<QuestionResponseDto> questionResponseDtos = questionService.listQuestionsByRandomCount(courseId, randomCount);
         return ResponseEntity.ok(questionResponseDtos);
     }
 

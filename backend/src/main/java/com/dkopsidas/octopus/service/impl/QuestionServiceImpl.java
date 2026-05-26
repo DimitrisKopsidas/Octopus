@@ -76,7 +76,7 @@ public class QuestionServiceImpl implements QuestionService {
         );
     }
 
-    public List<QuestionResponseDto> listQuestionsByQuestionSet(Long courseId, Integer setNum) {
+    public List<QuestionResponseDto> listQuestionsBySetNum(Long courseId, Integer setNum) {
         Course courseFromDto = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(courseId));
 
@@ -91,7 +91,22 @@ public class QuestionServiceImpl implements QuestionService {
 
         int toIndex = Math.min(fromIndex + setSize, allQuestions.size());
 
-        return scrambleQuestions(questionMapper.toDto(allQuestions.subList(fromIndex, toIndex)));
+        return questionMapper.toDto(scrambleQuestions(allQuestions.subList(fromIndex, toIndex)));
+    }
+
+    @Override
+    public List<QuestionResponseDto> listQuestionsByRandomCount(Long courseId, Integer randomCount) {
+        Course courseFromDto = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
+
+        List<Question> allQuestions = questionRepository.findAllByCourseId(courseId);
+
+        if (randomCount > allQuestions.size())
+            throw new SimpleException("Random count: " + randomCount + " exceeds the total question count for this course");
+
+        allQuestions = scrambleQuestions(allQuestions);
+
+        return questionMapper.toDto(allQuestions.subList(0, randomCount));
     }
 
     private void checkCorrectAnswerCount(Question question) {
@@ -104,8 +119,8 @@ public class QuestionServiceImpl implements QuestionService {
         }
     }
 
-    public List<QuestionResponseDto> scrambleQuestions(List<QuestionResponseDto> questions) {
-        List<QuestionResponseDto> scrambled = new ArrayList<>(questions);
+    public List<Question> scrambleQuestions(List<Question> questions) {
+        List<Question> scrambled = new ArrayList<>(questions);
         Collections.shuffle(scrambled);
         return scrambled;
     }
