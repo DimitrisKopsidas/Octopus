@@ -19,4 +19,6 @@ public interface QuestionService {
     void deleteQuestion(Long questionId);
 
     SettingsInfoResponseDto listSettingsInfo(Long courseId);
+
+    List<QuestionResponseDto> listQuestionsByQuestionSet(Long courseId, Integer setNum);
 }

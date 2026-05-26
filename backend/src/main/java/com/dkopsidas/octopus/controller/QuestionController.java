@@ -20,6 +20,24 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
+    @GetMapping(path = "/{courseId}/info")//GET INFORMATION NEEDED FOR SANDBOX SETTINGS
+    public ResponseEntity<SettingsInfoResponseDto> listSettingsInfo(
+            @PathVariable Long courseId
+    ) {
+        SettingsInfoResponseDto settingsInfoResponseDto = questionService.listSettingsInfo(courseId);
+        return ResponseEntity.ok(settingsInfoResponseDto);
+    }
+
+    @GetMapping(path = "/{courseId}/setNum={setNum}")
+    public ResponseEntity<List<QuestionResponseDto>> listQuestionsByQuestionSet(
+            @PathVariable Long courseId,
+            @PathVariable Integer setNum
+    ) {
+        List<QuestionResponseDto> questionResponseDtos = questionService.listQuestionsByQuestionSet(courseId, setNum);
+        return ResponseEntity.ok(questionResponseDtos);
+    }
+
+    //BASIC CRUD---------------------------------------------------------------------------------------
     @PostMapping //CREATE QUESTION
     public ResponseEntity<QuestionResponseDto> createQuestion(
             @Valid @RequestBody CreateQuestionRequestDto createQuestionRequestDto
@@ -34,14 +52,6 @@ public class QuestionController {
     ) {
         List<QuestionResponseDto> questionResponseDtos = questionService.listQuestions(courseId);
         return ResponseEntity.ok(questionResponseDtos);
-    }
-
-    @GetMapping(path = "/{courseId}/info")//GET INFORMATION NEEDED FOR SANDBOX SETTINGS
-    public ResponseEntity<SettingsInfoResponseDto> listQuestionsCount(
-            @PathVariable Long courseId
-    ) {
-        SettingsInfoResponseDto settingsInfoResponseDto = questionService.listSettingsInfo(courseId);
-        return ResponseEntity.ok(settingsInfoResponseDto);
     }
 
     @PutMapping(path = "/{questionId}")

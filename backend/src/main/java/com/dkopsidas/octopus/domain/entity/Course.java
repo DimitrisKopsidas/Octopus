@@ -29,8 +29,8 @@ public class Course {
     @OneToMany(mappedBy = "course")//field not column
     private List<Question> questions = new ArrayList<>();
 
-    @Column(name = "setQuestionCount", nullable = false)
-    private int setQuestionCount;
+    @Column(name = "questionSetSize", nullable = false)
+    private int questionSetSize;
 
     public void addQuestion(Question a) {
         questions.add(a);

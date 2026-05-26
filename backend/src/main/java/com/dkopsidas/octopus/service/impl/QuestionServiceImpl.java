@@ -10,15 +10,16 @@ import com.dkopsidas.octopus.domain.entity.Question;
 import com.dkopsidas.octopus.exception.CorrectAnswerCountException;
 import com.dkopsidas.octopus.exception.CourseNotFoundException;
 import com.dkopsidas.octopus.exception.QuestionNotFoundException;
+import com.dkopsidas.octopus.exception.SimpleException;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.QuestionRepository;
 import com.dkopsidas.octopus.service.QuestionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -31,7 +32,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponseDto createQuestion(CreateQuestionRequestDto createRequest) {
-        Course courseFromDto = courseRepository.findById(createRequest.courseId()).orElseThrow(() -> new CourseNotFoundException(createRequest.courseId()));
+        Course courseFromDto = courseRepository.findById(createRequest.courseId()).
+                orElseThrow(() -> new CourseNotFoundException(createRequest.courseId()));
 
         Question question = questionMapper.toEntity(createRequest, courseFromDto);
 
@@ -47,7 +49,8 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponseDto updateQuestion(Long questionId, UpdateQuestionRequestDto updateRequest) {
-        Question question = questionRepository.findById(questionId).orElseThrow(() -> new QuestionNotFoundException(questionId));
+        Question question = questionRepository.findById(questionId).
+                orElseThrow(() -> new QuestionNotFoundException(questionId));
         Question questionFromDto = questionMapper.toEntity(updateRequest);
 
         checkCorrectAnswerCount(questionFromDto);
@@ -69,8 +72,26 @@ public class QuestionServiceImpl implements QuestionService {
 
         return new SettingsInfoResponseDto(
                 questionRepository.countByCourseId(courseId),
-                courseFromDto.getSetQuestionCount()
+                courseFromDto.getQuestionSetSize()
         );
+    }
+
+    public List<QuestionResponseDto> listQuestionsByQuestionSet(Long courseId, Integer setNum) {
+        Course courseFromDto = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
+
+        int setSize = courseFromDto.getQuestionSetSize();
+        int fromIndex = setNum * setSize;
+
+        List<Question> allQuestions = questionRepository.findAllByCourseId(courseId);
+
+        if (fromIndex >= allQuestions.size()) {
+            throw new SimpleException("Set number " + setNum + " does not exist for this course");
+        }
+
+        int toIndex = Math.min(fromIndex + setSize, allQuestions.size());
+
+        return scrambleQuestions(questionMapper.toDto(allQuestions.subList(fromIndex, toIndex)));
     }
 
     private void checkCorrectAnswerCount(Question question) {
@@ -81,5 +102,11 @@ public class QuestionServiceImpl implements QuestionService {
         if (correctCount != 1) {
             throw new CorrectAnswerCountException(question.getId());
         }
+    }
+
+    public List<QuestionResponseDto> scrambleQuestions(List<QuestionResponseDto> questions) {
+        List<QuestionResponseDto> scrambled = new ArrayList<>(questions);
+        Collections.shuffle(scrambled);
+        return scrambled;
     }
 }

@@ -19,12 +19,6 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @GetMapping
-    public ResponseEntity<List<CourseResponseDto>> listCourses() {
-        List<CourseResponseDto> courseResponseDtos = courseService.listCourses();
-        return ResponseEntity.ok(courseResponseDtos);
-    }
-
     @GetMapping(path = "/{semester}")
     public ResponseEntity<List<CourseResponseDto>> listCourses(
             @PathVariable int semester
@@ -36,6 +30,13 @@ public class CourseController {
     @GetMapping(path = "/with-content")
     public ResponseEntity<List<CourseResponseDto>> listCoursesWithContent() {
         List<CourseResponseDto> courseResponseDtos = courseService.listCoursesWithQuestions();
+        return ResponseEntity.ok(courseResponseDtos);
+    }
+
+    //BASIC CRUD---------------------------------------------------------------------------------------
+    @GetMapping
+    public ResponseEntity<List<CourseResponseDto>> listCourses() {
+        List<CourseResponseDto> courseResponseDtos = courseService.listCourses();
         return ResponseEntity.ok(courseResponseDtos);
     }
 }

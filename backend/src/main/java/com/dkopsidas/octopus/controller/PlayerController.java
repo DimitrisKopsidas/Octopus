@@ -25,6 +25,7 @@ public class PlayerController {
     private final PlayerService playerService;
     private final PlayerMapper playerMapper;
 
+    //BASIC CRUD---------------------------------------------------------------------------------------
     @PostMapping
     public ResponseEntity<PlayerResponseDto> createPlayer(
             @Valid @RequestBody CreatePlayerRequestDto createPlayerRequestDto
