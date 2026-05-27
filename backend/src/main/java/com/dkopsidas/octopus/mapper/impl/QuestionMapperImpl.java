@@ -8,8 +8,6 @@ import com.dkopsidas.octopus.domain.entity.Answer;
 import com.dkopsidas.octopus.domain.entity.Course;
 import com.dkopsidas.octopus.domain.entity.Question;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
-import com.dkopsidas.octopus.repository.CourseRepository;
-import com.dkopsidas.octopus.repository.PlayerRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
