@@ -45,11 +45,6 @@ public class Question {
         a.setQuestion(this);
     }
 
-    public void removeAnswer(Answer a) {
-        answers.remove(a);
-        a.setQuestion(null);
-    }
-
     public void replaceAnswers(List<Answer> newAnswers) {
         this.answers.clear(); // orphanRemoval deletes removed answers from DB
         newAnswers.forEach(this::addAnswer); // sets back-reference on each
