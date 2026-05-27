@@ -32,6 +32,9 @@ public class Course {
     @Column(name = "questionSetSize", nullable = false)
     private int questionSetSize;
 
+    @Column(name = "defaultTimerMinutes", nullable = false)
+    private int defaultTimerMinutes;
+
     public void addQuestion(Question a) {
         questions.add(a);
         a.setCourse(this);

@@ -72,7 +72,8 @@ public class QuestionServiceImpl implements QuestionService {
 
         return new SettingsInfoResponseDto(
                 questionRepository.countByCourseId(courseId),
-                courseFromDto.getQuestionSetSize()
+                courseFromDto.getQuestionSetSize(),
+                courseFromDto.getDefaultTimerMinutes()
         );
     }
 

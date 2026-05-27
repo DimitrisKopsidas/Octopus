@@ -1,6 +1,7 @@
 package com.dkopsidas.octopus.service;
 
 import com.dkopsidas.octopus.domain.dto.CourseResponseDto;
+import com.dkopsidas.octopus.domain.dto.UpdateCourseRequestDto;
 import com.dkopsidas.octopus.domain.entity.Course;
 
 
@@ -13,4 +14,6 @@ public interface CourseService {
     List<CourseResponseDto> listCoursesBySemester(int semester);
 
     List<CourseResponseDto> listCoursesWithQuestions();
+
+    CourseResponseDto updateCourse(Long courseId, UpdateCourseRequestDto dto);
 }
