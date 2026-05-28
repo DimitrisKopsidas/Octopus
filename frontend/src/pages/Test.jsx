@@ -14,6 +14,7 @@ function Test() {
   const flaggedIds = useTestStore((s) => s.flaggedIds)
   const durationSeconds = useTestStore((s) => s.durationSeconds)
   const startedAt = useTestStore((s) => s.startedAt)
+  const endedAt = useTestStore((s) => s.endedAt)
   const courseName = useTestStore((s) => s.courseName)
   const selectAnswer = useTestStore((s) => s.selectAnswer)
   const clearAnswer = useTestStore((s) => s.clearAnswer)
@@ -33,12 +34,14 @@ function Test() {
     String(sessionCourseId) === String(courseId) &&
     questions.length > 0
 
-  // Guard: no active session → bounce to start
+  // Guards: no active session → start; refreshed after finish → results
   useEffect(() => {
     if (!hasSession) {
       navigate(`/courses/${courseId}/start`, { replace: true })
+    } else if (endedAt) {
+      navigate(`/test/${courseId}/results`, { replace: true })
     }
-  }, [hasSession, courseId, navigate])
+  }, [hasSession, endedAt, courseId, navigate])
 
   // Countdown
   useEffect(() => {

@@ -43,6 +43,15 @@ Version 0.4.0
 - (x) Multi-priority course sorting (Has Questions -> Semester -> Alphabetical)
 - (x) Responsive "Show More" course pagination (pages of 6) with auto-reset on search/filter changes
 
+Version 0.4.2
+[x] Backend integration: quiz endpoints, course settings, bundle persistence
+- (x) Wire 5 new endpoints in lib/api.js: coursesApi.update, questionsApi.settingsInfo / bySetNum / byRandomCount, bundlesApi.create
+- (x) Refactor CourseStart to use settingsInfo (drop fetch-all-questions); SET_SIZE and default timer pulled from backend per course
+- (x) On-demand question fetching: bySetNum on systematic set start, byRandomCount on custom sandbox start
+- (x) Display defaultTimerMinutes inside each systematic set card (⏱ N λεπτά)
+- (x) Submit bundle to backend on Results page (POST /bundles with setNum + answerIds, once per session via useRef guard)
+- (x) AdminCourse sub-header shows current settings (σετ N · χρόνος N′)
+- (x) sessionStorage persistence for test session via Zustand persist middleware (refresh-safe within a tab; custom Set ↔ Array serialization for flaggedIds)
 
 Version 0.5.0
 [] Demo auth interface (no backend yet)

@@ -10,13 +10,23 @@ export const coursesApi = {
   list: () => unwrap(http.get('/courses')),
   bySemester: (semester) => unwrap(http.get(`/courses/${semester}`)),
   listWithContent: () => unwrap(http.get('/courses/with-content')),
+  update: (id, payload) => unwrap(http.put(`/courses/${id}`, payload)),
 }
 
 export const questionsApi = {
   listByCourse: (courseId) => unwrap(http.get(`/questions/${courseId}`)),
+  settingsInfo: (courseId) => unwrap(http.get(`/questions/${courseId}/info`)),
+  bySetNum: (courseId, setNum) =>
+    unwrap(http.get(`/questions/${courseId}/setNum=${setNum}`)),
+  byRandomCount: (courseId, count) =>
+    unwrap(http.get(`/questions/${courseId}/randomCount=${count}`)),
   create: (payload) => unwrap(http.post('/questions', payload)),
   update: (id, payload) => unwrap(http.put(`/questions/${id}`, payload)),
   remove: (id) => http.delete(`/questions/${id}`),
 }
 
-export default { coursesApi, questionsApi }
+export const bundlesApi = {
+  create: (payload) => unwrap(http.post('/bundles', payload)),
+}
+
+export default { coursesApi, questionsApi, bundlesApi }

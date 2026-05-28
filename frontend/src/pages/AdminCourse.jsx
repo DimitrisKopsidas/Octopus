@@ -4,6 +4,7 @@ import { coursesApi, questionsApi } from '../lib/api'
 import Modal from '../components/Modal'
 import ConfirmModal from '../components/ConfirmModal'
 import QuestionForm from '../components/QuestionForm'
+import CourseSettingsForm from '../components/CourseSettingsForm'
 import BackButton from '../components/BackButton'
 
 function AdminCourse() {
@@ -13,6 +14,7 @@ function AdminCourse() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [modalState, setModalState] = useState({ open: false, editing: null })
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -85,16 +87,27 @@ function AdminCourse() {
           {course && (
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Κωδικός: {course.id} · Εξάμηνο: {course.semester} · {questions.length} ερωτήσεις
+              {' · '}σετ {course.questionSetSize} · χρόνος {course.defaultTimerMinutes}′
             </p>
           )}
         </div>
-        <button
-          type="button"
-          onClick={openCreate}
-          className="ml-auto px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium transition-colors shadow-sm"
-        >
-          + Νέα ερώτηση
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSettingsOpen(true)}
+            disabled={!course}
+            className="px-3 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 transition-colors disabled:opacity-50"
+          >
+            <span aria-hidden="true">⚙</span> Ρυθμίσεις
+          </button>
+          <button
+            type="button"
+            onClick={openCreate}
+            className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium transition-colors shadow-sm"
+          >
+            + Νέα ερώτηση
+          </button>
+        </div>
       </div>
 
       {loading && (
@@ -139,6 +152,22 @@ function AdminCourse() {
           onCreated={() => { closeModal(); reload() }}
           onUpdated={() => { closeModal(); reload() }}
           onCancel={closeModal}
+        />
+      </Modal>
+
+      <Modal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        title="Ρυθμίσεις μαθήματος"
+        size="md"
+      >
+        <CourseSettingsForm
+          course={course}
+          onSaved={(updated) => {
+            setCourse(updated)
+            setSettingsOpen(false)
+          }}
+          onCancel={() => setSettingsOpen(false)}
         />
       </Modal>
 

@@ -4,13 +4,7 @@ import { coursesApi, questionsApi } from '../lib/api'
 import { useTestStore } from '../store/testStore'
 import BackButton from '../components/BackButton'
 
-const TIMER_OPTIONS = [
-  { value: null, label: 'Χωρίς χρονόμετρο' },
-  { value: 5 * 60, label: '5 λεπτά' },
-  { value: 10 * 60, label: '10 λεπτά' },
-  { value: 15 * 60, label: '15 λεπτά' },
-  { value: 30 * 60, label: '30 λεπτά' },
-]
+const TIMER_PRESET_MINUTES = [null, 5, 10, 15, 30]
 
 const TIPS = [
   'Ξεκίνα με μικρό τεστ (5–10 ερωτήσεις) για να εκτιμήσεις πού βρίσκεσαι.',
@@ -25,14 +19,12 @@ function CourseStart() {
   const startSession = useTestStore((s) => s.startSession)
 
   const [course, setCourse] = useState(null)
-  const [availableQuestions, setAvailableQuestions] = useState([])
+  const [settings, setSettings] = useState(null) // { totalQuestionCount, setQuestionCount, defaultTimerMinutes }
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [starting, setStarting] = useState(false)
 
-  // Tab State: 'systematic' (Fixed sets of 25) vs 'sandbox' (Custom configuration)
   const [activeTab, setActiveTab] = useState('systematic')
-
-  // Sandbox config
   const [count, setCount] = useState(10)
   const [durationSeconds, setDurationSeconds] = useState(null)
 
@@ -45,15 +37,18 @@ function CourseStart() {
     setError(null)
     Promise.all([
       coursesApi.list(),
-      questionsApi.listByCourse(courseId),
+      questionsApi.settingsInfo(courseId),
     ])
-      .then(([courses, questions]) => {
+      .then(([courses, info]) => {
         if (cancelled) return
         const found = courses.find((c) => String(c.id) === String(courseId))
         setCourse(found || null)
-        setAvailableQuestions(questions)
-        const max = questions.length
-        if (max > 0) setCount(Math.min(10, max))
+        setSettings(info)
+        const total = info.totalQuestionCount || 0
+        if (total > 0) setCount(Math.min(10, total))
+        if (info.defaultTimerMinutes) {
+          setDurationSeconds(info.defaultTimerMinutes * 60)
+        }
       })
       .catch((err) => {
         if (!cancelled) setError(err.message || 'Σφάλμα φόρτωσης')
@@ -61,74 +56,94 @@ function CourseStart() {
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [courseId])
 
-  const max = availableQuestions.length
+  const max = settings?.totalQuestionCount || 0
+  const SET_SIZE = settings?.setQuestionCount || 25
   const canStart = max > 0 && count >= 1 && count <= max
-
-  // Fixed set constants
-  const SET_SIZE = 25
   const totalSets = Math.ceil(max / SET_SIZE)
 
-  // Partition questions into sets
-  const sets = useMemo(() => {
-    const result = []
-    for (let i = 0; i < totalSets; i++) {
-      const startIdx = i * SET_SIZE
-      const endIdx = Math.min((i + 1) * SET_SIZE, max)
-      result.push({
+  const sets = useMemo(
+    () =>
+      Array.from({ length: totalSets }, (_, i) => ({
         index: i,
-        start: startIdx + 1,
-        end: endIdx,
-        questions: availableQuestions.slice(startIdx, endIdx),
-      })
-    }
-    return result
-  }, [availableQuestions, totalSets, max])
+        start: i * SET_SIZE + 1,
+        end: Math.min((i + 1) * SET_SIZE, max),
+        count: Math.min(SET_SIZE, max - i * SET_SIZE),
+      })),
+    [totalSets, SET_SIZE, max]
+  )
 
-  // Syllabus coverage progress based on unique questions completed
   const coveragePercentage = useMemo(() => {
     if (max === 0) return 0
-    let coveredCount = 0
-    sets.forEach((set) => {
-      if (completedSets[set.index]) {
-        coveredCount += set.questions.length
-      }
-    })
-    return Math.round((coveredCount / max) * 100)
+    let covered = 0
+    sets.forEach((s) => { if (completedSets[s.index]) covered += s.count })
+    return Math.round((covered / max) * 100)
   }, [sets, completedSets, max])
 
-  // Custom sandbox launch
-  function handleStart() {
-    if (!canStart) return
-    const selected = availableQuestions.slice(0, count)
-    startSession({
-      courseId: Number(courseId),
-      courseName: course?.name || `Μάθημα ${courseId}`,
-      count,
-      durationSeconds,
-      order: 'sequential',
-      questions: selected,
-      setIndex: null, // custom sandbox
+  // Timer options: presets + the course's default (if not already in presets)
+  const timerOptions = useMemo(() => {
+    const minutesSet = new Set(TIMER_PRESET_MINUTES)
+    if (settings?.defaultTimerMinutes != null) {
+      minutesSet.add(settings.defaultTimerMinutes)
+    }
+    const minutes = [...minutesSet].sort((a, b) => {
+      if (a == null) return -1
+      if (b == null) return 1
+      return a - b
     })
-    navigate(`/test/${courseId}`)
+    return minutes.map((m) => ({
+      value: m == null ? null : m * 60,
+      label: m == null ? 'Χωρίς χρονόμετρο' : `${m} λεπτά`,
+    }))
+  }, [settings])
+
+  async function handleStart() {
+    if (!canStart || starting) return
+    setStarting(true)
+    setError(null)
+    try {
+      const questions = await questionsApi.byRandomCount(courseId, count)
+      startSession({
+        courseId: Number(courseId),
+        courseName: course?.name || `Μάθημα ${courseId}`,
+        count,
+        durationSeconds,
+        order: 'random',
+        questions,
+        setIndex: null,
+      })
+      navigate(`/test/${courseId}`)
+    } catch (err) {
+      setError(err.message || 'Σφάλμα έναρξης τεστ')
+      setStarting(false)
+    }
   }
 
-  // Systematic Set launch
-  function handleStartSet(set) {
-    startSession({
-      courseId: Number(courseId),
-      courseName: course?.name || `Μάθημα ${courseId}`,
-      count: set.questions.length,
-      durationSeconds: null,
-      order: 'sequential',
-      questions: set.questions,
-      setIndex: set.index,
-    })
-    navigate(`/test/${courseId}`)
+  async function handleStartSet(set) {
+    if (starting) return
+    setStarting(true)
+    setError(null)
+    try {
+      const questions = await questionsApi.bySetNum(courseId, set.index)
+      const timerSec = settings?.defaultTimerMinutes
+        ? settings.defaultTimerMinutes * 60
+        : null
+      startSession({
+        courseId: Number(courseId),
+        courseName: course?.name || `Μάθημα ${courseId}`,
+        count: set.count,
+        durationSeconds: timerSec,
+        order: 'sequential',
+        questions,
+        setIndex: set.index,
+      })
+      navigate(`/test/${courseId}`)
+    } catch (err) {
+      setError(err.message || 'Σφάλμα έναρξης σετ')
+      setStarting(false)
+    }
   }
 
   return (
@@ -172,8 +187,7 @@ function CourseStart() {
       {!loading && !error && max > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           <div className="md:col-span-2 space-y-6">
-            
-            {/* Tabs for Systematic Study vs Custom Sandbox */}
+
             <div className="flex border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl p-1 gap-1">
               <button
                 type="button"
@@ -201,18 +215,15 @@ function CourseStart() {
 
             {activeTab === 'systematic' ? (
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
-                
-                {/* Educational Explanation Box */}
                 <div className="rounded-lg bg-brand-50 dark:bg-brand-950/30 border border-brand-100 dark:border-brand-900/60 p-4">
                   <h3 className="font-semibold text-brand-900 dark:text-brand-300 text-sm mb-1">
                     💡 Πώς λειτουργεί η Συστηματική Μελέτη;
                   </h3>
                   <p className="text-xs text-brand-800 dark:text-brand-400 leading-relaxed">
-                    Η τελική εξέταση του μαθήματος αποτελείται από 25 ερωτήσεις. Χωρίσαμε τις συνολικά <strong>{max}</strong> ερωτήσεις του μαθήματος σε <strong>{totalSets}</strong> σταθερά, μη-επικαλυπτόμενα σετ. Ολοκληρώνοντας όλα τα σετ, εξασφαλίζεις ότι έχεις δει το <strong>100% της ύλης</strong>, χωρίς τυχαίες παραλείψεις ή επαναλήψεις!
+                    Η τελική εξέταση του μαθήματος αποτελείται από <strong>{SET_SIZE}</strong> ερωτήσεις. Χωρίσαμε τις συνολικά <strong>{max}</strong> ερωτήσεις του μαθήματος σε <strong>{totalSets}</strong> σταθερά, μη-επικαλυπτόμενα σετ. Ολοκληρώνοντας όλα τα σετ, εξασφαλίζεις ότι έχεις δει το <strong>100% της ύλης</strong>, χωρίς τυχαίες παραλείψεις ή επαναλήψεις!
                   </p>
                 </div>
 
-                {/* Syllabus Coverage Progress Bar */}
                 <div className="space-y-2">
                   <div className="flex items-baseline justify-between">
                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
@@ -229,13 +240,12 @@ function CourseStart() {
                     />
                   </div>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                    {coveragePercentage === 100 
+                    {coveragePercentage === 100
                       ? 'Συγχαρητήρια! Έχεις καλύψει ολόκληρη την ύλη του μαθήματος!'
                       : 'Ολοκλήρωσε όλα τα παρακάτω σετ για να φτάσεις στο 100%.'}
                   </p>
                 </div>
 
-                {/* Fixed Sets Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {sets.map((set) => {
                     const completed = completedSets[set.index]
@@ -254,8 +264,14 @@ function CourseStart() {
                               Σετ {set.index + 1}
                             </h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                              Ερωτήσεις {set.start} - {set.end} ({set.questions.length} σύνολο)
+                              Ερωτήσεις {set.start} - {set.end} ({set.count} σύνολο)
                             </p>
+                            {settings?.defaultTimerMinutes != null && (
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 inline-flex items-center gap-1">
+                                <span aria-hidden="true">⏱</span>
+                                {settings.defaultTimerMinutes} λεπτά
+                              </p>
+                            )}
                           </div>
                           {completed && (
                             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
@@ -267,13 +283,14 @@ function CourseStart() {
                         <button
                           type="button"
                           onClick={() => handleStartSet(set)}
-                          className={`mt-auto w-full py-2 rounded-md text-xs font-semibold shadow-sm transition-all cursor-pointer ${
+                          disabled={starting}
+                          className={`mt-auto w-full py-2 rounded-md text-xs font-semibold shadow-sm transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
                             completed
                               ? 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200'
                               : 'bg-brand-600 hover:bg-brand-700 text-white'
                           }`}
                         >
-                          {completed ? 'Επανάληψη Σετ' : 'Έναρξη Σετ'}
+                          {starting ? 'Φόρτωση…' : completed ? 'Επανάληψη Σετ' : 'Έναρξη Σετ'}
                         </button>
                       </div>
                     )
@@ -287,7 +304,7 @@ function CourseStart() {
                     Ρυθμίσεις Προσαρμοσμένου Τεστ
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Διαμόρφωσε τις ρυθμίσεις της προπόνησής σου ελεύθερα.
+                    Διαμόρφωσε τις ρυθμίσεις της προπόνησής σου ελεύθερα. Οι ερωτήσεις επιλέγονται τυχαία.
                   </p>
                 </header>
 
@@ -336,7 +353,7 @@ function CourseStart() {
                       Χρονόμετρο
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      {TIMER_OPTIONS.map((opt) => (
+                      {timerOptions.map((opt) => (
                         <TimerOption
                           key={String(opt.value)}
                           label={opt.label}
@@ -352,10 +369,10 @@ function CourseStart() {
                   <button
                     type="button"
                     onClick={handleStart}
-                    disabled={!canStart}
+                    disabled={!canStart || starting}
                     className="px-5 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 disabled:bg-brand-600/50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors cursor-pointer"
                   >
-                    Ξεκίνα τεστ
+                    {starting ? 'Φόρτωση…' : 'Ξεκίνα τεστ'}
                   </button>
                 </footer>
               </div>

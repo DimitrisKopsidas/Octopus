@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
+import { bundlesApi } from '../lib/api'
 import BackButton from '../components/BackButton'
 
 function Results() {
@@ -13,7 +14,10 @@ function Results() {
   const startedAt = useTestStore((s) => s.startedAt)
   const endedAt = useTestStore((s) => s.endedAt)
   const courseName = useTestStore((s) => s.courseName)
+  const setIndex = useTestStore((s) => s.setIndex)
   const reset = useTestStore((s) => s.reset)
+
+  const submittedRef = useRef(false)
 
   const hasResults =
     sessionCourseId != null &&
@@ -27,6 +31,17 @@ function Results() {
       navigate(`/courses/${courseId}/start`, { replace: true })
     }
   }, [hasResults, courseId, navigate])
+
+  // Submit bundle to backend once per session
+  useEffect(() => {
+    if (!hasResults || submittedRef.current) return
+    const answerIds = Object.values(answers)
+    if (answerIds.length === 0) return // backend requires min 1 answer
+    submittedRef.current = true
+    bundlesApi
+      .create({ setNum: setIndex, answerIds })
+      .catch((err) => console.warn('Bundle submit failed', err))
+  }, [hasResults, answers, setIndex])
 
   const { correctCount, total, durationMs } = useMemo(() => {
     let correct = 0
