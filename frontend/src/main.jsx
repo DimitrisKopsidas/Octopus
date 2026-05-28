@@ -12,6 +12,7 @@ import Admin from './pages/Admin.jsx'
 import AdminCourse from './pages/AdminCourse.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import Info from './pages/Info.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/admin/courses/:courseId" element={<AdminCourse />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/info" element={<Info />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

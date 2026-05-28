@@ -6,6 +6,7 @@ import ConfirmModal from '../components/ConfirmModal'
 import QuestionForm from '../components/QuestionForm'
 import CourseSettingsForm from '../components/CourseSettingsForm'
 import BackButton from '../components/BackButton'
+import t from '../content/adminCourse.json'
 
 function AdminCourse() {
   const { courseId } = useParams()
@@ -30,7 +31,7 @@ function AdminCourse() {
       setCourse(found || null)
       setQuestions(questions)
     } catch (err) {
-      setError(err.message || 'Σφάλμα φόρτωσης.')
+      setError(err.message || t.errorFallback)
     } finally {
       setLoading(false)
     }
@@ -67,27 +68,33 @@ function AdminCourse() {
       setQuestions(prev => prev.filter(q => q.id !== deleteTarget.id))
       setDeleteTarget(null)
     } catch (err) {
-      alert('Αποτυχία διαγραφής: ' + (err.message || ''))
+      alert(`${t.delete.failurePrefix} ${err.message || ''}`)
     } finally {
       setDeleting(false)
     }
   }
 
+  const title = course ? course.name : t.fallbackTitle.replace('{courseId}', courseId)
+
   return (
     <div>
       <div className="mb-6">
-        <BackButton to="/admin" label="Πίσω στα μαθήματα" />
+        <BackButton to="/admin" label={t.backLabel} />
       </div>
 
       <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            {course ? course.name : `Μάθημα ${courseId}`}
+            {title}
           </h1>
           {course && (
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Κωδικός: {course.id} · Εξάμηνο: {course.semester} · {questions.length} ερωτήσεις
-              {' · '}σετ {course.questionSetSize} · χρόνος {course.defaultTimerMinutes}′
+              {t.subheader
+                .replace('{id}', course.id)
+                .replace('{semester}', course.semester)
+                .replace('{count}', questions.length)
+                .replace('{setSize}', course.questionSetSize)
+                .replace('{timer}', course.defaultTimerMinutes)}
             </p>
           )}
         </div>
@@ -98,20 +105,20 @@ function AdminCourse() {
             disabled={!course}
             className="px-3 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 transition-colors disabled:opacity-50"
           >
-            <span aria-hidden="true">⚙</span> Ρυθμίσεις
+            <span aria-hidden="true">⚙</span> {t.settingsButton}
           </button>
           <button
             type="button"
             onClick={openCreate}
             className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium transition-colors shadow-sm"
           >
-            + Νέα ερώτηση
+            {t.newQuestionButton}
           </button>
         </div>
       </div>
 
       {loading && (
-        <p className="text-slate-500 dark:text-slate-400">Φόρτωση ερωτήσεων…</p>
+        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
       )}
 
       {error && !loading && (
@@ -122,8 +129,8 @@ function AdminCourse() {
 
       {!loading && !error && questions.length === 0 && (
         <div className="rounded-lg bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
-          <p className="text-slate-600 dark:text-slate-400 mb-1">Δεν υπάρχουν ερωτήσεις ακόμα.</p>
-          <p className="text-sm text-slate-500 dark:text-slate-500">Πρόσθεσε την πρώτη με το κουμπί παραπάνω.</p>
+          <p className="text-slate-600 dark:text-slate-400 mb-1">{t.empty.title}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-500">{t.empty.hint}</p>
         </div>
       )}
 
@@ -143,7 +150,7 @@ function AdminCourse() {
       <Modal
         open={modalState.open}
         onClose={closeModal}
-        title={modalState.editing ? 'Επεξεργασία ερώτησης' : 'Νέα ερώτηση'}
+        title={modalState.editing ? t.modal.editTitle : t.modal.createTitle}
         size="lg"
       >
         <QuestionForm
@@ -158,7 +165,7 @@ function AdminCourse() {
       <Modal
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        title="Ρυθμίσεις μαθήματος"
+        title={t.modal.settingsTitle}
         size="md"
       >
         <CourseSettingsForm
@@ -175,24 +182,24 @@ function AdminCourse() {
         open={!!deleteTarget}
         onClose={cancelDelete}
         onConfirm={confirmDelete}
-        title="Διαγραφή ερώτησης"
+        title={t.delete.title}
         message={
           deleteTarget && (
             <div className="space-y-3">
               <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                Είσαι σίγουρος ότι θες να διαγράψεις την ερώτηση:
+                {t.delete.promptPrefix}
               </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-md px-3 py-2">
                 «{deleteTarget.title}»
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Η ενέργεια δεν αναιρείται.
+                {t.delete.warning}
               </p>
             </div>
           )
         }
-        confirmLabel="Διαγραφή"
-        cancelLabel="Ακύρωση"
+        confirmLabel={t.delete.confirm}
+        cancelLabel={t.delete.cancel}
         variant="danger"
         confirming={deleting}
       />
@@ -214,7 +221,7 @@ function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
             onClick={onEdit}
             className="text-sm px-2.5 py-1 rounded-md text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 font-medium transition-colors"
           >
-            Επεξεργασία
+            {t.questionCard.edit}
           </button>
           <button
             type="button"
@@ -222,7 +229,7 @@ function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
             disabled={deleting}
             className="text-sm px-2.5 py-1 rounded-md text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium disabled:opacity-50 transition-colors"
           >
-            {deleting ? 'Διαγραφή…' : 'Διαγραφή'}
+            {deleting ? t.questionCard.deleting : t.questionCard.delete}
           </button>
         </div>
       </div>

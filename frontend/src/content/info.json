@@ -1,0 +1,133 @@
+{
+  "bmcUrl": "https://buymeacoffee.com/octopus",
+  "contactEmail": "hello@octopus.dev",
+  "hero": {
+    "title": "Πληροφορίες",
+    "subtitlePrefix": "Όλα όσα πρέπει να ξέρεις για το",
+    "brand": "Octopus",
+    "subtitleSuffix": "— πώς δουλεύει, πώς θα το χρησιμοποιήσεις σωστά, και πώς μπορείς να βοηθήσεις."
+  },
+  "whatIs": {
+    "title": "Τι είναι το Octopus;",
+    "paragraphs": [
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi magnam praesentium quaerat veritatis eius illo laborum voluptatibus eaque esse est, at voluptate veniam cupiditate ducimus non laudantium impedit maxime enim?",
+      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi magnam praesentium quaerat veritatis eius illo laborum voluptatibus eaque esse est, at voluptate veniam cupiditate ducimus non laudantium impedit maxime enim?"
+    ]
+  },
+  "howItWorks": {
+    "title": "Πώς δουλεύει",
+    "subtitle": "Δύο τρόποι εξάσκησης, ένα framework.",
+    "modes": [
+      {
+        "emoji": "🎯",
+        "title": "Συστηματική Μελέτη",
+        "description": "Η ύλη χωρισμένη σε σταθερά σετ ίσα με το μέγεθος της εξέτασης.",
+        "bullets": [
+          "Κάθε σετ έχει συγκεκριμένες ερωτήσεις (δεν επαναλαμβάνονται)",
+          "Ολοκληρώνοντας όλα τα σετ καλύπτεις το 100% της ύλης",
+          "Default χρόνος ίδιος με την εξέταση",
+          "Ιδανικό για προετοιμασία πριν την εξεταστική"
+        ]
+      },
+      {
+        "emoji": "⚙️",
+        "title": "Προσαρμοσμένο Τεστ",
+        "description": "Διάλεξε εσύ πλήθος ερωτήσεων και χρόνο.",
+        "bullets": [
+          "Ερωτήσεις τυχαία επιλεγμένες από όλη την ύλη",
+          "Slider από 1 ως όλες τις διαθέσιμες",
+          "Timer presets: 5 / 10 / 15 / 30 λεπτά ή χωρίς",
+          "Καλό για γρήγορη εξάσκηση ή warm-up"
+        ]
+      }
+    ]
+  },
+  "howToHelp": {
+    "title": "Πώς να βοηθήσεις",
+    "subtitle": "Τρεις τρόποι για να συνεισφέρεις στο project.",
+    "cards": [
+      {
+        "emoji": "🛠",
+        "title": "Γίνε Helper",
+        "description": "Πρόσθεσε ερωτήσεις από τα μαθήματά σου. Χρειάζεσαι κωδικό helper από διαχειριστή.",
+        "cta": "Εγγραφή",
+        "kind": "internal",
+        "target": "/register"
+      },
+      {
+        "emoji": "☕",
+        "title": "Στήριξε με coffee",
+        "description": "Κράτα το project ζωντανό. Οι supporters παίρνουν badge και ξεχωριστή εμφάνιση στα leaderboards.",
+        "cta": "Buy me a coffee",
+        "kind": "external",
+        "target": "bmcUrl",
+        "highlight": true
+      },
+      {
+        "emoji": "💬",
+        "title": "Feedback",
+        "description": "Πες μας τι θες να βελτιωθεί, ή αν βρήκες bug. Κάθε σχόλιο μετράει.",
+        "cta": "Επικοινωνία",
+        "kind": "external",
+        "target": "mailto"
+      }
+    ]
+  },
+  "shortcuts": {
+    "title": "Συντομεύσεις πληκτρολογίου",
+    "subtitle": "Στη σελίδα του τεστ — fast users τις λατρεύουν.",
+    "items": [
+      { "keys": ["←", "→"], "label": "Προηγούμενη / Επόμενη ερώτηση" },
+      { "keys": ["1", "2", "3", "4", "5"], "label": "Επιλογή απάντησης A–E" },
+      { "keys": ["0"], "label": "Καθαρισμός επιλογής" },
+      { "keys": ["F"], "label": "Σήμανση ερώτησης για επανέλεγχο" },
+      { "keys": ["Esc"], "label": "Κλείσιμο modal" }
+    ]
+  },
+  "faq": {
+    "title": "Συχνές ερωτήσεις",
+    "subtitle": "Κάνε κλικ για ανάπτυξη.",
+    "items": [
+      {
+        "q": "Πώς υπολογίζεται το σκορ μου;",
+        "a": "Για κάθε ερώτηση μετράει η σωστή απάντηση. Το συνολικό σκορ είναι το ποσοστό σωστών απαντήσεων επί του πλήθους ερωτήσεων του τεστ."
+      },
+      {
+        "q": "Μπορώ να αλλάξω απάντηση πριν τελειώσω;",
+        "a": "Ναι, πας με «Προηγούμενη» / «Επόμενη» και αλλάζεις ή καθαρίζεις την επιλογή σου. Τίποτα δεν κλειδώνει μέχρι την ολοκλήρωση."
+      },
+      {
+        "q": "Τι σημαίνει η σήμανση ερώτησης (🔖);",
+        "a": "Σημαδεύεις ερωτήσεις που θες να γυρίσεις και να τις δεις ξανά πριν την υποβολή. Οι σημειωμένες εμφανίζονται με κίτρινο δαχτυλίδι στο navigator pills bar."
+      },
+      {
+        "q": "Διαφορά Συστηματικής Μελέτης και Προσαρμοσμένου Τεστ;",
+        "a": "Η Συστηματική σε χωρίζει την ύλη σε σταθερά, μη-επικαλυπτόμενα σετ ίσα με το μέγεθος της εξέτασης — εξασφαλίζει 100% κάλυψη. Το Προσαρμοσμένο σου δίνει N τυχαίες ερωτήσεις με ρυθμίσεις της δικής σου επιλογής."
+      },
+      {
+        "q": "Τι γίνεται αν κλείσει η σελίδα ή πέσει το δίκτυο;",
+        "a": "Το state του τεστ αποθηκεύεται στο sessionStorage. Refresh = συνέχεια από την ίδια ερώτηση με τις ίδιες απαντήσεις. Κλείσιμο tab = το session χάνεται."
+      },
+      {
+        "q": "Είμαι helper, πώς προσθέτω ερωτήσεις;",
+        "a": "Στη Διαχείριση μαθήματος, κουμπί «+ Νέα ερώτηση». Κάθε ερώτηση έχει 3-5 απαντήσεις και ακριβώς μία σωστή."
+      }
+    ]
+  },
+  "roadmap": {
+    "title": "Έρχονται σύντομα",
+    "subtitle": "Τι δουλεύεται για επόμενες εκδόσεις.",
+    "items": [
+      { "emoji": "🔐", "text": "Πραγματικό auth με httpOnly cookies" },
+      { "emoji": "📈", "text": "Ιστορικό προσπαθειών στο προφίλ σου" },
+      { "emoji": "🏆", "text": "Leaderboards (Best Score / Most Tests / Streak)" },
+      { "emoji": "☕", "text": "Donor badges με ορατή αναγνώριση" },
+      { "emoji": "✨", "text": "Loading skeletons, error toasts, polish" }
+    ]
+  },
+  "footer": {
+    "tagline": "Octopus · εξάσκηση πανεπιστημιακών μαθημάτων",
+    "credit": "Made with 🐙 για το ΙΕΕ-ΔΙΠΑΕ",
+    "backLink": "← Πίσω στην Αρχική"
+  }
+}

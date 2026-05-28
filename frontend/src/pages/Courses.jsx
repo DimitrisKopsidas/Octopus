@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { coursesApi } from '../lib/api'
 import Modal from '../components/Modal'
 import ContentBadge from '../components/ContentBadge'
+import t from '../content/courses.json'
 
 const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -40,7 +41,7 @@ function Courses() {
       : coursesApi.bySemester(semester)
     fetcher
       .then(data => { if (!cancelled) setCourses(data) })
-      .catch(err => { if (!cancelled) setError(err.message || 'Σφάλμα φόρτωσης') })
+      .catch(err => { if (!cancelled) setError(err.message || t.errorLoad) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [semester])
@@ -102,9 +103,9 @@ function Courses() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Μαθήματα</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{t.title}</h1>
         <p className="text-slate-600 dark:text-slate-400">
-          Διάλεξε μάθημα για να ξεκινήσεις εξάσκηση.
+          {t.subtitle}
         </p>
       </div>
 
@@ -113,7 +114,7 @@ function Courses() {
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Αναζήτηση μαθήματος…"
+          placeholder={t.searchPlaceholder}
           className="flex-1 max-w-md px-4 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <button
@@ -122,7 +123,7 @@ function Courses() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
         >
           <span aria-hidden="true">⚙</span>
-          <span className="hidden sm:inline">Φίλτρα</span>
+          <span className="hidden sm:inline">{t.filtersButton}</span>
           {activeFilterCount > 0 && (
             <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-brand-600 text-white text-xs font-semibold">
               {activeFilterCount}
@@ -132,18 +133,18 @@ function Courses() {
       </div>
 
       {loading && (
-        <p className="text-slate-500 dark:text-slate-400">Φόρτωση μαθημάτων…</p>
+        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
       )}
 
       {error && !loading && (
         <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 text-rose-700 dark:text-rose-300">
-          Αδυναμία φόρτωσης μαθημάτων: {error}
+          {t.errorPrefix} {error}
         </div>
       )}
 
       {!loading && !error && filtered.length === 0 && (
         <div className="rounded-lg bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
-          <p className="text-slate-600 dark:text-slate-400">Δεν βρέθηκαν μαθήματα με αυτά τα κριτήρια.</p>
+          <p className="text-slate-600 dark:text-slate-400">{t.empty}</p>
         </div>
       )}
 
@@ -169,7 +170,7 @@ function Courses() {
             onClick={() => setVisibleCount(prev => prev + 6)}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-semibold hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-white shadow-sm transition-all cursor-pointer group"
           >
-            <span>Εμφάνιση περισσότερων</span>
+            <span>{t.showMore}</span>
             <span aria-hidden="true" className="text-xs transition-transform group-hover:translate-y-0.5">▼</span>
           </button>
         </div>
@@ -178,17 +179,17 @@ function Courses() {
       <Modal
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
-        title="Φίλτρα"
+        title={t.filterModal.title}
         size="md"
       >
         <div className="px-6 py-5 space-y-6">
           <section>
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-              Εξάμηνο
+              {t.filterModal.semesterTitle}
             </h3>
             <div className="grid grid-cols-5 gap-2">
               <SemesterButton
-                label="Όλα"
+                label={t.filterModal.allLabel}
                 active={draftSemester === 'all'}
                 onClick={() => setDraftSemester('all')}
               />
@@ -205,7 +206,7 @@ function Courses() {
 
           <section>
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-              Περιεχόμενο
+              {t.filterModal.contentTitle}
             </h3>
             <label className="flex items-center gap-3 cursor-pointer p-3 rounded-md border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 transition-colors">
               <input
@@ -237,7 +238,7 @@ function Courses() {
                 )}
               </span>
               <span className="text-sm text-slate-900 dark:text-slate-100">
-                Μόνο μαθήματα με ερωτήσεις
+                {t.filterModal.onlyWithContent}
               </span>
             </label>
           </section>
@@ -250,14 +251,14 @@ function Courses() {
             disabled={draftActiveCount === 0}
             className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Καθαρισμός φίλτρων
+            {t.filterModal.reset}
           </button>
           <button
             type="button"
             onClick={applyFilters}
             className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
           >
-            Εφαρμογή
+            {t.filterModal.apply}
           </button>
         </footer>
       </Modal>
@@ -287,7 +288,7 @@ function CourseCard({ course, hasContent, disabled }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/50 px-2 py-0.5 rounded mb-2">
-            Εξάμηνο {course.semester}
+            {t.courseCard.semesterPrefix} {course.semester}
           </span>
           <h3
             className={`font-semibold leading-snug transition-colors ${
@@ -299,7 +300,7 @@ function CourseCard({ course, hasContent, disabled }) {
             {course.name}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Κωδικός: {course.id}
+            {t.courseCard.codePrefix} {course.id}
           </p>
         </div>
         {!disabled && (
@@ -315,7 +316,7 @@ function CourseCard({ course, hasContent, disabled }) {
   if (disabled) {
     return (
       <div
-        title="Δεν υπάρχουν ερωτήσεις ακόμα για αυτό το μάθημα"
+        title={t.emptyDisabledTooltip}
         aria-disabled="true"
         className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm opacity-60 cursor-not-allowed select-none"
       >

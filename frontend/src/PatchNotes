@@ -53,6 +53,10 @@ Version 0.4.2
 - (x) AdminCourse sub-header shows current settings (σετ N · χρόνος N′)
 - (x) sessionStorage persistence for test session via Zustand persist middleware (refresh-safe within a tab; custom Set ↔ Array serialization for flaggedIds)
 
+Version 0.4.3
+- (x) exported static text to json 
+- (x) implemented info page
+
 Version 0.5.0
 [] Demo auth interface (no backend yet)
 - (x) Zustand authStore (in-memory only — interface scaffold)

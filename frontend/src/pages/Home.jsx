@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import t from '../content/home.json'
 
 function Home() {
   return (
@@ -6,67 +7,47 @@ function Home() {
       <section className="text-center pt-12 pb-8">
         <div className="text-6xl mb-4">🐙</div>
         <h1 className="text-5xl sm:text-6xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
-          Κυριάρχησε στα μαθήματά σου με το{' '}
-          <span className="text-brand-600 dark:text-brand-400">Octopus</span>
+          {t.hero.titlePrefix}{' '}
+          <span className="text-brand-600 dark:text-brand-400">{t.hero.brand}</span>
         </h1>
         <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-          Εξασκήσου σε ερωτήσεις πολλαπλής επιλογής, παρακολούθησε την πρόοδό σου,
-          και μετέτρεψε το διάβασμα σε παιχνίδι.
+          {t.hero.subtitle}
         </p>
         <div className="flex items-center justify-center gap-3 flex-wrap">
           <Link
             to="/courses"
             className="inline-block bg-brand-600 hover:bg-brand-700 text-white font-medium px-6 py-3 rounded-md transition-colors shadow-sm"
           >
-            Ξεκίνα εξάσκηση
+            {t.hero.ctaPractice}
           </Link>
           <Link
             to="/admin"
             className="inline-block bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-700 dark:text-brand-300 font-medium px-6 py-3 rounded-md transition-colors border border-slate-200 dark:border-slate-700"
           >
-            Διαχείριση ερωτήσεων
+            {t.hero.ctaManage}
           </Link>
         </div>
       </section>
 
       <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
-          Πώς δουλεύει
+          {t.howItWorks.title}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Step
-            number="1"
-            title="Διάλεξε μάθημα"
-            body="Δες τα διαθέσιμα μαθήματα του τμήματός σου και διάλεξε ένα."
-          />
-          <Step
-            number="2"
-            title="Όρισε διάρκεια"
-            body="Διάλεξε πόσες ερωτήσεις θες να απαντήσεις — ή λύσε όλες."
-          />
-          <Step
-            number="3"
-            title="Δες το σκορ"
-            body="Πάρε άμεση ανατροφοδότηση με τις σωστές απαντήσεις και αναθεώρησε τα λάθη σου."
-          />
+          {t.howItWorks.steps.map((step) => (
+            <Step key={step.number} number={step.number} title={step.title} body={step.body} />
+          ))}
         </div>
       </section>
 
       <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
-          Έρχονται σύντομα
+          {t.comingSoon.title}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          <FeatureCard
-            emoji="📈"
-            title="Ιστορικό & στατιστικά"
-            body="Δες κάθε προσπάθεια και την πρόοδό σου με τον χρόνο."
-          />
-          <FeatureCard
-            emoji="🏆"
-            title="Κατατάξεις"
-            body="Δες πώς τα πας σε σχέση με τους συμφοιτητές σου κάθε εβδομάδα."
-          />
+          {t.comingSoon.cards.map((card) => (
+            <FeatureCard key={card.title} emoji={card.emoji} title={card.title} body={card.body} />
+          ))}
         </div>
       </section>
     </div>

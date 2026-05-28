@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
 import UserMenu from './UserMenu'
 import { useAuthStore } from '../store/authStore'
+import t from '../content/layout.json'
 
 const navLinkClass = ({ isActive }) =>
   `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -25,7 +26,6 @@ function Layout() {
 
   const closeMenu = () => setMobileMenuOpen(false)
 
-  // Scroll lock when mobile navigation drawer is active
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.classList.add('overflow-hidden')
@@ -43,14 +43,14 @@ function Layout() {
         <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <NavLink to="/" className="flex items-center gap-2 text-white font-bold text-lg tracking-tight">
             <span className="text-2xl">🐙</span>
-            <span>Octopus</span>
+            <span>{t.brand}</span>
           </NavLink>
-          
-          {/* Desktop Navigation Links */}
+
           <div className="hidden md:flex items-center gap-1">
-            <NavLink to="/" end className={navLinkClass}>Αρχική</NavLink>
-            <NavLink to="/courses" className={navLinkClass}>Μαθήματα</NavLink>
-            <NavLink to="/admin" className={navLinkClass}>Διαχείριση</NavLink>
+            <NavLink to="/" end className={navLinkClass}>{t.nav.home}</NavLink>
+            <NavLink to="/courses" className={navLinkClass}>{t.nav.courses}</NavLink>
+            <NavLink to="/admin" className={navLinkClass}>{t.nav.admin}</NavLink>
+            <NavLink to="/info" className={navLinkClass}>{t.nav.info}</NavLink>
             <ThemeToggle />
             {user ? (
               <UserMenu />
@@ -59,16 +59,15 @@ function Layout() {
                 to="/login"
                 className="ml-1 px-3 py-2 rounded-md text-sm font-medium bg-brand-600 text-white hover:bg-brand-500 transition-colors"
               >
-                Σύνδεση
+                {t.nav.login}
               </NavLink>
             )}
           </div>
 
-          {/* Hamburger button for mobile */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-label="Μενού πλοήγησης"
+            aria-label={t.mobile.menuLabel}
             className="md:hidden flex items-center justify-center p-2 rounded-md text-brand-100 hover:bg-brand-800 hover:text-white transition-colors cursor-pointer"
           >
             <span className="text-xl leading-none">{mobileMenuOpen ? '✕' : '☰'}</span>
@@ -76,50 +75,43 @@ function Layout() {
         </nav>
       </header>
 
-      {/* Mobile Navigation Sidebar Drawer (Slides in from the right) - Rendered OUTSIDE header to prevent backdrop-blur leakage */}
       {mobileMenuOpen && (
         <>
-          {/* Backdrop overlay */}
-          <div 
+          <div
             onClick={closeMenu}
             className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 md:hidden animate-fadeIn"
           />
 
-          {/* Sidebar drawer container */}
           <div className="fixed top-0 right-0 bottom-0 w-72 max-w-[80vw] bg-brand-900 dark:bg-brand-950 border-l border-brand-800 shadow-2xl z-50 md:hidden p-6 flex flex-col justify-between animate-slideInRight">
-            
             <div className="space-y-6">
-              {/* Header of Drawer */}
               <div className="flex items-center justify-between pb-4 border-b border-brand-800">
                 <span className="flex items-center gap-2 text-white font-bold text-lg tracking-tight">
                   <span className="text-2xl">🐙</span>
-                  <span>Octopus</span>
+                  <span>{t.brand}</span>
                 </span>
                 <button
                   type="button"
                   onClick={closeMenu}
-                  aria-label="Κλείσιμο μενού"
+                  aria-label={t.mobile.closeLabel}
                   className="p-2 rounded-md text-brand-100 hover:bg-brand-800 hover:text-white transition-colors cursor-pointer"
                 >
                   <span className="text-xl leading-none">✕</span>
                 </button>
               </div>
 
-              {/* Navigation Links */}
               <div className="space-y-2">
-                <NavLink to="/" end onClick={closeMenu} className={mobileNavLinkClass}>Αρχική</NavLink>
-                <NavLink to="/courses" onClick={closeMenu} className={mobileNavLinkClass}>Μαθήματα</NavLink>
-                <NavLink to="/admin" onClick={closeMenu} className={mobileNavLinkClass}>Διαχείριση</NavLink>
+                <NavLink to="/" end onClick={closeMenu} className={mobileNavLinkClass}>{t.nav.home}</NavLink>
+                <NavLink to="/courses" onClick={closeMenu} className={mobileNavLinkClass}>{t.nav.courses}</NavLink>
+                <NavLink to="/admin" onClick={closeMenu} className={mobileNavLinkClass}>{t.nav.admin}</NavLink>
+                <NavLink to="/info" onClick={closeMenu} className={mobileNavLinkClass}>{t.nav.info}</NavLink>
               </div>
 
-              {/* Theme Toggle row */}
               <div className="flex items-center justify-between px-4 py-2 text-brand-100 text-sm font-semibold rounded-lg hover:bg-brand-800 transition-colors">
-                <span>Θέμα</span>
+                <span>{t.mobile.themeLabel}</span>
                 <ThemeToggle />
               </div>
             </div>
 
-            {/* Bottom Auth block */}
             <div className="border-t border-brand-800 pt-4">
               {user ? (
                 <div className="space-y-3">
@@ -140,7 +132,7 @@ function Layout() {
                     }}
                     className="w-full mt-2 py-2 rounded-lg text-sm font-semibold text-rose-300 hover:text-rose-200 bg-rose-950/20 hover:bg-rose-950/40 text-center transition-colors cursor-pointer"
                   >
-                    Αποσύνδεση
+                    {t.mobile.logout}
                   </button>
                 </div>
               ) : (
@@ -150,12 +142,11 @@ function Layout() {
                     onClick={closeMenu}
                     className="block w-full text-center py-2.5 rounded-lg text-sm font-semibold bg-brand-600 text-white hover:bg-brand-500 transition-colors"
                   >
-                    Σύνδεση
+                    {t.nav.login}
                   </NavLink>
                 </div>
               )}
             </div>
-
           </div>
         </>
       )}
@@ -164,7 +155,7 @@ function Layout() {
         <Outlet />
       </main>
       <footer className="border-t border-slate-200 dark:border-slate-800 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
-        Octopus · εξάσκηση πανεπιστημιακών μαθημάτων
+        {t.footer}
       </footer>
     </div>
   )

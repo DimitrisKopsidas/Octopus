@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import { bundlesApi } from '../lib/api'
 import BackButton from '../components/BackButton'
+import t from '../content/results.json'
 
 function Results() {
   const { courseId } = useParams()
@@ -75,26 +76,26 @@ function Results() {
   return (
     <div>
       <div className="mb-6">
-        <BackButton to="/courses" label="Πίσω στα μαθήματα" />
+        <BackButton to="/courses" label={t.backLabel} />
       </div>
 
       <div className="mb-8">
         <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-1">
           {courseName}
         </p>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Αποτελέσματα</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t.title}</h1>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <StatCard label="Σωστές απαντήσεις">
+        <StatCard label={t.stats.correct}>
           <span className={`text-3xl font-bold ${scoreTone}`}>
             {correctCount}/{total}
           </span>
         </StatCard>
-        <StatCard label="Ποσοστό επιτυχίας">
+        <StatCard label={t.stats.percentage}>
           <span className={`text-3xl font-bold ${scoreTone}`}>{percent}%</span>
         </StatCard>
-        <StatCard label="Διάρκεια">
+        <StatCard label={t.stats.duration}>
           <span className="text-3xl font-bold text-slate-900 dark:text-white">
             {formatDuration(durationMs)}
           </span>
@@ -102,13 +103,13 @@ function Results() {
       </div>
 
       <div className="mb-6 flex items-center justify-between gap-3 flex-wrap">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Ανασκόπηση</h2>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{t.reviewTitle}</h2>
         <button
           type="button"
           onClick={tryAgain}
           className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
         >
-          Νέο τεστ
+          {t.tryAgain}
         </button>
       </div>
 
@@ -166,7 +167,7 @@ function ReviewCard({ index, question, chosenAnswerId }) {
                 : 'text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/60'
           }`}
         >
-          {!wasAnswered ? 'Χωρίς απάντηση' : isCorrect ? 'Σωστή' : 'Λάθος'}
+          {!wasAnswered ? t.review.noAnswer : isCorrect ? t.review.correct : t.review.wrong}
         </span>
       </div>
       <ul className="p-3 space-y-1.5">
@@ -190,7 +191,7 @@ function ReviewCard({ index, question, chosenAnswerId }) {
               <span className="flex-1">{a.title}</span>
               {isChosen && (
                 <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded shrink-0">
-                  η επιλογή σου
+                  {t.review.yourChoice}
                 </span>
               )}
             </li>

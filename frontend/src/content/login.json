@@ -1,0 +1,20 @@
+{
+  "title": "Καλώς ήρθες ξανά",
+  "subtitle": "Μπες στον λογαριασμό σου για να συνεχίσεις.",
+  "fields": {
+    "username": "Username",
+    "password": "Κωδικός"
+  },
+  "placeholders": {
+    "username": "π.χ. giorgos",
+    "password": "••••••••"
+  },
+  "errors": {
+    "required": "Συμπλήρωσε username και κωδικό."
+  },
+  "submit": "Σύνδεση",
+  "footer": {
+    "prompt": "Δεν έχεις λογαριασμό;",
+    "link": "Εγγραφή"
+  }
+}

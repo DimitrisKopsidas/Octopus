@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import t from '../content/login.json'
 
 function Login() {
   const navigate = useNavigate()
@@ -18,7 +19,7 @@ function Login() {
   function handleSubmit(e) {
     e.preventDefault()
     if (!username.trim() || !password) {
-      setError('Συμπλήρωσε username και κωδικό.')
+      setError(t.errors.required)
       return
     }
     login({ username: username.trim(), password })
@@ -33,27 +34,27 @@ function Login() {
             🐙
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Καλώς ήρθες ξανά
+            {t.title}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Μπες στον λογαριασμό σου για να συνεχίσεις.
+            {t.subtitle}
           </p>
         </header>
 
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
           <Field
-            label="Username"
+            label={t.fields.username}
             value={username}
             onChange={setUsername}
-            placeholder="π.χ. giorgos"
+            placeholder={t.placeholders.username}
             autoFocus
           />
           <Field
-            label="Κωδικός"
+            label={t.fields.password}
             type="password"
             value={password}
             onChange={setPassword}
-            placeholder="••••••••"
+            placeholder={t.placeholders.password}
           />
 
           {error && (
@@ -66,14 +67,14 @@ function Login() {
             type="submit"
             className="w-full px-4 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
           >
-            Σύνδεση
+            {t.submit}
           </button>
         </form>
 
         <footer className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 text-center text-sm text-slate-600 dark:text-slate-400">
-          Δεν έχεις λογαριασμό;{' '}
+          {t.footer.prompt}{' '}
           <Link to="/register" className="text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">
-            Εγγραφή
+            {t.footer.link}
           </Link>
         </footer>
       </div>

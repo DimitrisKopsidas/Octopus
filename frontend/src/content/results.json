@@ -1,0 +1,17 @@
+{
+  "backLabel": "Πίσω στα μαθήματα",
+  "title": "Αποτελέσματα",
+  "stats": {
+    "correct": "Σωστές απαντήσεις",
+    "percentage": "Ποσοστό επιτυχίας",
+    "duration": "Διάρκεια"
+  },
+  "reviewTitle": "Ανασκόπηση",
+  "tryAgain": "Νέο τεστ",
+  "review": {
+    "noAnswer": "Χωρίς απάντηση",
+    "correct": "Σωστή",
+    "wrong": "Λάθος",
+    "yourChoice": "η επιλογή σου"
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import ConfirmModal from '../components/ConfirmModal'
+import t from '../content/test.json'
 
 function Test() {
   const { courseId } = useParams()
@@ -136,9 +137,12 @@ function Test() {
             {courseName}
           </p>
           <p className="text-sm text-slate-700 dark:text-slate-300 mt-0.5">
-            Ερώτηση <strong className="text-slate-900 dark:text-white">{currentIndex + 1}</strong> από {total}
+            {t.questionLabelTemplate.split('{current}')[0]}
+            <strong className="text-slate-900 dark:text-white">{currentIndex + 1}</strong>
+            {t.questionLabelTemplate.split('{current}')[1].replace('{total}', total)}
             <span className="ml-3 text-slate-500 dark:text-slate-400">
-              · απαντημένες {answeredCount}/{total}
+              {' '}
+              {t.answeredTemplate.replace('{count}', answeredCount).replace('{total}', total)}
             </span>
           </p>
         </div>
@@ -149,7 +153,7 @@ function Test() {
             onClick={() => setCancelOpen(true)}
             className="text-sm px-3 py-1.5 rounded-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors"
           >
-            Ακύρωση
+            {t.cancelButton}
           </button>
         </div>
       </header>
@@ -197,13 +201,13 @@ function Test() {
             {flash === 'saved' && (
               <span className="text-emerald-700 dark:text-emerald-400 font-medium inline-flex items-center gap-1.5">
                 <span aria-hidden="true">✓</span>
-                Η απάντηση αποθηκεύτηκε
+                {t.flash.saved}
               </span>
             )}
             {flash === 'cleared' && (
               <span className="text-slate-600 dark:text-slate-400 font-medium inline-flex items-center gap-1.5">
                 <span aria-hidden="true">↺</span>
-                Η επιλογή καθαρίστηκε
+                {t.flash.cleared}
               </span>
             )}
           </span>
@@ -211,11 +215,11 @@ function Test() {
             <button
               type="button"
               onClick={() => handleClear(currentQuestion.id)}
-              title="Καθαρισμός επιλογής (0)"
+              title={t.clear.tooltip}
               className="shrink-0 text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium inline-flex items-center gap-1 transition-colors"
             >
               <span aria-hidden="true">×</span>
-              Καθαρισμός επιλογής
+              {t.clear.label}
             </button>
           )}
         </div>
@@ -228,7 +232,7 @@ function Test() {
           disabled={isFirst}
           className="px-4 py-2 rounded-md text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          ← Προηγούμενη
+          {t.prevButton}
         </button>
         {isLast ? (
           <button
@@ -236,7 +240,7 @@ function Test() {
             onClick={handleFinish}
             className="px-5 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
           >
-            Ολοκλήρωση
+            {t.finishButton}
           </button>
         ) : (
           <button
@@ -244,7 +248,7 @@ function Test() {
             onClick={goNext}
             className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
           >
-            Επόμενη →
+            {t.nextButton}
           </button>
         )}
       </div>
@@ -253,10 +257,10 @@ function Test() {
         open={cancelOpen}
         onClose={() => setCancelOpen(false)}
         onConfirm={handleCancel}
-        title="Ακύρωση τεστ"
-        message="Αν ακυρώσεις, οι απαντήσεις σου θα χαθούν. Σίγουρα θες να συνεχίσεις;"
-        confirmLabel="Ακύρωση τεστ"
-        cancelLabel="Συνέχεια τεστ"
+        title={t.cancelModal.title}
+        message={t.cancelModal.message}
+        confirmLabel={t.cancelModal.confirm}
+        cancelLabel={t.cancelModal.cancel}
         variant="danger"
       />
     </div>
@@ -275,7 +279,7 @@ function QuestionNavigator({ questions, currentIndex, answers, flaggedIds, onJum
             key={q.id}
             type="button"
             onClick={() => onJump(i)}
-            aria-label={`Μετάβαση στην ερώτηση ${i + 1}`}
+            aria-label={t.navigatorJumpTemplate.replace('{n}', i + 1)}
             aria-current={isCurrent ? 'true' : undefined}
             className={`relative w-8 h-8 rounded-full text-xs font-semibold transition-all ${
               isCurrent
@@ -299,8 +303,8 @@ function FlagButton({ flagged, onToggle }) {
       type="button"
       onClick={onToggle}
       aria-pressed={flagged}
-      aria-label={flagged ? 'Αφαίρεση σήμανσης' : 'Σήμανση για επανέλεγχο'}
-      title={flagged ? 'Αφαίρεση σήμανσης (F)' : 'Σήμανση για επανέλεγχο (F)'}
+      aria-label={flagged ? t.flag.removeLabel : t.flag.addLabel}
+      title={flagged ? t.flag.removeTooltip : t.flag.addTooltip}
       className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors ${
         flagged
           ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
@@ -308,7 +312,7 @@ function FlagButton({ flagged, onToggle }) {
       }`}
     >
       <span aria-hidden="true">{flagged ? '🔖' : '🏷'}</span>
-      {flagged ? 'Σημειωμένη' : 'Σημείωση'}
+      {flagged ? t.flag.marked : t.flag.mark}
     </button>
   )
 }

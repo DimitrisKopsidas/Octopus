@@ -1,0 +1,31 @@
+{
+  "backLabel": "Πίσω στα μαθήματα",
+  "fallbackTitle": "Μάθημα {courseId}",
+  "subheader": "Κωδικός: {id} · Εξάμηνο: {semester} · {count} ερωτήσεις · σετ {setSize} · χρόνος {timer}′",
+  "settingsButton": "Ρυθμίσεις",
+  "newQuestionButton": "+ Νέα ερώτηση",
+  "loading": "Φόρτωση ερωτήσεων…",
+  "errorFallback": "Σφάλμα φόρτωσης.",
+  "empty": {
+    "title": "Δεν υπάρχουν ερωτήσεις ακόμα.",
+    "hint": "Πρόσθεσε την πρώτη με το κουμπί παραπάνω."
+  },
+  "questionCard": {
+    "edit": "Επεξεργασία",
+    "delete": "Διαγραφή",
+    "deleting": "Διαγραφή…"
+  },
+  "modal": {
+    "createTitle": "Νέα ερώτηση",
+    "editTitle": "Επεξεργασία ερώτησης",
+    "settingsTitle": "Ρυθμίσεις μαθήματος"
+  },
+  "delete": {
+    "title": "Διαγραφή ερώτησης",
+    "promptPrefix": "Είσαι σίγουρος ότι θες να διαγράψεις την ερώτηση:",
+    "warning": "Η ενέργεια δεν αναιρείται.",
+    "confirm": "Διαγραφή",
+    "cancel": "Ακύρωση",
+    "failurePrefix": "Αποτυχία διαγραφής:"
+  }
+}

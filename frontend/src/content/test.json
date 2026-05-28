@@ -1,0 +1,31 @@
+{
+  "questionLabelTemplate": "Ερώτηση {current} από {total}",
+  "answeredTemplate": "· απαντημένες {count}/{total}",
+  "cancelButton": "Ακύρωση",
+  "prevButton": "← Προηγούμενη",
+  "nextButton": "Επόμενη →",
+  "finishButton": "Ολοκλήρωση",
+  "navigatorJumpTemplate": "Μετάβαση στην ερώτηση {n}",
+  "flag": {
+    "addLabel": "Σήμανση για επανέλεγχο",
+    "removeLabel": "Αφαίρεση σήμανσης",
+    "addTooltip": "Σήμανση για επανέλεγχο (F)",
+    "removeTooltip": "Αφαίρεση σήμανσης (F)",
+    "marked": "Σημειωμένη",
+    "mark": "Σημείωση"
+  },
+  "flash": {
+    "saved": "Η απάντηση αποθηκεύτηκε",
+    "cleared": "Η επιλογή καθαρίστηκε"
+  },
+  "clear": {
+    "tooltip": "Καθαρισμός επιλογής (0)",
+    "label": "Καθαρισμός επιλογής"
+  },
+  "cancelModal": {
+    "title": "Ακύρωση τεστ",
+    "message": "Αν ακυρώσεις, οι απαντήσεις σου θα χαθούν. Σίγουρα θες να συνεχίσεις;",
+    "confirm": "Ακύρωση τεστ",
+    "cancel": "Συνέχεια τεστ"
+  }
+}

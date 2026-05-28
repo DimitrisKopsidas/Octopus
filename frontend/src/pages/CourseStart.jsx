@@ -3,15 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { coursesApi, questionsApi } from '../lib/api'
 import { useTestStore } from '../store/testStore'
 import BackButton from '../components/BackButton'
+import t from '../content/courseStart.json'
 
 const TIMER_PRESET_MINUTES = [null, 5, 10, 15, 30]
-
-const TIPS = [
-  'Ξεκίνα με μικρό τεστ (5–10 ερωτήσεις) για να εκτιμήσεις πού βρίσκεσαι.',
-  'Αν δεν ξέρεις, πέρνα παρακάτω και γύρνα στο τέλος — μην χάνεις χρόνο.',
-  'Πρόσεξε απόλυτες λέξεις («πάντα», «ποτέ», «μόνο») — συχνά είναι λάθος.',
-  'Πριν την εξεταστική, βάλε timer στα όρια της εξέτασης για ρεαλιστικό warm-up.',
-]
 
 function CourseStart() {
   const { courseId } = useParams()
@@ -51,7 +45,7 @@ function CourseStart() {
         }
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message || 'Σφάλμα φόρτωσης')
+        if (!cancelled) setError(err.message || t.errorLoad)
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -95,7 +89,7 @@ function CourseStart() {
     })
     return minutes.map((m) => ({
       value: m == null ? null : m * 60,
-      label: m == null ? 'Χωρίς χρονόμετρο' : `${m} λεπτά`,
+      label: m == null ? t.sandbox.timerNone : t.sandbox.timerMinutesTemplate.replace('{minutes}', m),
     }))
   }, [settings])
 
@@ -107,7 +101,7 @@ function CourseStart() {
       const questions = await questionsApi.byRandomCount(courseId, count)
       startSession({
         courseId: Number(courseId),
-        courseName: course?.name || `Μάθημα ${courseId}`,
+        courseName: course?.name || t.fallbackTitle.replace('{courseId}', courseId),
         count,
         durationSeconds,
         order: 'random',
@@ -116,7 +110,7 @@ function CourseStart() {
       })
       navigate(`/test/${courseId}`)
     } catch (err) {
-      setError(err.message || 'Σφάλμα έναρξης τεστ')
+      setError(err.message || t.errorStartTest)
       setStarting(false)
     }
   }
@@ -132,7 +126,7 @@ function CourseStart() {
         : null
       startSession({
         courseId: Number(courseId),
-        courseName: course?.name || `Μάθημα ${courseId}`,
+        courseName: course?.name || t.fallbackTitle.replace('{courseId}', courseId),
         count: set.count,
         durationSeconds: timerSec,
         order: 'sequential',
@@ -141,7 +135,7 @@ function CourseStart() {
       })
       navigate(`/test/${courseId}`)
     } catch (err) {
-      setError(err.message || 'Σφάλμα έναρξης σετ')
+      setError(err.message || t.errorStartSet)
       setStarting(false)
     }
   }
@@ -149,22 +143,22 @@ function CourseStart() {
   return (
     <div>
       <div className="mb-6">
-        <BackButton to="/courses" label="Πίσω στα μαθήματα" />
+        <BackButton to="/courses" label={t.backLabel} />
       </div>
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-          {course ? course.name : `Μάθημα ${courseId}`}
+          {course ? course.name : t.fallbackTitle.replace('{courseId}', courseId)}
         </h1>
         {course && (
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Κωδικός: {course.id} · Εξάμηνο: {course.semester}
+            {t.subheader.replace('{id}', course.id).replace('{semester}', course.semester)}
           </p>
         )}
       </div>
 
       {loading && (
-        <p className="text-slate-500 dark:text-slate-400">Φόρτωση…</p>
+        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
       )}
 
       {error && !loading && (
@@ -175,12 +169,8 @@ function CourseStart() {
 
       {!loading && !error && max === 0 && (
         <div className="rounded-lg bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
-          <p className="text-slate-600 dark:text-slate-400 mb-1">
-            Αυτό το μάθημα δεν έχει ακόμα ερωτήσεις.
-          </p>
-          <p className="text-sm text-slate-500 dark:text-slate-500">
-            Δοκίμασε ξανά αργότερα ή διάλεξε άλλο μάθημα.
-          </p>
+          <p className="text-slate-600 dark:text-slate-400 mb-1">{t.emptyCourse.title}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-500">{t.emptyCourse.hint}</p>
         </div>
       )}
 
@@ -198,7 +188,7 @@ function CourseStart() {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
                 }`}
               >
-                🎯 Συστηματική Μελέτη
+                {t.tabs.systematic}
               </button>
               <button
                 type="button"
@@ -209,7 +199,7 @@ function CourseStart() {
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
                 }`}
               >
-                ⚙️ Προσαρμοσμένο Τεστ
+                {t.tabs.sandbox}
               </button>
             </div>
 
@@ -217,17 +207,20 @@ function CourseStart() {
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
                 <div className="rounded-lg bg-brand-50 dark:bg-brand-950/30 border border-brand-100 dark:border-brand-900/60 p-4">
                   <h3 className="font-semibold text-brand-900 dark:text-brand-300 text-sm mb-1">
-                    💡 Πώς λειτουργεί η Συστηματική Μελέτη;
+                    {t.systematic.explanationTitle}
                   </h3>
                   <p className="text-xs text-brand-800 dark:text-brand-400 leading-relaxed">
-                    Η τελική εξέταση του μαθήματος αποτελείται από <strong>{SET_SIZE}</strong> ερωτήσεις. Χωρίσαμε τις συνολικά <strong>{max}</strong> ερωτήσεις του μαθήματος σε <strong>{totalSets}</strong> σταθερά, μη-επικαλυπτόμενα σετ. Ολοκληρώνοντας όλα τα σετ, εξασφαλίζεις ότι έχεις δει το <strong>100% της ύλης</strong>, χωρίς τυχαίες παραλείψεις ή επαναλήψεις!
+                    {t.systematic.explanationTemplate
+                      .replace('{setSize}', SET_SIZE)
+                      .replace('{total}', max)
+                      .replace('{totalSets}', totalSets)}
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-baseline justify-between">
                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                      Συνολική Κάλυψη Ύλης
+                      {t.systematic.coverageLabel}
                     </span>
                     <span className="text-xl font-bold text-brand-600 dark:text-brand-400 tabular-nums">
                       {coveragePercentage}% {coveragePercentage === 100 && '🏆'}
@@ -241,8 +234,8 @@ function CourseStart() {
                   </div>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400">
                     {coveragePercentage === 100
-                      ? 'Συγχαρητήρια! Έχεις καλύψει ολόκληρη την ύλη του μαθήματος!'
-                      : 'Ολοκλήρωσε όλα τα παρακάτω σετ για να φτάσεις στο 100%.'}
+                      ? t.systematic.coverageDone
+                      : t.systematic.coveragePending}
                   </p>
                 </div>
 
@@ -261,15 +254,18 @@ function CourseStart() {
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <h4 className="font-semibold text-slate-900 dark:text-white text-sm">
-                              Σετ {set.index + 1}
+                              {t.systematic.setLabel} {set.index + 1}
                             </h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                              Ερωτήσεις {set.start} - {set.end} ({set.count} σύνολο)
+                              {t.systematic.setRangeTemplate
+                                .replace('{start}', set.start)
+                                .replace('{end}', set.end)
+                                .replace('{count}', set.count)}
                             </p>
                             {settings?.defaultTimerMinutes != null && (
                               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 inline-flex items-center gap-1">
                                 <span aria-hidden="true">⏱</span>
-                                {settings.defaultTimerMinutes} λεπτά
+                                {t.systematic.setTimerTemplate.replace('{minutes}', settings.defaultTimerMinutes)}
                               </p>
                             )}
                           </div>
@@ -290,7 +286,7 @@ function CourseStart() {
                               : 'bg-brand-600 hover:bg-brand-700 text-white'
                           }`}
                         >
-                          {starting ? 'Φόρτωση…' : completed ? 'Επανάληψη Σετ' : 'Έναρξη Σετ'}
+                          {starting ? t.systematic.loadingSet : completed ? t.systematic.repeatSet : t.systematic.startSet}
                         </button>
                       </div>
                     )
@@ -301,10 +297,10 @@ function CourseStart() {
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <header className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30">
                   <h2 className="font-semibold text-slate-900 dark:text-white text-sm">
-                    Ρυθμίσεις Προσαρμοσμένου Τεστ
+                    {t.sandbox.title}
                   </h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Διαμόρφωσε τις ρυθμίσεις της προπόνησής σου ελεύθερα. Οι ερωτήσεις επιλέγονται τυχαία.
+                    {t.sandbox.subtitle}
                   </p>
                 </header>
 
@@ -312,7 +308,7 @@ function CourseStart() {
                   {coveragePercentage < 100 && (
                     <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/60 p-4">
                       <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-                        ⚠️ <strong>Προσοχή:</strong> Δεν έχεις καλύψει ακόμα το 100% της ύλης του μαθήματος. Συστήνεται να ολοκληρώσεις πρώτα τη <strong>Συστηματική Μελέτη</strong> για να σιγουρευτείς ότι έχεις διαβάσει όλες τις ερωτήσεις!
+                        {t.sandbox.warningTemplate}
                       </p>
                     </div>
                   )}
@@ -320,7 +316,7 @@ function CourseStart() {
                   <section>
                     <div className="flex items-baseline justify-between mb-3">
                       <label htmlFor="count" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Πλήθος ερωτήσεων
+                        {t.sandbox.countLabel}
                       </label>
                       <span className="text-2xl font-bold text-brand-600 dark:text-brand-400 tabular-nums">
                         {count}
@@ -342,7 +338,7 @@ function CourseStart() {
                         onClick={() => setCount(max)}
                         className="text-brand-700 dark:text-brand-400 font-medium hover:text-brand-800 dark:hover:text-brand-300"
                       >
-                        Όλες ({max})
+                        {t.sandbox.allLabelTemplate.replace('{max}', max)}
                       </button>
                       <span>{max}</span>
                     </div>
@@ -350,7 +346,7 @@ function CourseStart() {
 
                   <section>
                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3 block">
-                      Χρονόμετρο
+                      {t.sandbox.timerLabel}
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                       {timerOptions.map((opt) => (
@@ -372,7 +368,7 @@ function CourseStart() {
                     disabled={!canStart || starting}
                     className="px-5 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 disabled:bg-brand-600/50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors cursor-pointer"
                   >
-                    {starting ? 'Φόρτωση…' : 'Ξεκίνα τεστ'}
+                    {starting ? t.sandbox.startingButton : t.sandbox.startButton}
                   </button>
                 </footer>
               </div>
@@ -394,35 +390,34 @@ function CourseInfoCard({ course, questionCount, coverage }) {
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
       <header className="px-5 py-3 border-b border-slate-200 dark:border-slate-800">
         <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-          <span aria-hidden="true">📊</span>
-          Πληροφορίες μαθήματος
+          {t.info.title}
         </h2>
       </header>
       <dl className="px-5 py-4 space-y-3 text-sm">
-        <InfoRow label="Διαθέσιμες ερωτήσεις">
+        <InfoRow label={t.info.availableQuestions}>
           <span className="font-semibold text-slate-900 dark:text-white tabular-nums">
             {questionCount}
           </span>
         </InfoRow>
-        <InfoRow label="Κάλυψη ύλης">
+        <InfoRow label={t.info.coverage}>
           <span className="font-semibold text-brand-600 dark:text-brand-400 tabular-nums">
             {coverage}%
           </span>
         </InfoRow>
         {course && (
           <>
-            <InfoRow label="Κωδικός">
+            <InfoRow label={t.info.code}>
               <span className="text-slate-700 dark:text-slate-300 tabular-nums">{course.id}</span>
             </InfoRow>
-            <InfoRow label="Εξάμηνο">
+            <InfoRow label={t.info.semester}>
               <span className="text-slate-700 dark:text-slate-300">{course.semester}</span>
             </InfoRow>
           </>
         )}
-        <InfoRow label="Τελευταία εξεταστική" muted>
+        <InfoRow label={t.info.lastExam} muted>
           <SoonBadge />
         </InfoRow>
-        <InfoRow label="Πρόσφατες προσθήκες" muted>
+        <InfoRow label={t.info.recentAdditions} muted>
           <SoonBadge />
         </InfoRow>
       </dl>
@@ -435,12 +430,11 @@ function TipsCard() {
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
       <header className="px-5 py-3 border-b border-slate-200 dark:border-slate-800">
         <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-          <span aria-hidden="true">💡</span>
-          Συμβουλές για το τεστ
+          {t.tipsCard.title}
         </h2>
       </header>
       <ol className="px-5 py-4 space-y-3">
-        {TIPS.map((tip, i) => (
+        {t.tips.map((tip, i) => (
           <li key={i} className="flex items-start gap-3 text-sm">
             <span className="shrink-0 w-5 h-5 rounded-full bg-brand-100 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 text-xs font-bold flex items-center justify-center mt-0.5">
               {i + 1}
@@ -469,7 +463,7 @@ function InfoRow({ label, children, muted }) {
 function SoonBadge() {
   return (
     <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
-      Σύντομα
+      {t.info.soonBadge}
     </span>
   )
 }

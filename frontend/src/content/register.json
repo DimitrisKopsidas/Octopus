@@ -1,0 +1,32 @@
+{
+  "title": "Δημιουργία λογαριασμού",
+  "subtitle": "Μπες στο Octopus και ξεκίνα την εξάσκηση.",
+  "fields": {
+    "displayName": "Ονοματεπώνυμο",
+    "username": "Username",
+    "password": "Κωδικός"
+  },
+  "placeholders": {
+    "displayName": "π.χ. Γιώργος Παπαδόπουλος",
+    "username": "π.χ. giorgos",
+    "password": "••••••••",
+    "helperCode": "π.χ. HLP2026X"
+  },
+  "role": {
+    "label": "Ρόλος",
+    "student": { "emoji": "🎓", "label": "Φοιτητής", "description": "Λύνει τεστ" },
+    "helper": { "emoji": "🛠", "label": "Helper", "description": "Διαχειρίζεται ερωτήσεις" }
+  },
+  "helperCode": {
+    "label": "Κωδικός helper"
+  },
+  "errors": {
+    "requiredAll": "Συμπλήρωσε όλα τα πεδία.",
+    "requiredHelperCode": "Συμπλήρωσε τον κωδικό helper."
+  },
+  "submit": "Δημιουργία λογαριασμού",
+  "footer": {
+    "prompt": "Έχεις ήδη λογαριασμό;",
+    "link": "Σύνδεση"
+  }
+}

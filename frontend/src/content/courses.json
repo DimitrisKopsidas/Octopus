@@ -1,0 +1,25 @@
+{
+  "title": "Μαθήματα",
+  "subtitle": "Διάλεξε μάθημα για να ξεκινήσεις εξάσκηση.",
+  "searchPlaceholder": "Αναζήτηση μαθήματος…",
+  "filtersButton": "Φίλτρα",
+  "loading": "Φόρτωση μαθημάτων…",
+  "errorPrefix": "Αδυναμία φόρτωσης μαθημάτων:",
+  "errorLoad": "Σφάλμα φόρτωσης",
+  "empty": "Δεν βρέθηκαν μαθήματα με αυτά τα κριτήρια.",
+  "showMore": "Εμφάνιση περισσότερων",
+  "emptyDisabledTooltip": "Δεν υπάρχουν ερωτήσεις ακόμα για αυτό το μάθημα",
+  "courseCard": {
+    "semesterPrefix": "Εξάμηνο",
+    "codePrefix": "Κωδικός:"
+  },
+  "filterModal": {
+    "title": "Φίλτρα",
+    "semesterTitle": "Εξάμηνο",
+    "allLabel": "Όλα",
+    "contentTitle": "Περιεχόμενο",
+    "onlyWithContent": "Μόνο μαθήματα με ερωτήσεις",
+    "reset": "Καθαρισμός φίλτρων",
+    "apply": "Εφαρμογή"
+  }
+}

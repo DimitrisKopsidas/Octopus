@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { coursesApi } from '../lib/api'
 import ContentBadge from '../components/ContentBadge'
+import t from '../content/admin.json'
 
 function Admin() {
   const [courses, setCourses] = useState([])
@@ -14,7 +15,7 @@ function Admin() {
     let cancelled = false
     coursesApi.list()
       .then(data => { if (!cancelled) setCourses(data) })
-      .catch(err => { if (!cancelled) setError(err.message || 'Σφάλμα φόρτωσης') })
+      .catch(err => { if (!cancelled) setError(err.message || t.errorLoad) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [])
@@ -47,9 +48,9 @@ function Admin() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Πίνακας διαχείρισης</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{t.title}</h1>
         <p className="text-slate-600 dark:text-slate-400">
-          Διάλεξε μάθημα για να προσθέσεις ή να επεξεργαστείς ερωτήσεις.
+          {t.subtitle}
         </p>
       </div>
 
@@ -58,30 +59,30 @@ function Admin() {
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Αναζήτηση μαθήματος…"
+          placeholder={t.searchPlaceholder}
           className="w-full max-w-md px-4 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
       </div>
 
       {loading && (
-        <p className="text-slate-500 dark:text-slate-400">Φόρτωση μαθημάτων…</p>
+        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
       )}
 
       {error && (
         <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 text-rose-700 dark:text-rose-300">
-          Αδυναμία φόρτωσης μαθημάτων: {error}
+          {t.errorPrefix} {error}
         </div>
       )}
 
       {!loading && !error && grouped.length === 0 && (
-        <p className="text-slate-500 dark:text-slate-400">Δεν βρέθηκαν μαθήματα.</p>
+        <p className="text-slate-500 dark:text-slate-400">{t.empty}</p>
       )}
 
       <div className="space-y-10">
         {grouped.map(([semester, list]) => (
           <section key={semester}>
             <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
-              Εξάμηνο {semester}
+              {t.semesterPrefix} {semester}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {list.map(course => (
@@ -111,7 +112,7 @@ function CourseCard({ course, hasContent }) {
             {course.name}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Κωδικός: {course.id}
+            {t.courseCard.codePrefix} {course.id}
           </p>
         </div>
         <span className="text-brand-600 dark:text-brand-400 text-xl shrink-0">→</span>
