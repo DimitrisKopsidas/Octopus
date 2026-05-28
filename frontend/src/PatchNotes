@@ -67,6 +67,14 @@ Version 0.4.4
 - (x) Courses page filters by semester client-side (drop bySemester refetch on chip click — instant filtering)
 - (x) Optimistic course update in cache after settings save; invalidate withContent after question add/delete
 
+Version 0.4.5
+[x] Full frontend refactor: separation of concerns, smaller files
+- (x) Restructure components/ into subfolders: ui/, layout/, course/, question/, info/
+- (x) Extract sub-components from pages (CourseCard, QuestionCard, ReviewCard, ModeCard, HelpCard, RoadmapItem, SemesterButton, CoursesFilterModal, SystematicStudyPanel, SandboxPanel, CourseInfoCard, TipsCard, InfoRow, TimerOption, AdminCourseCard, AnswerOption, FlagButton, QuestionNavigator, StatCard, Countdown, Kbd, SoonBadge, all *Skeleton variants)
+- (x) New src/hooks/ folder with reusable logic: useCountdown, useFlash, useTestKeyboard, useCourseSettings
+- (x) Pages reduced to orchestration only (state + composition):
+- (x) Dead code removal: coursesApi.bySemester (no callers since client-side semester filtering), coursesStore.reset (no callers)
+
 Version 0.5.0
 [] Demo auth interface (no backend yet)
 - (x) Zustand authStore (in-memory only — interface scaffold)

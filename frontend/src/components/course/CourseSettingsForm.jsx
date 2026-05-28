@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { coursesApi } from '../lib/api'
+import { coursesApi } from '../../lib/api'
 
 function CourseSettingsForm({ course, onSaved, onCancel }) {
   const [questionSetSize, setQuestionSetSize] = useState(course?.questionSetSize ?? 25)

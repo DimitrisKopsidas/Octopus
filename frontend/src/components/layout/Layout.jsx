@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
 import UserMenu from './UserMenu'
-import ToastContainer from './Toast'
-import { useAuthStore } from '../store/authStore'
-import t from '../content/layout.json'
+import ToastContainer from '../ui/Toast'
+import { useAuthStore } from '../../store/authStore'
+import t from '../../content/layout.json'
 
 const navLinkClass = ({ isActive }) =>
   `px-3 py-2 rounded-md text-sm font-medium transition-colors ${

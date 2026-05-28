@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useToastStore } from '../store/toastStore'
+import { useToastStore } from '../../store/toastStore'
 
 const VARIANT = {
   success: {

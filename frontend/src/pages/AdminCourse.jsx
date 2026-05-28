@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { questionsApi } from '../lib/api'
 import { useCoursesStore } from '../store/coursesStore'
-import Modal from '../components/Modal'
-import ConfirmModal from '../components/ConfirmModal'
-import QuestionForm from '../components/QuestionForm'
-import CourseSettingsForm from '../components/CourseSettingsForm'
-import BackButton from '../components/BackButton'
-import Skeleton from '../components/Skeleton'
+import Modal from '../components/ui/Modal'
+import ConfirmModal from '../components/ui/ConfirmModal'
+import BackButton from '../components/ui/BackButton'
+import QuestionForm from '../components/question/QuestionForm'
+import QuestionCard from '../components/question/QuestionCard'
+import QuestionCardSkeleton from '../components/question/QuestionCardSkeleton'
+import CourseSettingsForm from '../components/course/CourseSettingsForm'
 import { toast } from '../store/toastStore'
 import t from '../content/adminCourse.json'
 
@@ -49,26 +50,11 @@ function AdminCourse() {
 
   useEffect(() => { reloadQuestions() }, [reloadQuestions])
 
-  function openCreate() {
-    setModalState({ open: true, editing: null })
-  }
-
-  function openEdit(question) {
-    setModalState({ open: true, editing: question })
-  }
-
-  function closeModal() {
-    setModalState({ open: false, editing: null })
-  }
-
-  function requestDelete(question) {
-    setDeleteTarget(question)
-  }
-
-  function cancelDelete() {
-    if (deleting) return
-    setDeleteTarget(null)
-  }
+  const openCreate = () => setModalState({ open: true, editing: null })
+  const openEdit = (question) => setModalState({ open: true, editing: question })
+  const closeModal = () => setModalState({ open: false, editing: null })
+  const requestDelete = (question) => setDeleteTarget(question)
+  const cancelDelete = () => { if (!deleting) setDeleteTarget(null) }
 
   async function confirmDelete() {
     if (!deleteTarget) return
@@ -96,9 +82,7 @@ function AdminCourse() {
 
       <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            {title}
-          </h1>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{title}</h1>
           {course && (
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               {t.subheader
@@ -130,14 +114,8 @@ function AdminCourse() {
       </div>
 
       {loading && (
-        <div
-          role="status"
-          aria-label={t.loading}
-          className="space-y-4"
-        >
-          {Array.from({ length: 3 }).map((_, i) => (
-            <QuestionCardSkeleton key={i} />
-          ))}
+        <div role="status" aria-label={t.loading} className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => <QuestionCardSkeleton key={i} />)}
         </div>
       )}
 
@@ -213,9 +191,7 @@ function AdminCourse() {
               <p className="text-sm font-medium text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-md px-3 py-2">
                 «{deleteTarget.title}»
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t.delete.warning}
-              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t.delete.warning}</p>
             </div>
           )
         }
@@ -224,70 +200,6 @@ function AdminCourse() {
         variant="danger"
         confirming={deleting}
       />
-    </div>
-  )
-}
-
-function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <h3 className="font-semibold text-slate-900 dark:text-white">
-          <span className="text-slate-400 dark:text-slate-500 mr-2">{index}.</span>
-          {question.title}
-        </h3>
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-sm px-2.5 py-1 rounded-md text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 font-medium transition-colors"
-          >
-            {t.questionCard.edit}
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            disabled={deleting}
-            className="text-sm px-2.5 py-1 rounded-md text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium disabled:opacity-50 transition-colors"
-          >
-            {deleting ? t.questionCard.deleting : t.questionCard.delete}
-          </button>
-        </div>
-      </div>
-      <ul className="space-y-1.5">
-        {question.answers.map(a => (
-          <li
-            key={a.id}
-            className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md ${
-              a.isCorrect
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900'
-                : 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 border border-transparent'
-            }`}
-          >
-            <span className="text-base">{a.isCorrect ? '✓' : '·'}</span>
-            <span>{a.title}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-function QuestionCardSkeleton() {
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <Skeleton className="h-5 w-2/3" />
-        <div className="flex items-center gap-1 shrink-0">
-          <Skeleton className="h-6 w-20" />
-          <Skeleton className="h-6 w-16" />
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-8 w-3/4" />
-      </div>
     </div>
   )
 }

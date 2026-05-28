@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { questionsApi } from '../lib/api'
+import { questionsApi } from '../../lib/api'
 
 const MIN_ANSWERS = 3
 const MAX_ANSWERS = 5

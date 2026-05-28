@@ -2,8 +2,17 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import { bundlesApi } from '../lib/api'
-import BackButton from '../components/BackButton'
+import BackButton from '../components/ui/BackButton'
+import StatCard from '../components/ui/StatCard'
+import ReviewCard from '../components/question/ReviewCard'
 import t from '../content/results.json'
+
+function formatDuration(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000))
+  const m = Math.floor(s / 60)
+  const rem = s % 60
+  return `${m}:${String(rem).padStart(2, '0')}`
+}
 
 function Results() {
   const { courseId } = useParams()
@@ -26,18 +35,14 @@ function Results() {
     questions.length > 0 &&
     endedAt != null
 
-  // Guard: if no completed session, bounce to start
   useEffect(() => {
-    if (!hasResults) {
-      navigate(`/courses/${courseId}/start`, { replace: true })
-    }
+    if (!hasResults) navigate(`/courses/${courseId}/start`, { replace: true })
   }, [hasResults, courseId, navigate])
 
-  // Submit bundle to backend once per session
   useEffect(() => {
     if (!hasResults || submittedRef.current) return
     const answerIds = Object.values(answers)
-    if (answerIds.length === 0) return // backend requires min 1 answer
+    if (answerIds.length === 0) return
     submittedRef.current = true
     bundlesApi
       .create({ setNum: setIndex, answerIds })
@@ -88,9 +93,7 @@ function Results() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <StatCard label={t.stats.correct}>
-          <span className={`text-3xl font-bold ${scoreTone}`}>
-            {correctCount}/{total}
-          </span>
+          <span className={`text-3xl font-bold ${scoreTone}`}>{correctCount}/{total}</span>
         </StatCard>
         <StatCard label={t.stats.percentage}>
           <span className={`text-3xl font-bold ${scoreTone}`}>{percent}%</span>
@@ -115,98 +118,11 @@ function Results() {
 
       <div className="space-y-4">
         {questions.map((q, i) => (
-          <ReviewCard
-            key={q.id}
-            index={i + 1}
-            question={q}
-            chosenAnswerId={answers[q.id]}
-          />
+          <ReviewCard key={q.id} index={i + 1} question={q} chosenAnswerId={answers[q.id]} />
         ))}
       </div>
     </div>
   )
-}
-
-function StatCard({ label, children }) {
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
-      <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-2">
-        {label}
-      </p>
-      {children}
-    </div>
-  )
-}
-
-function ReviewCard({ index, question, chosenAnswerId }) {
-  const correctAnswer = question.answers.find((a) => a.isCorrect)
-  const isCorrect = chosenAnswerId === correctAnswer?.id
-  const wasAnswered = chosenAnswerId != null
-
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <div
-        className={`px-5 py-3 border-b flex items-center justify-between gap-3 ${
-          !wasAnswered
-            ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800'
-            : isCorrect
-              ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900'
-              : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900'
-        }`}
-      >
-        <h3 className="font-semibold text-slate-900 dark:text-white">
-          <span className="text-slate-400 dark:text-slate-500 mr-2">{index}.</span>
-          {question.title}
-        </h3>
-        <span
-          className={`text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded shrink-0 ${
-            !wasAnswered
-              ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-700'
-              : isCorrect
-                ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60'
-                : 'text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/60'
-          }`}
-        >
-          {!wasAnswered ? t.review.noAnswer : isCorrect ? t.review.correct : t.review.wrong}
-        </span>
-      </div>
-      <ul className="p-3 space-y-1.5">
-        {question.answers.map((a) => {
-          const isChosen = a.id === chosenAnswerId
-          const isCorrectAnswer = a.isCorrect
-          return (
-            <li
-              key={a.id}
-              className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md ${
-                isCorrectAnswer
-                  ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900'
-                  : isChosen
-                    ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900'
-                    : 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 border border-transparent'
-              }`}
-            >
-              <span className="text-base shrink-0">
-                {isCorrectAnswer ? '✓' : isChosen ? '✗' : '·'}
-              </span>
-              <span className="flex-1">{a.title}</span>
-              {isChosen && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded shrink-0">
-                  {t.review.yourChoice}
-                </span>
-              )}
-            </li>
-          )
-        })}
-      </ul>
-    </div>
-  )
-}
-
-function formatDuration(ms) {
-  const s = Math.max(0, Math.floor(ms / 1000))
-  const m = Math.floor(s / 60)
-  const rem = s % 60
-  return `${m}:${String(rem).padStart(2, '0')}`
 }
 
 export default Results

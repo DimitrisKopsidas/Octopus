@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useCoursesStore } from '../store/coursesStore'
-import ContentBadge from '../components/ContentBadge'
-import Skeleton from '../components/Skeleton'
+import AdminCourseCard from '../components/course/AdminCourseCard'
+import AdminCourseCardSkeleton from '../components/course/AdminCourseCardSkeleton'
+import Skeleton from '../components/ui/Skeleton'
 import t from '../content/admin.json'
 
 function Admin() {
@@ -40,9 +40,7 @@ function Admin() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{t.title}</h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          {t.subtitle}
-        </p>
+        <p className="text-slate-600 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
       <div className="mb-6">
@@ -56,18 +54,12 @@ function Admin() {
       </div>
 
       {loading && (
-        <div
-          role="status"
-          aria-label={t.loading}
-          className="space-y-10"
-        >
+        <div role="status" aria-label={t.loading} className="space-y-10">
           {[1, 2].map((s) => (
             <section key={s}>
               <Skeleton className="h-3 w-24 mb-3" />
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <AdminCourseCardSkeleton key={i} />
-                ))}
+                {Array.from({ length: 3 }).map((_, i) => <AdminCourseCardSkeleton key={i} />)}
               </div>
             </section>
           ))}
@@ -92,7 +84,7 @@ function Admin() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {list.map(course => (
-                <CourseCard
+                <AdminCourseCard
                   key={course.id}
                   course={course}
                   hasContent={safeWithContentIds.has(course.id)}
@@ -101,44 +93,6 @@ function Admin() {
             </div>
           </section>
         ))}
-      </div>
-    </div>
-  )
-}
-
-function CourseCard({ course, hasContent }) {
-  return (
-    <Link
-      to={`/admin/courses/${course.id}`}
-      className="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-600 transition-all"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="font-semibold text-slate-900 dark:text-white leading-snug group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors">
-            {course.name}
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            {t.courseCard.codePrefix} {course.id}
-          </p>
-        </div>
-        <span className="text-brand-600 dark:text-brand-400 text-xl shrink-0">→</span>
-      </div>
-      <div className="mt-auto pt-4 flex justify-end">
-        <ContentBadge hasContent={hasContent} />
-      </div>
-    </Link>
-  )
-}
-
-function AdminCourseCardSkeleton() {
-  return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
-      <div className="space-y-2">
-        <Skeleton className="h-5 w-3/4" />
-        <Skeleton className="h-3 w-1/3" />
-      </div>
-      <div className="mt-auto pt-4 flex justify-end">
-        <Skeleton className="h-4 w-24" />
       </div>
     </div>
   )

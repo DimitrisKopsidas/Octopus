@@ -3,8 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { questionsApi } from '../lib/api'
 import { useCoursesStore } from '../store/coursesStore'
 import { useTestStore } from '../store/testStore'
-import BackButton from '../components/BackButton'
-import Skeleton from '../components/Skeleton'
+import { useCourseSettings } from '../hooks/useCourseSettings'
+import BackButton from '../components/ui/BackButton'
+import CourseStartSkeleton from '../components/course/CourseStartSkeleton'
+import CourseInfoCard from '../components/course/CourseInfoCard'
+import TipsCard from '../components/course/TipsCard'
+import SystematicStudyPanel from '../components/course/SystematicStudyPanel'
+import SandboxPanel from '../components/course/SandboxPanel'
 import t from '../content/courseStart.json'
 
 const TIMER_PRESET_MINUTES = [null, 5, 10, 15, 30]
@@ -16,50 +21,35 @@ function CourseStart() {
 
   const courses = useCoursesStore((s) => s.courses)
   const loadCourses = useCoursesStore((s) => s.loadCourses)
-
   const course = useMemo(
     () => courses?.find((c) => String(c.id) === String(courseId)) || null,
     [courses, courseId]
   )
 
-  const [settings, setSettings] = useState(null)
-  const [settingsLoading, setSettingsLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [starting, setStarting] = useState(false)
+  const { settings, loading: settingsLoading, error: settingsError } =
+    useCourseSettings(courseId, t.errorLoad)
 
   const [activeTab, setActiveTab] = useState('systematic')
   const [count, setCount] = useState(10)
   const [durationSeconds, setDurationSeconds] = useState(null)
+  const [starting, setStarting] = useState(false)
+  const [startError, setStartError] = useState(null)
 
   // Completed sets will come from the user model (backend) — interface only for now.
   const completedSets = {}
 
   useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
 
+  // Initialize sandbox defaults once settings arrive
   useEffect(() => {
-    let cancelled = false
-    setSettingsLoading(true)
-    setError(null)
-    questionsApi.settingsInfo(courseId)
-      .then((info) => {
-        if (cancelled) return
-        setSettings(info)
-        const total = info.totalQuestionCount || 0
-        if (total > 0) setCount(Math.min(10, total))
-        if (info.defaultTimerMinutes) {
-          setDurationSeconds(info.defaultTimerMinutes * 60)
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message || t.errorLoad)
-      })
-      .finally(() => {
-        if (!cancelled) setSettingsLoading(false)
-      })
-    return () => { cancelled = true }
-  }, [courseId])
+    if (!settings) return
+    const total = settings.totalQuestionCount || 0
+    if (total > 0) setCount(Math.min(10, total))
+    if (settings.defaultTimerMinutes) setDurationSeconds(settings.defaultTimerMinutes * 60)
+  }, [settings])
 
   const loading = settingsLoading || courses == null
+  const error = settingsError || startError
 
   const max = settings?.totalQuestionCount || 0
   const SET_SIZE = settings?.setQuestionCount || 25
@@ -82,14 +72,11 @@ function CourseStart() {
     let covered = 0
     sets.forEach((s) => { if (completedSets[s.index]) covered += s.count })
     return Math.round((covered / max) * 100)
-  }, [sets, completedSets, max])
+  }, [sets, max])
 
-  // Timer options: presets + the course's default (if not already in presets)
   const timerOptions = useMemo(() => {
     const minutesSet = new Set(TIMER_PRESET_MINUTES)
-    if (settings?.defaultTimerMinutes != null) {
-      minutesSet.add(settings.defaultTimerMinutes)
-    }
+    if (settings?.defaultTimerMinutes != null) minutesSet.add(settings.defaultTimerMinutes)
     const minutes = [...minutesSet].sort((a, b) => {
       if (a == null) return -1
       if (b == null) return 1
@@ -104,7 +91,7 @@ function CourseStart() {
   async function handleStart() {
     if (!canStart || starting) return
     setStarting(true)
-    setError(null)
+    setStartError(null)
     try {
       const questions = await questionsApi.byRandomCount(courseId, count)
       startSession({
@@ -118,7 +105,7 @@ function CourseStart() {
       })
       navigate(`/test/${courseId}`)
     } catch (err) {
-      setError(err.message || t.errorStartTest)
+      setStartError(err.message || t.errorStartTest)
       setStarting(false)
     }
   }
@@ -126,7 +113,7 @@ function CourseStart() {
   async function handleStartSet(set) {
     if (starting) return
     setStarting(true)
-    setError(null)
+    setStartError(null)
     try {
       const questions = await questionsApi.bySetNum(courseId, set.index)
       const timerSec = settings?.defaultTimerMinutes
@@ -143,7 +130,7 @@ function CourseStart() {
       })
       navigate(`/test/${courseId}`)
     } catch (err) {
-      setError(err.message || t.errorStartSet)
+      setStartError(err.message || t.errorStartSet)
       setStarting(false)
     }
   }
@@ -183,201 +170,40 @@ function CourseStart() {
       {!loading && !error && max > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           <div className="md:col-span-2 space-y-6">
-
             <div className="flex border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl p-1 gap-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab('systematic')}
-                className={`flex-1 text-center py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === 'systematic'
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
-                }`}
-              >
+              <TabButton active={activeTab === 'systematic'} onClick={() => setActiveTab('systematic')}>
                 {t.tabs.systematic}
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('sandbox')}
-                className={`flex-1 text-center py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === 'sandbox'
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
-                }`}
-              >
+              </TabButton>
+              <TabButton active={activeTab === 'sandbox'} onClick={() => setActiveTab('sandbox')}>
                 {t.tabs.sandbox}
-              </button>
+              </TabButton>
             </div>
 
             {activeTab === 'systematic' ? (
-              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
-                <div className="rounded-lg bg-brand-50 dark:bg-brand-950/30 border border-brand-100 dark:border-brand-900/60 p-4">
-                  <h3 className="font-semibold text-brand-900 dark:text-brand-300 text-sm mb-1">
-                    {t.systematic.explanationTitle}
-                  </h3>
-                  <p className="text-xs text-brand-800 dark:text-brand-400 leading-relaxed">
-                    {t.systematic.explanationTemplate
-                      .replace('{setSize}', SET_SIZE)
-                      .replace('{total}', max)
-                      .replace('{totalSets}', totalSets)}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                      {t.systematic.coverageLabel}
-                    </span>
-                    <span className="text-xl font-bold text-brand-600 dark:text-brand-400 tabular-nums">
-                      {coveragePercentage}% {coveragePercentage === 100 && '🏆'}
-                    </span>
-                  </div>
-                  <div className="h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
-                    <div
-                      className="h-full bg-gradient-to-r from-brand-500 to-brand-600 transition-all duration-500 rounded-full"
-                      style={{ width: `${coveragePercentage}%` }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                    {coveragePercentage === 100
-                      ? t.systematic.coverageDone
-                      : t.systematic.coveragePending}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {sets.map((set) => {
-                    const completed = completedSets[set.index]
-                    return (
-                      <div
-                        key={set.index}
-                        className={`flex flex-col rounded-lg border p-4 shadow-sm transition-all ${
-                          completed
-                            ? 'bg-slate-50/50 dark:bg-slate-900/30 border-slate-300 dark:border-slate-800'
-                            : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-700'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h4 className="font-semibold text-slate-900 dark:text-white text-sm">
-                              {t.systematic.setLabel} {set.index + 1}
-                            </h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                              {t.systematic.setRangeTemplate
-                                .replace('{start}', set.start)
-                                .replace('{end}', set.end)
-                                .replace('{count}', set.count)}
-                            </p>
-                            {settings?.defaultTimerMinutes != null && (
-                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 inline-flex items-center gap-1">
-                                <span aria-hidden="true">⏱</span>
-                                {t.systematic.setTimerTemplate.replace('{minutes}', settings.defaultTimerMinutes)}
-                              </p>
-                            )}
-                          </div>
-                          {completed && (
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
-                              ✓ {completed.score}/{completed.total}
-                            </span>
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleStartSet(set)}
-                          disabled={starting}
-                          className={`mt-auto w-full py-2 rounded-md text-xs font-semibold shadow-sm transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
-                            completed
-                              ? 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200'
-                              : 'bg-brand-600 hover:bg-brand-700 text-white'
-                          }`}
-                        >
-                          {starting ? t.systematic.loadingSet : completed ? t.systematic.repeatSet : t.systematic.startSet}
-                        </button>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
+              <SystematicStudyPanel
+                total={max}
+                setSize={SET_SIZE}
+                totalSets={totalSets}
+                sets={sets}
+                completedSets={completedSets}
+                defaultTimerMinutes={settings?.defaultTimerMinutes}
+                coveragePercentage={coveragePercentage}
+                starting={starting}
+                onStartSet={handleStartSet}
+              />
             ) : (
-              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                <header className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30">
-                  <h2 className="font-semibold text-slate-900 dark:text-white text-sm">
-                    {t.sandbox.title}
-                  </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    {t.sandbox.subtitle}
-                  </p>
-                </header>
-
-                <div className="px-6 py-5 space-y-6">
-                  {coveragePercentage < 100 && (
-                    <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/60 p-4">
-                      <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-                        {t.sandbox.warningTemplate}
-                      </p>
-                    </div>
-                  )}
-
-                  <section>
-                    <div className="flex items-baseline justify-between mb-3">
-                      <label htmlFor="count" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                        {t.sandbox.countLabel}
-                      </label>
-                      <span className="text-2xl font-bold text-brand-600 dark:text-brand-400 tabular-nums">
-                        {count}
-                      </span>
-                    </div>
-                    <input
-                      id="count"
-                      type="range"
-                      min={1}
-                      max={max}
-                      value={count}
-                      onChange={(e) => setCount(Number(e.target.value))}
-                      className="w-full h-2 rounded-lg bg-slate-200 dark:bg-slate-800 appearance-none cursor-pointer accent-brand-600"
-                    />
-                    <div className="flex items-center justify-between mt-2 text-xs text-slate-500 dark:text-slate-400">
-                      <span>1</span>
-                      <button
-                        type="button"
-                        onClick={() => setCount(max)}
-                        className="text-brand-700 dark:text-brand-400 font-medium hover:text-brand-800 dark:hover:text-brand-300"
-                      >
-                        {t.sandbox.allLabelTemplate.replace('{max}', max)}
-                      </button>
-                      <span>{max}</span>
-                    </div>
-                  </section>
-
-                  <section>
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3 block">
-                      {t.sandbox.timerLabel}
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                      {timerOptions.map((opt) => (
-                        <TimerOption
-                          key={String(opt.value)}
-                          label={opt.label}
-                          active={durationSeconds === opt.value}
-                          onClick={() => setDurationSeconds(opt.value)}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                </div>
-
-                <footer className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
-                  <button
-                    type="button"
-                    onClick={handleStart}
-                    disabled={!canStart || starting}
-                    className="px-5 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 disabled:bg-brand-600/50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors cursor-pointer"
-                  >
-                    {starting ? t.sandbox.startingButton : t.sandbox.startButton}
-                  </button>
-                </footer>
-              </div>
+              <SandboxPanel
+                max={max}
+                count={count}
+                setCount={setCount}
+                durationSeconds={durationSeconds}
+                setDurationSeconds={setDurationSeconds}
+                timerOptions={timerOptions}
+                coveragePercentage={coveragePercentage}
+                starting={starting}
+                canStart={canStart}
+                onStart={handleStart}
+              />
             )}
           </div>
 
@@ -391,156 +217,19 @@ function CourseStart() {
   )
 }
 
-function CourseInfoCard({ course, questionCount, coverage }) {
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <header className="px-5 py-3 border-b border-slate-200 dark:border-slate-800">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-          {t.info.title}
-        </h2>
-      </header>
-      <dl className="px-5 py-4 space-y-3 text-sm">
-        <InfoRow label={t.info.availableQuestions}>
-          <span className="font-semibold text-slate-900 dark:text-white tabular-nums">
-            {questionCount}
-          </span>
-        </InfoRow>
-        <InfoRow label={t.info.coverage}>
-          <span className="font-semibold text-brand-600 dark:text-brand-400 tabular-nums">
-            {coverage}%
-          </span>
-        </InfoRow>
-        {course && (
-          <>
-            <InfoRow label={t.info.code}>
-              <span className="text-slate-700 dark:text-slate-300 tabular-nums">{course.id}</span>
-            </InfoRow>
-            <InfoRow label={t.info.semester}>
-              <span className="text-slate-700 dark:text-slate-300">{course.semester}</span>
-            </InfoRow>
-          </>
-        )}
-        <InfoRow label={t.info.lastExam} muted>
-          <SoonBadge />
-        </InfoRow>
-        <InfoRow label={t.info.recentAdditions} muted>
-          <SoonBadge />
-        </InfoRow>
-      </dl>
-    </div>
-  )
-}
-
-function TipsCard() {
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <header className="px-5 py-3 border-b border-slate-200 dark:border-slate-800">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-          {t.tipsCard.title}
-        </h2>
-      </header>
-      <ol className="px-5 py-4 space-y-3">
-        {t.tips.map((tip, i) => (
-          <li key={i} className="flex items-start gap-3 text-sm">
-            <span className="shrink-0 w-5 h-5 rounded-full bg-brand-100 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 text-xs font-bold flex items-center justify-center mt-0.5">
-              {i + 1}
-            </span>
-            <span className="text-slate-700 dark:text-slate-300 leading-relaxed">
-              {tip}
-            </span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
-}
-
-function InfoRow({ label, children, muted }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <dt className={`text-xs uppercase tracking-wider font-medium ${muted ? 'text-slate-400 dark:text-slate-500' : 'text-slate-500 dark:text-slate-400'}`}>
-        {label}
-      </dt>
-      <dd>{children}</dd>
-    </div>
-  )
-}
-
-function SoonBadge() {
-  return (
-    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
-      {t.info.soonBadge}
-    </span>
-  )
-}
-
-function TimerOption({ label, active, onClick }) {
+function TabButton({ active, onClick, children }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+      className={`flex-1 text-center py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
         active
           ? 'bg-brand-600 text-white shadow-sm'
-          : 'bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300'
+          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40'
       }`}
     >
-      {label}
+      {children}
     </button>
-  )
-}
-
-function CourseStartSkeleton() {
-  return (
-    <div
-      role="status"
-      aria-label={t.loading}
-      className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
-    >
-      <div className="md:col-span-2 space-y-6">
-        <Skeleton className="h-12 w-full rounded-xl" />
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
-          <Skeleton className="h-20 w-full rounded-lg" />
-          <div className="space-y-2">
-            <div className="flex items-baseline justify-between">
-              <Skeleton className="h-3 w-32" />
-              <Skeleton className="h-6 w-16" />
-            </div>
-            <Skeleton className="h-3 w-full rounded-full" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-800 p-4 space-y-3">
-                <Skeleton className="h-4 w-1/3" />
-                <Skeleton className="h-3 w-2/3" />
-                <Skeleton className="h-3 w-1/4" />
-                <Skeleton className="h-8 w-full mt-3" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <aside className="space-y-4">
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3">
-          <Skeleton className="h-4 w-1/2 mb-3" />
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center justify-between gap-3">
-              <Skeleton className="h-3 w-1/2" />
-              <Skeleton className="h-4 w-12" />
-            </div>
-          ))}
-        </div>
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3">
-          <Skeleton className="h-4 w-2/3 mb-3" />
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <Skeleton className="h-5 w-5 rounded-full shrink-0" />
-              <Skeleton className="h-3 w-full" />
-            </div>
-          ))}
-        </div>
-      </aside>
-    </div>
   )
 }
 
