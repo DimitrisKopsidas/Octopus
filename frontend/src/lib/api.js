@@ -8,7 +8,6 @@ const unwrap = (promise) => promise.then((res) => res.data)
 
 export const coursesApi = {
   list: () => unwrap(http.get('/courses')),
-  bySemester: (semester) => unwrap(http.get(`/courses/${semester}`)),
   listWithContent: () => unwrap(http.get('/courses/with-content')),
   update: (id, payload) => unwrap(http.put(`/courses/${id}`, payload)),
 }

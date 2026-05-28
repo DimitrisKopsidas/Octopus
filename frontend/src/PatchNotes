@@ -57,6 +57,16 @@ Version 0.4.3
 - (x) exported static text to json 
 - (x) implemented info page
 
+Version 0.4.4
+[x] UX polish: skeletons, toasts, courses cache
+- (x) Skeleton primitive component + per-page skeleton layouts (Courses, Admin, AdminCourse, CourseStart)
+- (x) Toast notification system: Zustand toastStore + ToastContainer + 4 variants (success/error/warning/info) + helper API `toast.success(...)`
+- (x) Mount ToastContainer in Layout (visible from every page)
+- (x) Replace alert() in AdminCourse delete with toast.error; add success toasts for question create/update/delete + course settings save
+- (x) Zustand coursesStore caches /courses and /courses/with-content for the SPA session (one fetch shared across Courses, Admin, AdminCourse, CourseStart)
+- (x) Courses page filters by semester client-side (drop bySemester refetch on chip click — instant filtering)
+- (x) Optimistic course update in cache after settings save; invalidate withContent after question add/delete
+
 Version 0.5.0
 [] Demo auth interface (no backend yet)
 - (x) Zustand authStore (in-memory only — interface scaffold)

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
 import UserMenu from './UserMenu'
+import ToastContainer from './Toast'
 import { useAuthStore } from '../store/authStore'
 import t from '../content/layout.json'
 
@@ -157,6 +158,8 @@ function Layout() {
       <footer className="border-t border-slate-200 dark:border-slate-800 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
         {t.footer}
       </footer>
+
+      <ToastContainer />
     </div>
   )
 }

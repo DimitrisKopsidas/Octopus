@@ -1,16 +1,29 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { coursesApi, questionsApi } from '../lib/api'
+import { questionsApi } from '../lib/api'
+import { useCoursesStore } from '../store/coursesStore'
 import Modal from '../components/Modal'
 import ConfirmModal from '../components/ConfirmModal'
 import QuestionForm from '../components/QuestionForm'
 import CourseSettingsForm from '../components/CourseSettingsForm'
 import BackButton from '../components/BackButton'
+import Skeleton from '../components/Skeleton'
+import { toast } from '../store/toastStore'
 import t from '../content/adminCourse.json'
 
 function AdminCourse() {
   const { courseId } = useParams()
-  const [course, setCourse] = useState(null)
+
+  const courses = useCoursesStore((s) => s.courses)
+  const loadCourses = useCoursesStore((s) => s.loadCourses)
+  const applyCourseUpdate = useCoursesStore((s) => s.applyCourseUpdate)
+  const invalidateWithContent = useCoursesStore((s) => s.invalidateWithContent)
+
+  const course = useMemo(
+    () => courses?.find((c) => String(c.id) === String(courseId)) || null,
+    [courses, courseId]
+  )
+
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -19,17 +32,14 @@ function AdminCourse() {
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
-  const reload = useCallback(async () => {
+  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
+
+  const reloadQuestions = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const [courses, questions] = await Promise.all([
-        coursesApi.list(),
-        questionsApi.listByCourse(courseId),
-      ])
-      const found = courses.find(c => String(c.id) === String(courseId))
-      setCourse(found || null)
-      setQuestions(questions)
+      const data = await questionsApi.listByCourse(courseId)
+      setQuestions(data)
     } catch (err) {
       setError(err.message || t.errorFallback)
     } finally {
@@ -37,7 +47,7 @@ function AdminCourse() {
     }
   }, [courseId])
 
-  useEffect(() => { reload() }, [reload])
+  useEffect(() => { reloadQuestions() }, [reloadQuestions])
 
   function openCreate() {
     setModalState({ open: true, editing: null })
@@ -67,8 +77,10 @@ function AdminCourse() {
       await questionsApi.remove(deleteTarget.id)
       setQuestions(prev => prev.filter(q => q.id !== deleteTarget.id))
       setDeleteTarget(null)
+      invalidateWithContent()
+      toast.success(t.toast.questionDeleted)
     } catch (err) {
-      alert(`${t.delete.failurePrefix} ${err.message || ''}`)
+      toast.error(`${t.delete.failurePrefix} ${err.message || ''}`)
     } finally {
       setDeleting(false)
     }
@@ -118,7 +130,15 @@ function AdminCourse() {
       </div>
 
       {loading && (
-        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
+        <div
+          role="status"
+          aria-label={t.loading}
+          className="space-y-4"
+        >
+          {Array.from({ length: 3 }).map((_, i) => (
+            <QuestionCardSkeleton key={i} />
+          ))}
+        </div>
       )}
 
       {error && !loading && (
@@ -156,8 +176,8 @@ function AdminCourse() {
         <QuestionForm
           courseId={courseId}
           initialQuestion={modalState.editing}
-          onCreated={() => { closeModal(); reload() }}
-          onUpdated={() => { closeModal(); reload() }}
+          onCreated={() => { closeModal(); reloadQuestions(); invalidateWithContent(); toast.success(t.toast.questionCreated) }}
+          onUpdated={() => { closeModal(); reloadQuestions(); toast.success(t.toast.questionUpdated) }}
           onCancel={closeModal}
         />
       </Modal>
@@ -171,8 +191,9 @@ function AdminCourse() {
         <CourseSettingsForm
           course={course}
           onSaved={(updated) => {
-            setCourse(updated)
+            applyCourseUpdate(updated)
             setSettingsOpen(false)
+            toast.success(t.toast.settingsSaved)
           }}
           onCancel={() => setSettingsOpen(false)}
         />
@@ -248,6 +269,25 @@ function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
           </li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+function QuestionCardSkeleton() {
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <Skeleton className="h-5 w-2/3" />
+        <div className="flex items-center gap-1 shrink-0">
+          <Skeleton className="h-6 w-20" />
+          <Skeleton className="h-6 w-16" />
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-3/4" />
+      </div>
     </div>
   )
 }

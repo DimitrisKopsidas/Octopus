@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { coursesApi, questionsApi } from '../lib/api'
+import { questionsApi } from '../lib/api'
+import { useCoursesStore } from '../store/coursesStore'
 import { useTestStore } from '../store/testStore'
 import BackButton from '../components/BackButton'
+import Skeleton from '../components/Skeleton'
 import t from '../content/courseStart.json'
 
 const TIMER_PRESET_MINUTES = [null, 5, 10, 15, 30]
@@ -12,9 +14,16 @@ function CourseStart() {
   const navigate = useNavigate()
   const startSession = useTestStore((s) => s.startSession)
 
-  const [course, setCourse] = useState(null)
-  const [settings, setSettings] = useState(null) // { totalQuestionCount, setQuestionCount, defaultTimerMinutes }
-  const [loading, setLoading] = useState(true)
+  const courses = useCoursesStore((s) => s.courses)
+  const loadCourses = useCoursesStore((s) => s.loadCourses)
+
+  const course = useMemo(
+    () => courses?.find((c) => String(c.id) === String(courseId)) || null,
+    [courses, courseId]
+  )
+
+  const [settings, setSettings] = useState(null)
+  const [settingsLoading, setSettingsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [starting, setStarting] = useState(false)
 
@@ -25,18 +34,15 @@ function CourseStart() {
   // Completed sets will come from the user model (backend) — interface only for now.
   const completedSets = {}
 
+  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
+
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
+    setSettingsLoading(true)
     setError(null)
-    Promise.all([
-      coursesApi.list(),
-      questionsApi.settingsInfo(courseId),
-    ])
-      .then(([courses, info]) => {
+    questionsApi.settingsInfo(courseId)
+      .then((info) => {
         if (cancelled) return
-        const found = courses.find((c) => String(c.id) === String(courseId))
-        setCourse(found || null)
         setSettings(info)
         const total = info.totalQuestionCount || 0
         if (total > 0) setCount(Math.min(10, total))
@@ -48,10 +54,12 @@ function CourseStart() {
         if (!cancelled) setError(err.message || t.errorLoad)
       })
       .finally(() => {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) setSettingsLoading(false)
       })
     return () => { cancelled = true }
   }, [courseId])
+
+  const loading = settingsLoading || courses == null
 
   const max = settings?.totalQuestionCount || 0
   const SET_SIZE = settings?.setQuestionCount || 25
@@ -157,9 +165,7 @@ function CourseStart() {
         )}
       </div>
 
-      {loading && (
-        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
-      )}
+      {loading && <CourseStartSkeleton />}
 
       {error && !loading && (
         <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 text-rose-700 dark:text-rose-300">
@@ -481,6 +487,60 @@ function TimerOption({ label, active, onClick }) {
     >
       {label}
     </button>
+  )
+}
+
+function CourseStartSkeleton() {
+  return (
+    <div
+      role="status"
+      aria-label={t.loading}
+      className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start"
+    >
+      <div className="md:col-span-2 space-y-6">
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-6">
+          <Skeleton className="h-20 w-full rounded-lg" />
+          <div className="space-y-2">
+            <div className="flex items-baseline justify-between">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-6 w-16" />
+            </div>
+            <Skeleton className="h-3 w-full rounded-full" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-800 p-4 space-y-3">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-3 w-2/3" />
+                <Skeleton className="h-3 w-1/4" />
+                <Skeleton className="h-8 w-full mt-3" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <aside className="space-y-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3">
+          <Skeleton className="h-4 w-1/2 mb-3" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between gap-3">
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-4 w-12" />
+            </div>
+          ))}
+        </div>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 space-y-3">
+          <Skeleton className="h-4 w-2/3 mb-3" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <Skeleton className="h-5 w-5 rounded-full shrink-0" />
+              <Skeleton className="h-3 w-full" />
+            </div>
+          ))}
+        </div>
+      </aside>
+    </div>
   )
 }
 

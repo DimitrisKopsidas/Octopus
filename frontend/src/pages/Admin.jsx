@@ -1,36 +1,27 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { coursesApi } from '../lib/api'
+import { useCoursesStore } from '../store/coursesStore'
 import ContentBadge from '../components/ContentBadge'
+import Skeleton from '../components/Skeleton'
 import t from '../content/admin.json'
 
 function Admin() {
-  const [courses, setCourses] = useState([])
-  const [withContentIds, setWithContentIds] = useState(() => new Set())
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const courses = useCoursesStore((s) => s.courses)
+  const withContentIds = useCoursesStore((s) => s.withContentIds)
+  const error = useCoursesStore((s) => s.error)
+  const loadCourses = useCoursesStore((s) => s.loadCourses)
+  const loadWithContent = useCoursesStore((s) => s.loadWithContent)
+
+  const loading = courses == null
+  const safeWithContentIds = withContentIds ?? new Set()
+
   const [query, setQuery] = useState('')
 
-  useEffect(() => {
-    let cancelled = false
-    coursesApi.list()
-      .then(data => { if (!cancelled) setCourses(data) })
-      .catch(err => { if (!cancelled) setError(err.message || t.errorLoad) })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    coursesApi.listWithContent()
-      .then(data => {
-        if (!cancelled) setWithContentIds(new Set(data.map(c => c.id)))
-      })
-      .catch(() => {})
-    return () => { cancelled = true }
-  }, [])
+  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
+  useEffect(() => { loadWithContent() }, [loadWithContent])
 
   const grouped = useMemo(() => {
+    if (!courses) return []
     const q = query.trim().toLowerCase()
     const filtered = q
       ? courses.filter(c => c.name.toLowerCase().includes(q) || String(c.id).includes(q))
@@ -65,7 +56,22 @@ function Admin() {
       </div>
 
       {loading && (
-        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
+        <div
+          role="status"
+          aria-label={t.loading}
+          className="space-y-10"
+        >
+          {[1, 2].map((s) => (
+            <section key={s}>
+              <Skeleton className="h-3 w-24 mb-3" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <AdminCourseCardSkeleton key={i} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       )}
 
       {error && (
@@ -89,7 +95,7 @@ function Admin() {
                 <CourseCard
                   key={course.id}
                   course={course}
-                  hasContent={withContentIds.has(course.id)}
+                  hasContent={safeWithContentIds.has(course.id)}
                 />
               ))}
             </div>
@@ -121,6 +127,20 @@ function CourseCard({ course, hasContent }) {
         <ContentBadge hasContent={hasContent} />
       </div>
     </Link>
+  )
+}
+
+function AdminCourseCardSkeleton() {
+  return (
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="space-y-2">
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-3 w-1/3" />
+      </div>
+      <div className="mt-auto pt-4 flex justify-end">
+        <Skeleton className="h-4 w-24" />
+      </div>
+    </div>
   )
 }
 

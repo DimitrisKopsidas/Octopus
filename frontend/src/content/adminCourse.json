@@ -27,5 +27,11 @@
     "confirm": "Διαγραφή",
     "cancel": "Ακύρωση",
     "failurePrefix": "Αποτυχία διαγραφής:"
+  },
+  "toast": {
+    "questionCreated": "Η ερώτηση δημιουργήθηκε",
+    "questionUpdated": "Η ερώτηση ενημερώθηκε",
+    "questionDeleted": "Η ερώτηση διαγράφηκε",
+    "settingsSaved": "Οι ρυθμίσεις αποθηκεύτηκαν"
   }
 }

@@ -1,18 +1,24 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { coursesApi } from '../lib/api'
+import { useCoursesStore } from '../store/coursesStore'
 import Modal from '../components/Modal'
 import ContentBadge from '../components/ContentBadge'
+import Skeleton from '../components/Skeleton'
 import t from '../content/courses.json'
 
 const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 function Courses() {
-  const [courses, setCourses] = useState([])
-  const [withContentIds, setWithContentIds] = useState(() => new Set())
-  const [withContentLoaded, setWithContentLoaded] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const courses = useCoursesStore((s) => s.courses)
+  const withContentIds = useCoursesStore((s) => s.withContentIds)
+  const error = useCoursesStore((s) => s.error)
+  const loadCourses = useCoursesStore((s) => s.loadCourses)
+  const loadWithContent = useCoursesStore((s) => s.loadWithContent)
+
+  const loading = courses == null
+  const withContentLoaded = withContentIds != null
+  const safeWithContentIds = withContentIds ?? new Set()
+
   const [query, setQuery] = useState('')
 
   // Applied filters (used by the listing)
@@ -27,56 +33,28 @@ function Courses() {
   // Pagination (UX Show More)
   const [visibleCount, setVisibleCount] = useState(6)
 
-  // Reset pagination count when search terms or filters change
   useEffect(() => {
     setVisibleCount(6)
   }, [query, semester, onlyWithContent])
 
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setError(null)
-    const fetcher = semester === 'all'
-      ? coursesApi.list()
-      : coursesApi.bySemester(semester)
-    fetcher
-      .then(data => { if (!cancelled) setCourses(data) })
-      .catch(err => { if (!cancelled) setError(err.message || t.errorLoad) })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
-  }, [semester])
-
-  useEffect(() => {
-    let cancelled = false
-    coursesApi.listWithContent()
-      .then(data => {
-        if (cancelled) return
-        setWithContentIds(new Set(data.map(c => c.id)))
-        setWithContentLoaded(true)
-      })
-      .catch(() => {})
-    return () => { cancelled = true }
-  }, [])
+  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
+  useEffect(() => { loadWithContent() }, [loadWithContent])
 
   const filtered = useMemo(() => {
+    if (!courses) return []
     const q = query.trim().toLowerCase()
     return courses
-      .filter(c => !onlyWithContent || withContentIds.has(c.id))
+      .filter(c => semester === 'all' || c.semester === semester)
+      .filter(c => !onlyWithContent || safeWithContentIds.has(c.id))
       .filter(c => !q || c.name.toLowerCase().includes(q) || String(c.id).includes(q))
       .sort((a, b) => {
-        const aHas = withContentIds.has(a.id) ? 1 : 0
-        const bHas = withContentIds.has(b.id) ? 1 : 0
-
-        // Priority 1: Has content (Yes comes before No, descending)
+        const aHas = safeWithContentIds.has(a.id) ? 1 : 0
+        const bHas = safeWithContentIds.has(b.id) ? 1 : 0
         if (aHas !== bHas) return bHas - aHas
-
-        // Priority 2: Semester (ascending, e.g. 1st semester before 3rd)
         if (a.semester !== b.semester) return a.semester - b.semester
-
-        // Priority 3: Alphabetical Greek name sorting
         return a.name.localeCompare(b.name, 'el')
       })
-  }, [courses, query, onlyWithContent, withContentIds])
+  }, [courses, query, semester, onlyWithContent, safeWithContentIds])
 
   const activeFilterCount =
     (semester !== 'all' ? 1 : 0) + (onlyWithContent ? 1 : 0)
@@ -133,7 +111,15 @@ function Courses() {
       </div>
 
       {loading && (
-        <p className="text-slate-500 dark:text-slate-400">{t.loading}</p>
+        <div
+          role="status"
+          aria-label={t.loading}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CourseCardSkeleton key={i} />
+          ))}
+        </div>
       )}
 
       {error && !loading && (
@@ -150,7 +136,7 @@ function Courses() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.slice(0, visibleCount).map(course => {
-          const hasContent = withContentIds.has(course.id)
+          const hasContent = safeWithContentIds.has(course.id)
           const disabled = withContentLoaded && !hasContent
           return (
             <CourseCard
@@ -332,6 +318,21 @@ function CourseCard({ course, hasContent, disabled }) {
     >
       {inner}
     </Link>
+  )
+}
+
+function CourseCardSkeleton() {
+  return (
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-3 w-1/3" />
+      </div>
+      <div className="mt-auto pt-4 flex justify-end">
+        <Skeleton className="h-4 w-24" />
+      </div>
+    </div>
   )
 }
 
