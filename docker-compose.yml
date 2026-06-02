@@ -27,7 +27,8 @@ services:
       - /app/node_modules
     depends_on:
       - backend
-
+    environment:
+      - VITE_API_BASE_URL=https://octopus.kerberos.network/api/v1
 
 #old-----------------------------------------------------
 #name: octopus
