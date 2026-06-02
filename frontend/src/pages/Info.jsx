@@ -51,7 +51,13 @@ function Info() {
       <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.howToHelp.title}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.howToHelp.subtitle}</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={`grid grid-cols-1 ${
+          t.howToHelp.cards.length === 1
+            ? 'max-w-md mx-auto w-full'
+            : t.howToHelp.cards.length === 2
+            ? 'md:grid-cols-2 max-w-2xl mx-auto w-full'
+            : 'md:grid-cols-3'
+        } gap-4`}>
           {t.howToHelp.cards.map((card) => (
             <HelpCard
               key={card.title}

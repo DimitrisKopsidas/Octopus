@@ -44,16 +44,8 @@
   },
   "howToHelp": {
     "title": "Πώς να βοηθήσεις",
-    "subtitle": "Τρεις τρόποι για να συνεισφέρεις στο project.",
+    "subtitle": "Δύο τρόποι για να συνεισφέρεις στο project.",
     "cards": [
-      {
-        "emoji": "🛠",
-        "title": "Γίνε Helper",
-        "description": "Πρόσθεσε ερωτήσεις από τα μαθήματά σου. Χρειάζεσαι κωδικό helper από διαχειριστή.",
-        "cta": "Εγγραφή",
-        "kind": "internal",
-        "target": "/register"
-      },
       {
         "emoji": "☕",
         "title": "Στήριξε με coffee",
@@ -65,11 +57,11 @@
       },
       {
         "emoji": "💬",
-        "title": "Feedback",
-        "description": "Πες μας τι θες να βελτιωθεί, ή αν βρήκες bug. Κάθε σχόλιο μετράει.",
-        "cta": "Επικοινωνία",
+        "title": "Feedback & Επικοινωνία",
+        "description": "Πες μας τι θες να βελτιωθεί, αν βρήκες κάποιο bug, ή πρότεινε νέες ιδέες. Κάθε σχόλιο μετράει.",
+        "cta": "Discord Κανάλι",
         "kind": "external",
-        "target": "mailto"
+        "target": "https://discord.gg/MZKMrnzPVq"
       }
     ]
   },
@@ -118,11 +110,10 @@
     "title": "Έρχονται σύντομα",
     "subtitle": "Τι δουλεύεται για επόμενες εκδόσεις.",
     "items": [
-      { "emoji": "🔐", "text": "Πραγματικό auth με httpOnly cookies" },
+      { "emoji": "👥", "text": "Λογαριασμοί χρηστών σύντομα διαθέσιμοι" },
       { "emoji": "📈", "text": "Ιστορικό προσπαθειών στο προφίλ σου" },
       { "emoji": "🏆", "text": "Leaderboards (Best Score / Most Tests / Streak)" },
-      { "emoji": "☕", "text": "Donor badges με ορατή αναγνώριση" },
-      { "emoji": "✨", "text": "Loading skeletons, error toasts, polish" }
+      { "emoji": "☕", "text": "Donor badges με ορατή αναγνώριση" }
     ]
   },
   "footer": {

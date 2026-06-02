@@ -1,8 +1,7 @@
 import axios from 'axios'
 
 const http = axios.create({
-//  baseURL: 'http://localhost:8080/api/v1',
-    baseURL: 'https://octopus.kerberos.network/api/v1'
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
 })
 
 const unwrap = (promise) => promise.then((res) => res.data)
