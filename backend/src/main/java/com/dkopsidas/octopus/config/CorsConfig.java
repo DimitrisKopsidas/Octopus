@@ -9,7 +9,8 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/v1/**")
-                .allowedOrigins("http://localhost:5173")
+                .allowedOrigins("http://localhost:5173",
+                        "https://octopus.kerberos.network")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH");
     }
 }
