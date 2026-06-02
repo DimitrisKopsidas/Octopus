@@ -29,10 +29,10 @@ public class Course {
     @OneToMany(mappedBy = "course")//field not column
     private List<Question> questions = new ArrayList<>();
 
-    @Column(name = "questionSetSize", nullable = false)
+    @Column(name = "question_set_size", nullable = false)
     private int questionSetSize;
 
-    @Column(name = "defaultTimerMinutes", nullable = false)
+    @Column(name = "default_timer_minutes", nullable = false)
     private int defaultTimerMinutes;
 
     public void addQuestion(Question a) {

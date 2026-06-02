@@ -19,6 +19,7 @@ public class BundleMapperImpl implements BundleMapper {
         Bundle bundle = new Bundle();
         bundle.setSetNum(dto.setNum());
         bundle.setScore(0);
+        bundle.setTimeForCompletion(dto.timeForCompletion());
         bundle.setCreated(Instant.now());
 
         answers.forEach(bundle::addAnswer);

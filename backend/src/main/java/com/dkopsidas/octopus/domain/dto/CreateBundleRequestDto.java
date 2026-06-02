@@ -6,6 +6,7 @@ import java.util.List;
 
 public record CreateBundleRequestDto(
         Integer setNum,
+        Integer timeForCompletion,
         @Size(min = 1, message = ERROR_MESSAGE_ANSWER_COUNT)
         List<Long> answerIds
 ) {

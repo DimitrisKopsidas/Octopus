@@ -27,6 +27,9 @@ public class Bundle {
     @Column(name = "score", nullable = false)
     private int score;
 
+    @Column(name = "time_for_completion", nullable = false)
+    private int timeForCompletion;
+
     @JsonIgnore//TODO test that the answers are returned when needed
     @ManyToMany
     @JoinTable(
