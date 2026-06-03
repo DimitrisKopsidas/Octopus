@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { questionsApi } from '../lib/api'
 
 // Fetches settings info for a course: { totalQuestionCount, setQuestionCount, defaultTimerMinutes }.
+// Returns a `reload()` to retry after an error/timeout.
 export function useCourseSettings(courseId, fallbackErrorMessage = 'Σφάλμα φόρτωσης') {
   const [settings, setSettings] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -22,7 +24,9 @@ export function useCourseSettings(courseId, fallbackErrorMessage = 'Σφάλμα
         if (!cancelled) setLoading(false)
       })
     return () => { cancelled = true }
-  }, [courseId, fallbackErrorMessage])
+  }, [courseId, fallbackErrorMessage, reloadKey])
 
-  return { settings, loading, error }
+  const reload = () => setReloadKey((k) => k + 1)
+
+  return { settings, loading, error, reload }
 }

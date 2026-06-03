@@ -4,10 +4,12 @@ import { questionsApi } from '../lib/api'
 import { useCoursesStore } from '../store/coursesStore'
 import { useTestStore } from '../store/testStore'
 import { useCourseSettings } from '../hooks/useCourseSettings'
+import { toast } from '../store/toastStore'
 import BackButton from '../components/ui/BackButton'
 import CourseStartSkeleton from '../components/course/CourseStartSkeleton'
 import CourseInfoCard from '../components/course/CourseInfoCard'
 import TipsCard from '../components/course/TipsCard'
+import ErrorState from '../components/ui/ErrorState'
 import SystematicStudyPanel from '../components/course/SystematicStudyPanel'
 import SandboxPanel from '../components/course/SandboxPanel'
 import t from '../content/courseStart.json'
@@ -20,20 +22,20 @@ function CourseStart() {
   const startSession = useTestStore((s) => s.startSession)
 
   const courses = useCoursesStore((s) => s.courses)
+  const coursesError = useCoursesStore((s) => s.error)
   const loadCourses = useCoursesStore((s) => s.loadCourses)
   const course = useMemo(
     () => courses?.find((c) => String(c.id) === String(courseId)) || null,
     [courses, courseId]
   )
 
-  const { settings, loading: settingsLoading, error: settingsError } =
+  const { settings, loading: settingsLoading, error: settingsError, reload: reloadSettings } =
     useCourseSettings(courseId, t.errorLoad)
 
   const [activeTab, setActiveTab] = useState('systematic')
   const [count, setCount] = useState(10)
   const [durationSeconds, setDurationSeconds] = useState(null)
   const [starting, setStarting] = useState(false)
-  const [startError, setStartError] = useState(null)
 
   // Completed sets will come from the user model (backend) — interface only for now.
   const completedSets = {}
@@ -48,8 +50,10 @@ function CourseStart() {
     if (settings.defaultTimerMinutes) setDurationSeconds(settings.defaultTimerMinutes * 60)
   }, [settings])
 
-  const loading = settingsLoading || courses == null
-  const error = settingsError || startError
+  // Page-load error (settings/courses) hides the page; an action error (failing
+  // to fetch questions on start) is shown as a toast so the page stays usable.
+  const error = settingsError || coursesError
+  const loading = !error && (settingsLoading || courses == null)
 
   const max = settings?.totalQuestionCount || 0
   const SET_SIZE = settings?.setQuestionCount || 25
@@ -91,7 +95,6 @@ function CourseStart() {
   async function handleStart() {
     if (!canStart || starting) return
     setStarting(true)
-    setStartError(null)
     try {
       const questions = await questionsApi.byRandomCount(courseId, count)
       startSession({
@@ -105,7 +108,7 @@ function CourseStart() {
       })
       navigate(`/test/${courseId}`)
     } catch (err) {
-      setStartError(err.message || t.errorStartTest)
+      toast.error(err.message || t.errorStartTest)
       setStarting(false)
     }
   }
@@ -113,7 +116,6 @@ function CourseStart() {
   async function handleStartSet(set) {
     if (starting) return
     setStarting(true)
-    setStartError(null)
     try {
       const questions = await questionsApi.bySetNum(courseId, set.index)
       const timerSec = settings?.defaultTimerMinutes
@@ -130,7 +132,7 @@ function CourseStart() {
       })
       navigate(`/test/${courseId}`)
     } catch (err) {
-      setStartError(err.message || t.errorStartSet)
+      toast.error(err.message || t.errorStartSet)
       setStarting(false)
     }
   }
@@ -155,9 +157,10 @@ function CourseStart() {
       {loading && <CourseStartSkeleton />}
 
       {error && !loading && (
-        <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 text-rose-700 dark:text-rose-300">
-          {error}
-        </div>
+        <ErrorState
+          message={error}
+          onRetry={() => { loadCourses().catch(() => {}); reloadSettings() }}
+        />
       )}
 
       {!loading && !error && max === 0 && (

@@ -1,3 +1,4 @@
+import QuestionImage from './QuestionImage'
 import t from '../../content/results.json'
 
 function ReviewCard({ index, question, chosenAnswerId }) {
@@ -28,6 +29,11 @@ function ReviewCard({ index, question, chosenAnswerId }) {
           {!wasAnswered ? t.review.noAnswer : isCorrect ? t.review.correct : t.review.wrong}
         </span>
       </div>
+      {question.imageUrl && (
+        <div className="px-3 pt-3 flex justify-center">
+          <QuestionImage src={question.imageUrl} alt={question.title} className="max-h-48" />
+        </div>
+      )}
       <ul className="p-3 space-y-1.5">
         {question.answers.map((a) => {
           const isChosen = a.id === chosenAnswerId

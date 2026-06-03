@@ -75,6 +75,24 @@ Version 0.4.5
 - (x) Pages reduced to orchestration only (state + composition):
 - (x) Dead code removal: coursesApi.bySemester (no callers since client-side semester filtering), coursesStore.reset (no callers)
 
+
+Version 0.4.6
+[x] Added .env file + fix on info page
+
+
+Version 0.4.7
+[x] Question images + request resilience (timeout / retry)
+- (x) Question image upload (helper): file picker with instant local preview (objectURL), 5MB + type validation, remove button
+- (x) Display question image (when present) in Test, Results review, and admin QuestionCard
+- (x) Request timeout (8s default, 60s for image uploads) so fetches never hang forever; aborted requests surface as errors
+- (x) Axios interceptor maps timeout / network errors to friendly Greek messages
+- (x) Fix infinite skeleton on fetch failure: loading now derived as (data == null && !error) in Courses, Admin, CourseStart
+- (x) New ErrorState component (centered card, icon + title + message, retry button with loading spinner; also a compact banner variant)
+- (x) Retry wired in Courses, Admin, AdminCourse, CourseStart (useCourseSettings now exposes reload())
+- (x) Mutations (question create/update, course settings, delete) covered: try/catch/finally so buttons never stay stuck, friendly error feedback + timeout
+- (x) Removed leftover fake/mock data (no mocks remain in the app)
+
+
 Version 0.5.0
 [] Demo auth interface (no backend yet)
 - (x) Zustand authStore (in-memory only — interface scaffold)

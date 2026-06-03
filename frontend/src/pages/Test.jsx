@@ -9,6 +9,7 @@ import Countdown from '../components/ui/Countdown'
 import QuestionNavigator from '../components/question/QuestionNavigator'
 import FlagButton from '../components/question/FlagButton'
 import AnswerOption from '../components/question/AnswerOption'
+import QuestionImage from '../components/question/QuestionImage'
 import t from '../content/test.json'
 
 function Test() {
@@ -146,6 +147,12 @@ function Test() {
           </h2>
           <FlagButton flagged={isCurrentFlagged} onToggle={() => toggleFlag(currentQuestion.id)} />
         </div>
+
+        {currentQuestion.imageUrl && (
+          <div className="mb-6 flex justify-center">
+            <QuestionImage src={currentQuestion.imageUrl} alt={currentQuestion.title} />
+          </div>
+        )}
 
         <div className="space-y-2">
           {currentQuestion.answers.map((a, i) => (

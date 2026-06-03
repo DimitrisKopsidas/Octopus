@@ -8,6 +8,7 @@ import BackButton from '../components/ui/BackButton'
 import QuestionForm from '../components/question/QuestionForm'
 import QuestionCard from '../components/question/QuestionCard'
 import QuestionCardSkeleton from '../components/question/QuestionCardSkeleton'
+import ErrorState from '../components/ui/ErrorState'
 import CourseSettingsForm from '../components/course/CourseSettingsForm'
 import { toast } from '../store/toastStore'
 import t from '../content/adminCourse.json'
@@ -120,9 +121,7 @@ function AdminCourse() {
       )}
 
       {error && !loading && (
-        <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 text-rose-700 dark:text-rose-300">
-          {error}
-        </div>
+        <ErrorState message={error} onRetry={reloadQuestions} />
       )}
 
       {!loading && !error && questions.length === 0 && (

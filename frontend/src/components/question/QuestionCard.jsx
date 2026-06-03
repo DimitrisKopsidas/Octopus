@@ -1,3 +1,4 @@
+import QuestionImage from './QuestionImage'
 import t from '../../content/adminCourse.json'
 
 function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
@@ -26,6 +27,11 @@ function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
           </button>
         </div>
       </div>
+      {question.imageUrl && (
+        <div className="mb-3">
+          <QuestionImage src={question.imageUrl} alt={question.title} className="max-h-40" />
+        </div>
+      )}
       <ul className="space-y-1.5">
         {question.answers.map(a => (
           <li

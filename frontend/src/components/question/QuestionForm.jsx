@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { questionsApi } from '../../lib/api'
+import QuestionImageUpload from './QuestionImageUpload'
 
 const MIN_ANSWERS = 3
 const MAX_ANSWERS = 5
@@ -34,6 +35,18 @@ function QuestionForm({ courseId, initialQuestion, onCreated, onUpdated, onCance
   const [correctIndex, setCorrectIndex] = useState(init.correctIndex)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
+
+  // Image: a freshly picked File, or the existing backend URL (edit mode)
+  const [imageFile, setImageFile] = useState(null)
+  const [existingImageUrl, setExistingImageUrl] = useState(initialQuestion?.imageUrl || null)
+
+  function handleImageChange(file) {
+    setImageFile(file)
+  }
+  function handleImageRemove() {
+    setImageFile(null)
+    setExistingImageUrl(null)
+  }
 
   const canAdd = answers.length < MAX_ANSWERS
   const canRemove = answers.length > MIN_ANSWERS
@@ -76,17 +89,25 @@ function QuestionForm({ courseId, initialQuestion, onCreated, onUpdated, onCance
         isCorrect: i === correctIndex,
       }))
       if (isEdit) {
-        await questionsApi.update(initialQuestion.id, {
-          title: title.trim(),
-          answers: answersPayload,
-        })
+        await questionsApi.update(
+          initialQuestion.id,
+          {
+            title: title.trim(),
+            answers: answersPayload,
+            imageUrl: existingImageUrl, // null = removed; unchanged otherwise
+          },
+          imageFile
+        )
         onUpdated?.()
       } else {
-        await questionsApi.create({
-          title: title.trim(),
-          courseId: Number(courseId),
-          answers: answersPayload,
-        })
+        await questionsApi.create(
+          {
+            title: title.trim(),
+            courseId: Number(courseId),
+            answers: answersPayload,
+          },
+          imageFile
+        )
         onCreated?.()
       }
     } catch (err) {
@@ -116,6 +137,13 @@ function QuestionForm({ courseId, initialQuestion, onCreated, onUpdated, onCance
             {title.length}/255
           </p>
         </section>
+
+        <QuestionImageUpload
+          file={imageFile}
+          existingUrl={existingImageUrl}
+          onFileChange={handleImageChange}
+          onRemove={handleImageRemove}
+        />
 
         <section>
           <div className="flex items-baseline justify-between mb-3">

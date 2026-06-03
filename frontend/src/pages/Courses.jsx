@@ -3,6 +3,7 @@ import { useCoursesStore } from '../store/coursesStore'
 import CourseCard from '../components/course/CourseCard'
 import CourseCardSkeleton from '../components/course/CourseCardSkeleton'
 import CoursesFilterModal from '../components/course/CoursesFilterModal'
+import ErrorState from '../components/ui/ErrorState'
 import t from '../content/courses.json'
 
 function Courses() {
@@ -12,7 +13,7 @@ function Courses() {
   const loadCourses = useCoursesStore((s) => s.loadCourses)
   const loadWithContent = useCoursesStore((s) => s.loadWithContent)
 
-  const loading = courses == null
+  const loading = courses == null && !error
   const withContentLoaded = withContentIds != null
   const safeWithContentIds = withContentIds ?? new Set()
 
@@ -32,6 +33,11 @@ function Courses() {
   useEffect(() => { setVisibleCount(6) }, [query, semester, onlyWithContent])
   useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
   useEffect(() => { loadWithContent() }, [loadWithContent])
+
+  function retry() {
+    loadWithContent()
+    return loadCourses().catch(() => {})
+  }
 
   const filtered = useMemo(() => {
     if (!courses) return []
@@ -104,9 +110,7 @@ function Courses() {
       )}
 
       {error && !loading && (
-        <div className="rounded-md bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 p-4 text-rose-700 dark:text-rose-300">
-          {t.errorPrefix} {error}
-        </div>
+        <ErrorState message={error} onRetry={retry} retryLabel={t.retry} />
       )}
 
       {!loading && !error && filtered.length === 0 && (
