@@ -7,51 +7,30 @@ services:
       - "5432:5432"
     restart: always
     environment:
-      POSTGRES_PASSWORD: dimitris
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend
+    build: ./Backend
     ports:
       - "8080:8080"
     depends_on:
       - db
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
 
   frontend:
-    build: ./frontend
+    build: ./Frontend
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "80:80"
     depends_on:
       - backend
-    environment:
-      - VITE_API_BASE_URL=https://octopus.kerberos.network/api/v1
 
-#old-----------------------------------------------------
-#name: octopus
-#services:
-#  db:
-#    image: postgres
-#    ports:
-#      - "5432:5432"
-#    restart: always
-#    environment:
-#      POSTGRES_PASSWORD: dimitris
-#  ui:
-#    image: ghcr.io/devtiro/devtiro-build-task-app:latest
-#    ports:
-#      - "3000:3000"
-#    environment:
-#      - BACKEND_HOST=host.docker.internal
-#      - BACKEND_PORT=8080
-#    extra_hosts:
-#      - "host.docker.internal:host-gateway"
-##  backend:
-##    build: .
-##    ports:
-##      - "8080:8080"
-##    depends_on:
-##      - db
+volumes:
+  postgres_data:
