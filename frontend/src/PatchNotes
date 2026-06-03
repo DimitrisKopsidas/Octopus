@@ -85,12 +85,12 @@ Version 0.4.7
 - (x) Question image upload (helper): file picker with instant local preview (objectURL), 5MB + type validation, remove button
 - (x) Display question image (when present) in Test, Results review, and admin QuestionCard
 - (x) Request timeout (8s default, 60s for image uploads) so fetches never hang forever; aborted requests surface as errors
-- (x) Axios interceptor maps timeout / network errors to friendly Greek messages
+- (x) Axios interceptor maps timeout / network errors to retry messages
 - (x) Fix infinite skeleton on fetch failure: loading now derived as (data == null && !error) in Courses, Admin, CourseStart
 - (x) New ErrorState component (centered card, icon + title + message, retry button with loading spinner; also a compact banner variant)
 - (x) Retry wired in Courses, Admin, AdminCourse, CourseStart (useCourseSettings now exposes reload())
 - (x) Mutations (question create/update, course settings, delete) covered: try/catch/finally so buttons never stay stuck, friendly error feedback + timeout
-- (x) Removed leftover fake/mock data (no mocks remain in the app)
+- (x) Removed leftover fake/mock data 
 
 
 Version 0.5.0
