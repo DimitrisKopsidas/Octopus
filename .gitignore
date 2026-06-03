@@ -36,7 +36,6 @@ build/
 .env
 .env.local
 .env.development
-.env.production
 .env.*.local
 
 # Spring Boot dev/local properties
