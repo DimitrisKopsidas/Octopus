@@ -27,8 +27,8 @@ createRoot(document.getElementById('root')).render(
           <Route path="/test/:courseId/results" element={<Results />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/courses/:courseId" element={<AdminCourse />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/login" element={<Login />} /> */}
+          {/* <Route path="/register" element={<Register />} /> */}
           <Route path="/info" element={<Info />} />
           <Route path="*" element={<NotFound />} />
         </Route>

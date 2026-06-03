@@ -16,11 +16,11 @@ function CourseInfoCard({ course, questionCount, coverage }) {
             {questionCount}
           </span>
         </InfoRow>
-        <InfoRow label={t.info.coverage}>
+        {/* <InfoRow label={t.info.coverage}>
           <span className="font-semibold text-brand-600 dark:text-brand-400 tabular-nums">
             {coverage}%
           </span>
-        </InfoRow>
+        </InfoRow> */}
         {course && (
           <>
             <InfoRow label={t.info.code}>

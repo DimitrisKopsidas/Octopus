@@ -53,7 +53,7 @@ function Layout() {
             <NavLink to="/admin" className={navLinkClass}>{t.nav.admin}</NavLink>
             <NavLink to="/info" className={navLinkClass}>{t.nav.info}</NavLink>
             <ThemeToggle />
-            {user ? (
+            {/* {user ? (
               <UserMenu />
             ) : (
               <NavLink
@@ -62,7 +62,7 @@ function Layout() {
               >
                 {t.nav.login}
               </NavLink>
-            )}
+            )} */}
           </div>
 
           <button
@@ -113,7 +113,7 @@ function Layout() {
               </div>
             </div>
 
-            <div className="border-t border-brand-800 pt-4">
+            {/* <div className="border-t border-brand-800 pt-4">
               {user ? (
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 px-2">
@@ -147,7 +147,7 @@ function Layout() {
                   </NavLink>
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
         </>
       )}

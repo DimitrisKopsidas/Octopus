@@ -7,7 +7,6 @@ import t from '../content/info.json'
 
 function resolveHref(target) {
   if (target === 'bmcUrl') return t.bmcUrl
-  if (target === 'mailto') return `mailto:${t.contactEmail}`
   return target
 }
 

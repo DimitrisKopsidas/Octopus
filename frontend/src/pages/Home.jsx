@@ -40,7 +40,7 @@ function Home() {
         </div>
       </section>
 
-      <section>
+      {/* <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
           {t.comingSoon.title}
         </h2>
@@ -49,7 +49,7 @@ function Home() {
             <FeatureCard key={card.title} emoji={card.emoji} title={card.title} body={card.body} />
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }

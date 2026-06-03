@@ -90,7 +90,14 @@ Version 0.4.7
 - (x) New ErrorState component (centered card, icon + title + message, retry button with loading spinner; also a compact banner variant)
 - (x) Retry wired in Courses, Admin, AdminCourse, CourseStart (useCourseSettings now exposes reload())
 - (x) Mutations (question create/update, course settings, delete) covered: try/catch/finally so buttons never stay stuck, friendly error feedback + timeout
-- (x) Removed leftover fake/mock data 
+- (x) Removed leftover fake/mock data
+
+
+Version 0.4.8
+[x] Temporarily hide features pending backend (commented out, returning next version)
+- (x) Hide auth UI until real auth lands: /login + /register routes (main.jsx), navbar UserMenu / Σύνδεση CTA — desktop + mobile drawer (Layout.jsx)
+- (x) Hide syllabus coverage UI: progress bar in SystematicStudyPanel + coverage row in CourseInfoCard (depends on per-user completed sets from backend)
+- (x) Hide Home "coming soon" cards section
 
 
 Version 0.5.0

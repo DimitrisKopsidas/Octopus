@@ -25,7 +25,7 @@ function SystematicStudyPanel({
         </p>
       </div>
 
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <div className="flex items-baseline justify-between">
           <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
             {t.systematic.coverageLabel}
@@ -43,7 +43,7 @@ function SystematicStudyPanel({
         <p className="text-[10px] text-slate-500 dark:text-slate-400">
           {coveragePercentage === 100 ? t.systematic.coverageDone : t.systematic.coveragePending}
         </p>
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {sets.map((set) => {
