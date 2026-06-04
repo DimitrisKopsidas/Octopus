@@ -1,5 +1,6 @@
+// Zustand cache store for /courses + with-content. Used by Courses, Admin, AdminCourse, CourseStart.
 import { create } from 'zustand'
-import { coursesApi } from '../lib/api'
+import { coursesApi, extractErrorMessage } from '../lib/api'
 
 // Caches /courses and /courses/with-content for the lifetime of the SPA session.
 // Cleared on full page reload (no persistence — fresh data when user opens tab).
@@ -21,7 +22,21 @@ export const useCoursesStore = create((set, get) => ({
       set({ courses: data, loading: false })
       return data
     } catch (err) {
-      set({ loading: false, error: err.message || 'Σφάλμα φόρτωσης' })
+      set({ loading: false, error: extractErrorMessage(err, 'Σφάλμα φόρτωσης') })
+      throw err
+    }
+  },
+
+  // Silent retry: keeps ErrorState visible (spinner on button) — no skeleton flash.
+  retryCourses: async () => {
+    const state = get()
+    if (state.courses != null) return state.courses
+    try {
+      const data = await coursesApi.list()
+      set({ courses: data, error: null })
+      return data
+    } catch (err) {
+      set({ error: extractErrorMessage(err, 'Σφάλμα φόρτωσης') })
       throw err
     }
   },

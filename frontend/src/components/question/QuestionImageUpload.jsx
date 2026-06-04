@@ -1,3 +1,4 @@
+// Image picker with live preview + validation. Used by QuestionForm.
 import { useEffect, useState } from 'react'
 import { resolveImageUrl } from '../../lib/api'
 

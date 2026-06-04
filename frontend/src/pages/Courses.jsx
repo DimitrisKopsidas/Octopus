@@ -1,3 +1,4 @@
+// Courses listing page: search + semester filter + Show-More pagination. Route: /courses
 import { useEffect, useMemo, useState } from 'react'
 import { useCoursesStore } from '../store/coursesStore'
 import CourseCard from '../components/course/CourseCard'
@@ -11,6 +12,7 @@ function Courses() {
   const withContentIds = useCoursesStore((s) => s.withContentIds)
   const error = useCoursesStore((s) => s.error)
   const loadCourses = useCoursesStore((s) => s.loadCourses)
+  const retryCourses = useCoursesStore((s) => s.retryCourses)
   const loadWithContent = useCoursesStore((s) => s.loadWithContent)
 
   const loading = courses == null && !error
@@ -36,7 +38,7 @@ function Courses() {
 
   function retry() {
     loadWithContent()
-    return loadCourses().catch(() => {})
+    return retryCourses().catch(() => {})
   }
 
   const filtered = useMemo(() => {

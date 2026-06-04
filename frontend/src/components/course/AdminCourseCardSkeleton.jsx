@@ -1,3 +1,4 @@
+// Loading skeleton for AdminCourseCard. Used by Admin page.
 import Skeleton from '../ui/Skeleton'
 
 function AdminCourseCardSkeleton() {

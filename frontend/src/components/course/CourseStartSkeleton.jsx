@@ -1,3 +1,4 @@
+// Loading skeleton for the CourseStart page.
 import Skeleton from '../ui/Skeleton'
 import t from '../../content/courseStart.json'
 

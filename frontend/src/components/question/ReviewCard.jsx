@@ -1,21 +1,25 @@
+// Per-question review card (correct/wrong/unanswered). Used by Results.
 import QuestionImage from './QuestionImage'
+import { getChosenIds, isQuestionCorrect } from '../../lib/scoring'
 import t from '../../content/results.json'
 
 function ReviewCard({ index, question, chosenAnswerId }) {
-  const correctAnswer = question.answers.find((a) => a.isCorrect)
-  const isCorrect = chosenAnswerId === correctAnswer?.id
-  const wasAnswered = chosenAnswerId != null
+  const chosenIds = getChosenIds(chosenAnswerId)
+  const isCorrect = isQuestionCorrect(question, chosenAnswerId)
+  const wasAnswered = chosenIds.length > 0
 
-  const headerTone = !wasAnswered
-    ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800'
-    : isCorrect
-      ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900'
+  // Three outcomes: correct (green), wrong (solid red), unanswered (muted red —
+  // still no point, but visually distinct from an actively wrong answer).
+  const headerTone = isCorrect
+    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900'
+    : !wasAnswered
+      ? 'bg-rose-50/50 dark:bg-rose-950/15 border-rose-200/70 dark:border-rose-900/50'
       : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900'
 
-  const badgeTone = !wasAnswered
-    ? 'text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-700'
-    : isCorrect
-      ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60'
+  const badgeTone = isCorrect
+    ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60'
+    : !wasAnswered
+      ? 'text-rose-500/90 dark:text-rose-400/80 bg-rose-100/60 dark:bg-rose-900/30'
       : 'text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-900/60'
 
   return (
@@ -36,7 +40,7 @@ function ReviewCard({ index, question, chosenAnswerId }) {
       )}
       <ul className="p-3 space-y-1.5">
         {question.answers.map((a) => {
-          const isChosen = a.id === chosenAnswerId
+          const isChosen = chosenIds.includes(a.id)
           const isCorrectAnswer = a.isCorrect
           const rowTone = isCorrectAnswer
             ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900'

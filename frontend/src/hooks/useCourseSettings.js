@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { questionsApi } from '../lib/api'
+// Fetches per-course settings info (set size, timer, totals). Used by useCourseStart and AdminCourse.
+import { useCallback, useEffect, useState } from 'react'
+import { questionsApi, extractErrorMessage } from '../lib/api'
 
 // Fetches settings info for a course: { totalQuestionCount, setQuestionCount, defaultTimerMinutes }.
-// Returns a `reload()` to retry after an error/timeout.
+// Returns `reload()` (full, with skeletons) and `retry()` (silent, keeps ErrorState visible).
 export function useCourseSettings(courseId, fallbackErrorMessage = 'Σφάλμα φόρτωσης') {
   const [settings, setSettings] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -18,7 +19,7 @@ export function useCourseSettings(courseId, fallbackErrorMessage = 'Σφάλμα
         if (!cancelled) setSettings(info)
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message || fallbackErrorMessage)
+        if (!cancelled) setError(extractErrorMessage(err, fallbackErrorMessage))
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
@@ -28,5 +29,16 @@ export function useCourseSettings(courseId, fallbackErrorMessage = 'Σφάλμα
 
   const reload = () => setReloadKey((k) => k + 1)
 
-  return { settings, loading, error, reload }
+  // Silent retry: keeps ErrorState visible (spinner on button) — no skeleton flash.
+  const retry = useCallback(async () => {
+    try {
+      const info = await questionsApi.settingsInfo(courseId)
+      setSettings(info)
+      setError(null)
+    } catch (err) {
+      setError(extractErrorMessage(err, fallbackErrorMessage))
+    }
+  }, [courseId, fallbackErrorMessage])
+
+  return { settings, loading, error, reload, retry }
 }

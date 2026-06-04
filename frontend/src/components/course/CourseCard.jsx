@@ -1,3 +1,4 @@
+// Course card in the Courses grid. Used by Courses page.
 import { Link } from 'react-router-dom'
 import ContentBadge from './ContentBadge'
 import t from '../../content/courses.json'

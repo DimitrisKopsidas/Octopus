@@ -1,3 +1,4 @@
+// Zustand store for the active test session (questions, answers, flags) with sessionStorage persistence. Used by Test, Results, CourseStart.
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -9,7 +10,7 @@ const initialState = {
   order: 'sequential',
   questions: [],
   currentIndex: 0,
-  answers: {},           // { [questionId]: answerId }
+  answers: {},           // { [questionId]: answerId | answerId[] } — array for multi-correct questions
   flaggedIds: new Set(), // questionIds flagged for review
   startedAt: null,
   endedAt: null,
@@ -37,10 +38,26 @@ export const useTestStore = create(
           setIndex,
         }),
 
+      // Single-correct questions: store one id, replacing any previous choice.
       selectAnswer: (questionId, answerId) =>
         set((state) => ({
           answers: { ...state.answers, [questionId]: answerId },
         })),
+
+      // Multiple-correct questions: toggle an id within an array.
+      // When the array empties, the question becomes "unanswered" again.
+      toggleAnswer: (questionId, answerId) =>
+        set((state) => {
+          const cur = state.answers[questionId]
+          const arr = Array.isArray(cur) ? cur : cur == null ? [] : [cur]
+          const nextArr = arr.includes(answerId)
+            ? arr.filter((id) => id !== answerId)
+            : [...arr, answerId]
+          const next = { ...state.answers }
+          if (nextArr.length === 0) delete next[questionId]
+          else next[questionId] = nextArr
+          return { answers: next }
+        }),
 
       clearAnswer: (questionId) =>
         set((state) => {

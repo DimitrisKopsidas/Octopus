@@ -1,3 +1,4 @@
+// Renders a question image (resolves backend/blob URLs) if present. Used by Test, Results, StudyMaterialPanel, QuestionCard.
 import { resolveImageUrl } from '../../lib/api'
 
 // Renders a question image if one exists, otherwise nothing.

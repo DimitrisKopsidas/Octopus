@@ -6,6 +6,7 @@
   "nextButton": "Επόμενη →",
   "finishButton": "Ολοκλήρωση",
   "navigatorJumpTemplate": "Μετάβαση στην ερώτηση {n}",
+  "multiHint": "Πολλαπλές σωστές — επίλεξε όλες τις σωστές απαντήσεις",
   "flag": {
     "addLabel": "Σήμανση για επανέλεγχο",
     "removeLabel": "Αφαίρεση σήμανσης",

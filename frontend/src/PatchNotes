@@ -99,6 +99,16 @@ Version 0.4.8
 - (x) Hide syllabus coverage UI: progress bar in SystematicStudyPanel + coverage row in CourseInfoCard (depends on per-user completed sets from backend)
 - (x) Hide Home "coming soon" cards section
 
+Version 0.4.9
+[x] Error handling, retry UX, Home stats, bundle time, default answers
+- (x) Silent retry: "Δοκίμασε ξανά" keeps ErrorState visible with spinner instead of flashing loading skeletons for 8s — new retryCourses() in coursesStore, retryQuestions() in AdminCourse, retry() in useCourseSettings
+- (x) Multiple-correct answers: checkbox-style multi-select in Test, all-or-nothing scoring (shared lib/scoring.js across Test/Results/ReviewCard), flat answerIds kept on bundle submit
+- (x) New "Μελέτη Ύλης" flashcard tab: every course question, reveal correct answer(s) (green ✓), progress bar, keyboard (←/→ navigate, Space/Enter reveal), clear/reset in card header
+- (x) CourseStart reframed into a 3-step guided journey with hero band: Μελέτη ύλης → Συστηματική → Εξάσκηση
+- (x) Results review: muted-red styling for unanswered questions (distinct from solid-red wrong — still no point)
+- (x) Redesigned footer: brand + tagline, navigation links, v1.0 badge, credits, dynamic copyright year
+- (x) Refactored some pages + added single line comment on each file 
+
 
 Version 0.5.0
 [] Demo auth interface (no backend yet)

@@ -1,3 +1,4 @@
+// Error card with retry (+ compact banner variant). Used across pages.
 import { useState } from 'react'
 
 // Friendly error state with an optional retry action.

@@ -1,6 +1,8 @@
+// Demo register page with role picker (auth UI; route currently disabled in main.jsx)
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import logo from '../assets/favicon.png'
 import t from '../content/register.json'
 
 function Register() {
@@ -43,8 +45,8 @@ function Register() {
     <div className="max-w-md mx-auto py-8">
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <header className="text-center px-6 pt-8 pb-5">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/50 text-4xl mb-3">
-            🐙
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/50 mb-3">
+            <img src={logo} alt="Octopus" className="w-10 h-10" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
             {t.title}

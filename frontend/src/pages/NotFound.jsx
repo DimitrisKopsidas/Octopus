@@ -1,3 +1,4 @@
+// 404 fallback page. Route: *
 import { Link } from 'react-router-dom'
 import t from '../content/notFound.json'
 

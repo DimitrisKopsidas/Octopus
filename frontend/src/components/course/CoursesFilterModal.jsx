@@ -1,3 +1,4 @@
+// Semester filter modal. Used by Courses page.
 import Modal from '../ui/Modal'
 import SemesterButton from './SemesterButton'
 import t from '../../content/courses.json'

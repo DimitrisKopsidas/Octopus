@@ -1,3 +1,4 @@
+// Coming-soon badge. Used in Info / Home.
 import t from '../../content/courseStart.json'
 
 function SoonBadge() {

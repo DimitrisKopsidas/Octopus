@@ -1,3 +1,4 @@
+// Sidebar info card (questions count, code, semester). Used by CourseStart.
 import InfoRow from './InfoRow'
 import SoonBadge from '../ui/SoonBadge'
 import t from '../../content/courseStart.json'

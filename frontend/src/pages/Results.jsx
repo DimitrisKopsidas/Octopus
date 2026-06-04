@@ -1,7 +1,9 @@
+// Test results page: score stats + per-question review + bundle submit. Route: /test/:courseId/results
 import { useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import { bundlesApi } from '../lib/api'
+import { isQuestionCorrect, flattenAnswerIds } from '../lib/scoring'
 import BackButton from '../components/ui/BackButton'
 import StatCard from '../components/ui/StatCard'
 import ReviewCard from '../components/question/ReviewCard'
@@ -41,20 +43,21 @@ function Results() {
 
   useEffect(() => {
     if (!hasResults || submittedRef.current) return
-    const answerIds = Object.values(answers)
+    const answerIds = flattenAnswerIds(answers)
     if (answerIds.length === 0) return
     submittedRef.current = true
+    const timeForCompletion = endedAt && startedAt
+      ? Math.round((endedAt - startedAt) / 1000)
+      : null
     bundlesApi
-      .create({ setNum: setIndex, answerIds })
+      .create({ setNum: setIndex, answerIds, timeForCompletion })
       .catch((err) => console.warn('Bundle submit failed', err))
-  }, [hasResults, answers, setIndex])
+  }, [hasResults, answers, setIndex, startedAt, endedAt])
 
   const { correctCount, total, durationMs } = useMemo(() => {
     let correct = 0
     for (const q of questions) {
-      const chosen = answers[q.id]
-      const correctAnswer = q.answers.find((a) => a.isCorrect)
-      if (correctAnswer && chosen === correctAnswer.id) correct += 1
+      if (isQuestionCorrect(q, answers[q.id])) correct += 1
     }
     return {
       correctCount: correct,

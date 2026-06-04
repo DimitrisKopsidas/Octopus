@@ -1,3 +1,4 @@
+// Loading skeleton for QuestionCard. Used by AdminCourse.
 import Skeleton from '../ui/Skeleton'
 
 function QuestionCardSkeleton() {

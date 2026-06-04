@@ -1,3 +1,4 @@
+// Theme (dark/light) state + localStorage persistence hook. Used by ThemeToggle.
 import { useEffect, useState } from 'react'
 
 function getInitialTheme() {

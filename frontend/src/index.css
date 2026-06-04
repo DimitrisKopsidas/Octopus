@@ -2,7 +2,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
+@theme extend {
   --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --color-brand-50:  #f0fdfa;
@@ -32,6 +32,60 @@ html, body, #root {
 
 body {
   margin: 0;
+  background-color: var(--color-slate-50);
+}
+html.dark body {
+  background-color: var(--color-slate-950);
+}
+
+/* ── Scrollbar (matches page theme) ───────────────────────── */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate-300) var(--color-slate-50);
+}
+html.dark {
+  scrollbar-color: var(--color-slate-700) var(--color-slate-950);
+}
+
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-slate-300) transparent;
+}
+.dark .scrollbar-custom {
+  scrollbar-color: var(--color-slate-700) transparent;
+}
+
+/* WebKit/Blink (Chrome, Edge, Safari) */
+html::-webkit-scrollbar,
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+html::-webkit-scrollbar-track {
+  background: var(--color-slate-50);
+}
+html.dark::-webkit-scrollbar-track {
+  background: var(--color-slate-950);
+}
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;
+}
+html::-webkit-scrollbar-thumb,
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: var(--color-slate-300);
+  border-radius: 9999px;
+}
+html::-webkit-scrollbar-thumb:hover,
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand-400);
+}
+html.dark::-webkit-scrollbar-thumb,
+.dark .scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: var(--color-slate-700);
+}
+html.dark::-webkit-scrollbar-thumb:hover,
+.dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand-500);
 }
 
 @keyframes slideInRight {
@@ -44,10 +98,19 @@ body {
   to   { opacity: 1; }
 }
 
+@keyframes revealPop {
+  from { opacity: 0.4; transform: translateY(2px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .animate-slideInRight {
   animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out forwards;
+}
+
+.animate-reveal {
+  animation: revealPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }

@@ -1,3 +1,4 @@
+// Zustand demo auth store (in-memory user). Used by Layout, Login, Register.
 import { create } from 'zustand'
 
 // In-memory only — interface scaffold until real backend auth lands.

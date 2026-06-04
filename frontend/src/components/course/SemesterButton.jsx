@@ -1,3 +1,4 @@
+// Semester filter chip. Used by Courses / CoursesFilterModal.
 function SemesterButton({ label, active, onClick }) {
   return (
     <button

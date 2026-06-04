@@ -1,9 +1,11 @@
+// Active test page: one question at a time, answer select, navigator, timer. Route: /test/:courseId
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import { useCountdown } from '../hooks/useCountdown'
 import { useFlash } from '../hooks/useFlash'
 import { useTestKeyboard } from '../hooks/useTestKeyboard'
+import { isMultiAnswer, getChosenIds } from '../lib/scoring'
 import ConfirmModal from '../components/ui/ConfirmModal'
 import Countdown from '../components/ui/Countdown'
 import QuestionNavigator from '../components/question/QuestionNavigator'
@@ -26,6 +28,7 @@ function Test() {
   const endedAt = useTestStore((s) => s.endedAt)
   const courseName = useTestStore((s) => s.courseName)
   const selectAnswer = useTestStore((s) => s.selectAnswer)
+  const toggleAnswer = useTestStore((s) => s.toggleAnswer)
   const clearAnswer = useTestStore((s) => s.clearAnswer)
   const toggleFlag = useTestStore((s) => s.toggleFlag)
   const goNext = useTestStore((s) => s.goNext)
@@ -58,15 +61,24 @@ function Test() {
 
   const total = questions.length
   const currentQuestion = questions[currentIndex]
-  const selectedAnswerId = currentQuestion ? answers[currentQuestion.id] : undefined
+  const isMultiCurrent = currentQuestion ? isMultiAnswer(currentQuestion) : false
+  const chosenIds = currentQuestion ? getChosenIds(answers[currentQuestion.id]) : []
+  const hasChoice = chosenIds.length > 0
   const isFirst = currentIndex === 0
   const isLast = currentIndex === total - 1
   const isCurrentFlagged = currentQuestion ? flaggedIds.has(currentQuestion.id) : false
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers])
 
+  // Single-correct → replace the choice. Multi-correct → toggle within the set.
   function handleSelect(questionId, answerId) {
-    selectAnswer(questionId, answerId)
-    setFlash('saved')
+    if (isMultiCurrent) {
+      const wasSelected = getChosenIds(answers[questionId]).includes(answerId)
+      toggleAnswer(questionId, answerId)
+      setFlash(wasSelected ? 'cleared' : 'saved')
+    } else {
+      selectAnswer(questionId, answerId)
+      setFlash('saved')
+    }
   }
   function handleClear(questionId) {
     if (answers[questionId] == null) return
@@ -154,13 +166,20 @@ function Test() {
           </div>
         )}
 
+        {isMultiCurrent && (
+          <p className="mb-3 text-xs font-medium text-brand-700 dark:text-brand-400 inline-flex items-center gap-1.5">
+            <span aria-hidden="true">☑</span> {t.multiHint}
+          </p>
+        )}
+
         <div className="space-y-2">
           {currentQuestion.answers.map((a, i) => (
             <AnswerOption
               key={a.id}
               label={a.title}
               letter={String.fromCharCode(65 + i)}
-              selected={selectedAnswerId === a.id}
+              selected={chosenIds.includes(a.id)}
+              multi={isMultiCurrent}
               onClick={() => handleSelect(currentQuestion.id, a.id)}
             />
           ))}
@@ -179,7 +198,7 @@ function Test() {
               </span>
             )}
           </span>
-          {selectedAnswerId != null && (
+          {hasChoice && (
             <button
               type="button"
               onClick={() => handleClear(currentQuestion.id)}

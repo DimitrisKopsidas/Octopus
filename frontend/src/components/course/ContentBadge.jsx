@@ -1,3 +1,4 @@
+// Badge showing if a course has questions. Used in course cards.
 function ContentBadge({ hasContent }) {
   if (hasContent) {
     return (

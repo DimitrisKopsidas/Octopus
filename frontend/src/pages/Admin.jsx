@@ -1,3 +1,4 @@
+// Admin dashboard: lists courses with an add-questions action. Route: /admin
 import { useEffect, useMemo, useState } from 'react'
 import { useCoursesStore } from '../store/coursesStore'
 import AdminCourseCard from '../components/course/AdminCourseCard'
@@ -11,6 +12,7 @@ function Admin() {
   const withContentIds = useCoursesStore((s) => s.withContentIds)
   const error = useCoursesStore((s) => s.error)
   const loadCourses = useCoursesStore((s) => s.loadCourses)
+  const retryCourses = useCoursesStore((s) => s.retryCourses)
   const loadWithContent = useCoursesStore((s) => s.loadWithContent)
 
   const loading = courses == null && !error
@@ -23,7 +25,7 @@ function Admin() {
 
   function retry() {
     loadWithContent()
-    return loadCourses().catch(() => {})
+    return retryCourses().catch(() => {})
   }
 
   const grouped = useMemo(() => {

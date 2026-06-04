@@ -1,3 +1,4 @@
+// Labeled stat card. Used by Results and Home.
 function StatCard({ label, children }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">

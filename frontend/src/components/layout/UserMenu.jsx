@@ -1,3 +1,4 @@
+// Logged-in user dropdown (avatar, logout). Used by Layout (currently commented out).
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'

@@ -1,3 +1,4 @@
+// Help / FAQ card. Used by Info page.
 import { Link } from 'react-router-dom'
 
 function HelpCard({ emoji, title, description, ctaLabel, kind, href, to, highlight }) {

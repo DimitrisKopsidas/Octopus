@@ -1,3 +1,4 @@
+// Course card with add-questions action. Used by Admin page.
 import { Link } from 'react-router-dom'
 import ContentBadge from './ContentBadge'
 import t from '../../content/admin.json'

@@ -1,5 +1,6 @@
+// Form to edit a course set size + default timer. Used in AdminCourse settings modal.
 import { useState } from 'react'
-import { coursesApi } from '../../lib/api'
+import { coursesApi, extractErrorMessage } from '../../lib/api'
 
 function CourseSettingsForm({ course, onSaved, onCancel }) {
   const [questionSetSize, setQuestionSetSize] = useState(course?.questionSetSize ?? 25)
@@ -26,8 +27,7 @@ function CourseSettingsForm({ course, onSaved, onCancel }) {
       })
       onSaved?.(updated)
     } catch (err) {
-      const backendMsg = err?.response?.data?.message || err?.response?.data?.error
-      setError(backendMsg || err.message || 'Σφάλμα αποθήκευσης.')
+      setError(extractErrorMessage(err, 'Σφάλμα αποθήκευσης.'))
     } finally {
       setSubmitting(false)
     }

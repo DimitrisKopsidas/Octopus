@@ -1,6 +1,7 @@
+// Admin page for one course: question list + create/edit/delete + settings modals. Route: /admin/courses/:courseId
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { questionsApi } from '../lib/api'
+import { questionsApi, extractErrorMessage } from '../lib/api'
 import { useCoursesStore } from '../store/coursesStore'
 import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
@@ -36,6 +37,7 @@ function AdminCourse() {
 
   useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
 
+  // Full reload: shows loading skeletons (used on first mount).
   const reloadQuestions = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -43,9 +45,20 @@ function AdminCourse() {
       const data = await questionsApi.listByCourse(courseId)
       setQuestions(data)
     } catch (err) {
-      setError(err.message || t.errorFallback)
+      setError(extractErrorMessage(err, t.errorFallback))
     } finally {
       setLoading(false)
+    }
+  }, [courseId])
+
+  // Silent retry: keeps ErrorState visible (spinner on button) — no skeleton flash.
+  const retryQuestions = useCallback(async () => {
+    try {
+      const data = await questionsApi.listByCourse(courseId)
+      setQuestions(data)
+      setError(null)
+    } catch (err) {
+      setError(extractErrorMessage(err, t.errorFallback))
     }
   }, [courseId])
 
@@ -67,7 +80,7 @@ function AdminCourse() {
       invalidateWithContent()
       toast.success(t.toast.questionDeleted)
     } catch (err) {
-      toast.error(`${t.delete.failurePrefix} ${err.message || ''}`)
+      toast.error(`${t.delete.failurePrefix} ${extractErrorMessage(err, '')}`)
     } finally {
       setDeleting(false)
     }
@@ -121,7 +134,7 @@ function AdminCourse() {
       )}
 
       {error && !loading && (
-        <ErrorState message={error} onRetry={reloadQuestions} />
+        <ErrorState message={error} onRetry={retryQuestions} />
       )}
 
       {!loading && !error && questions.length === 0 && (

@@ -1,3 +1,4 @@
+// Sidebar tips card. Used by CourseStart.
 import t from '../../content/courseStart.json'
 
 function TipsCard() {

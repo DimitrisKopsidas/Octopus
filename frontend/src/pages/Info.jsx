@@ -1,4 +1,6 @@
+// Info / about page (help cards, study modes, roadmap). Route: /info
 import { Link } from 'react-router-dom'
+import logo from '../assets/logo.png'
 import ModeCard from '../components/info/ModeCard'
 import HelpCard from '../components/info/HelpCard'
 import RoadmapItem from '../components/info/RoadmapItem'
@@ -15,8 +17,8 @@ function Info() {
     <div className="max-w-4xl mx-auto space-y-16">
 
       <section className="text-center pt-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-950/50 text-5xl mb-4">
-          🐙
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-950/50 mb-4">
+          <img src={logo} alt="Octopus" className="w-12 h-12" />
         </div>
         <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
           {t.hero.title}

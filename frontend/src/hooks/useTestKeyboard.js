@@ -1,3 +1,4 @@
+// Keyboard shortcuts for the Test page. Used by Test.
 import { useEffect } from 'react'
 
 // Keyboard shortcuts for the Test page:

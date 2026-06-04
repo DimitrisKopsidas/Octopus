@@ -1,3 +1,4 @@
+// Axios instance + namespaced API (courses/questions/bundles) + URL/error helpers. Used app-wide.
 import axios from 'axios'
 
 // Default timeout: if a request hangs longer than this, axios aborts it so the
@@ -38,6 +39,18 @@ http.interceptors.response.use(
 
 const unwrap = (promise) => promise.then((res) => res.data)
 
+// Extract the most useful error message from an axios error.
+// Handles: JSON body (.message / .error), plain-string body, interceptor-set message.
+export function extractErrorMessage(err, fallback = 'Σφάλμα.') {
+  const data = err?.response?.data
+  if (data) {
+    if (typeof data === 'string' && data.length > 0) return data
+    if (data.message) return data.message
+    if (data.error) return data.error
+  }
+  return err?.message || fallback
+}
+
 // Builds the request body + per-request config for question create/update.
 // - No image  → plain JSON (existing contract)
 // - With image → multipart/form-data with two parts + a longer timeout:
@@ -55,6 +68,7 @@ function questionBody(payload, imageFile) {
 export const coursesApi = {
   list: () => unwrap(http.get('/courses')),
   listWithContent: () => unwrap(http.get('/courses/with-content')),
+  countWithContent: () => unwrap(http.get('/courses/count-with-content')),
   update: (id, payload) => unwrap(http.put(`/courses/${id}`, payload)),
 }
 
@@ -78,6 +92,7 @@ export const questionsApi = {
 
 export const bundlesApi = {
   create: (payload) => unwrap(http.post('/bundles', payload)),
+  count: () => unwrap(http.get('/bundles/count')),
 }
 
 export default { coursesApi, questionsApi, bundlesApi }

@@ -1,3 +1,4 @@
+// Toast container + toast items. Mounted once in Layout.
 import { useEffect } from 'react'
 import { useToastStore } from '../../store/toastStore'
 

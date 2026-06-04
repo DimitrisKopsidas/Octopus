@@ -1,3 +1,4 @@
+// Fixed question-set cards + coverage. Used by CourseStart (step 2).
 import t from '../../content/courseStart.json'
 
 function SystematicStudyPanel({

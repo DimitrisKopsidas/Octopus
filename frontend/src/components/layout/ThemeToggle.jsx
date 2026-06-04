@@ -1,3 +1,4 @@
+// Dark/light theme toggle button. Used in Layout header + mobile drawer.
 import { useTheme } from '../../lib/useTheme'
 
 function ThemeToggle() {

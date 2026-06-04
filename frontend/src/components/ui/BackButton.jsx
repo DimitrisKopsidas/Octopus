@@ -1,3 +1,4 @@
+// Back navigation link button. Used across pages.
 import { Link } from 'react-router-dom'
 
 function BackButton({ to, label = 'Πίσω' }) {

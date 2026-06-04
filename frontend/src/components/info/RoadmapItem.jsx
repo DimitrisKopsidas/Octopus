@@ -1,3 +1,4 @@
+// Roadmap list item. Used by Info page.
 function RoadmapItem({ emoji, children }) {
   return (
     <li className="flex items-start gap-3">

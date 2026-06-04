@@ -1,3 +1,4 @@
+// Custom test settings (count slider + timer). Used by CourseStart (step 3).
 import TimerOption from './TimerOption'
 import t from '../../content/courseStart.json'
 

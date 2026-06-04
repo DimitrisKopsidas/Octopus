@@ -1,3 +1,4 @@
+// Timer countdown display. Used by Test.
 function Countdown({ seconds }) {
   const safe = Math.max(0, seconds)
   const m = Math.floor(safe / 60)

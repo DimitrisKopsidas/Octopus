@@ -1,3 +1,4 @@
+// Zustand toast store + toast.* helper API. Used app-wide.
 import { create } from 'zustand'
 
 let nextId = 1

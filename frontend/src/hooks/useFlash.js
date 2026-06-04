@@ -1,3 +1,4 @@
+// Transient flash-message state hook (auto-clears). Used by Test.
 import { useEffect, useState } from 'react'
 
 // Transient state that auto-clears after `duration` ms. Returns [value, setValue].

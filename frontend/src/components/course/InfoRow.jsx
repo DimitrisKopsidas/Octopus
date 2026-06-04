@@ -1,3 +1,4 @@
+// Label/value row. Used by CourseInfoCard.
 function InfoRow({ label, children, muted }) {
   return (
     <div className="flex items-center justify-between gap-3">

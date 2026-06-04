@@ -1,8 +1,9 @@
+// Grid of question jump buttons (answered/flagged state). Used by Test.
 import t from '../../content/test.json'
 
 function QuestionNavigator({ questions, currentIndex, answers, flaggedIds, onJump }) {
   return (
-    <div className="mb-6 max-h-28 overflow-y-auto flex flex-wrap gap-1.5">
+    <div className="mb-6 max-h-28 overflow-y-auto flex flex-wrap gap-1.5 p-1.5">
       {questions.map((q, i) => {
         const isCurrent = i === currentIndex
         const isAnswered = answers[q.id] != null

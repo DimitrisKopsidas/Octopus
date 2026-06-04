@@ -1,3 +1,4 @@
+// Admin question display card (edit/delete). Used by AdminCourse.
 import QuestionImage from './QuestionImage'
 import t from '../../content/adminCourse.json'
 

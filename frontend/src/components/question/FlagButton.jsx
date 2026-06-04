@@ -1,3 +1,4 @@
+// Toggle flag-for-review button. Used by Test.
 import t from '../../content/test.json'
 
 function FlagButton({ flagged, onToggle }) {

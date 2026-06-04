@@ -1,3 +1,4 @@
+// Countdown timer hook (returns remaining seconds). Used by Test.
 import { useEffect, useState } from 'react'
 
 // Returns remaining seconds (or null when no timer). Calls onZero once when it hits 0.

@@ -1,3 +1,4 @@
+// Confirmation dialog (danger/default variants). Used by AdminCourse, Test.
 import Modal from './Modal'
 
 const VARIANT_STYLES = {

@@ -1,3 +1,4 @@
+// Loading skeleton for CourseCard. Used by Courses page.
 import Skeleton from '../ui/Skeleton'
 
 function CourseCardSkeleton() {
