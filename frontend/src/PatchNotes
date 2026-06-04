@@ -110,6 +110,10 @@ Version 0.4.9
 - (x) Refactored some pages + added single line comment on each file 
 
 
+Version 0.4.10
+[x] Changed flash cards tab to show all answears with scalable pagination
+
+
 Version 0.5.0
 [] Demo auth interface (no backend yet)
 - (x) Zustand authStore (in-memory only — interface scaffold)
