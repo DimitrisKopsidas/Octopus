@@ -36,5 +36,10 @@ public class BundleServiceImpl implements BundleService {
 
         return bundleMapper.toDto(bundleRepository.save(bundle));
     }
+
+    @Override
+    public Long countBundle() {
+        return bundleRepository.count();
+    }
 }
 
