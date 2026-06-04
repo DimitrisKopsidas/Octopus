@@ -10,4 +10,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findAllBySemester(int semester);
 
     List<Course> findAllByQuestionsIsNotEmpty();
+
+    Integer countByQuestionsIsNotEmpty();
 }

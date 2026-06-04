@@ -15,5 +15,7 @@ public interface CourseService {
 
     List<CourseResponseDto> listCoursesWithQuestions();
 
+    Integer listCoursesCountWithQuestions();
+
     CourseResponseDto updateCourse(Long courseId, UpdateCourseRequestDto dto);
 }

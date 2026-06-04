@@ -41,6 +41,13 @@ public class CourseController {
         return ResponseEntity.ok(courseResponseDtos);
     }
 
+    @GetMapping(path = "/count-with-content")
+    public ResponseEntity<Integer> listCoursesCountWithContent() {
+        Integer count = courseService.listCoursesCountWithQuestions();
+        return ResponseEntity.ok(count);
+    }
+
+
     //BASIC CRUD---------------------------------------------------------------------------------------
     @GetMapping
     public ResponseEntity<List<CourseResponseDto>> listCourses() {

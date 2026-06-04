@@ -40,6 +40,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Integer listCoursesCountWithQuestions() {
+        return courseRepository.countByQuestionsIsNotEmpty();
+    }
+
+    @Override
     public CourseResponseDto updateCourse(Long courseId, UpdateCourseRequestDto updateRequest) {
         Course course = courseRepository.findById(courseId).
                 orElseThrow(() -> new CourseNotFoundException(courseId));
