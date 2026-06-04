@@ -56,6 +56,7 @@ public class QuestionServiceImpl implements QuestionService {
         checkCorrectAnswerCount(questionFromDto);
 
         question.setTitle(questionFromDto.getTitle());
+        question.setImageUrl(questionFromDto.getImageUrl());
         question.replaceAnswers(questionFromDto.getAnswers());
 
         return questionMapper.toDto(questionRepository.save(question));
@@ -115,7 +116,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .filter(Answer::getIsCorrect)
                 .count();
 
-        if (correctCount != 1) {
+        if (correctCount == 0) {
             throw new CorrectAnswerCountException(question.getId());
         }
     }

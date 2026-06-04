@@ -11,7 +11,8 @@ public record UpdateQuestionRequestDto(
         @NotBlank(message = ERROR_MESSAGE_TITLE_LENGTH)
         @Length(max = 255, message = ERROR_MESSAGE_TITLE_LENGTH)
         String title,
-        @Size(min = 3, max = 5, message = ERROR_MESSAGE_ANSWER_COUNT)
+        String imageUrl,
+        @Size(min = 2, max = 10, message = ERROR_MESSAGE_ANSWER_COUNT)
         List<AnswerRequestDto> answers
 ) {
     private static final String ERROR_MESSAGE_TITLE_LENGTH = "Title must be between 1 and 255 characters";

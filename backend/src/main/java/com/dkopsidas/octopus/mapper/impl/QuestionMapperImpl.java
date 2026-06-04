@@ -23,6 +23,7 @@ public class QuestionMapperImpl implements QuestionMapper {
         Question question = new Question(
                 null,
                 dto.title(),
+                dto.imageUrl(),
                 new ArrayList<>(),
                 courseById,
                 Instant.now(),
@@ -46,6 +47,7 @@ public class QuestionMapperImpl implements QuestionMapper {
         Question question = new Question(
                 null,
                 dto.title(),
+                dto.imageUrl(),
                 new ArrayList<>(),
                 null,
                 null,
@@ -76,6 +78,7 @@ public class QuestionMapperImpl implements QuestionMapper {
         return new QuestionResponseDto(
                 question.getId(),
                 question.getTitle(),
+                question.getImageUrl(),
                 answers,
                 question.getCourse().getId()
         );

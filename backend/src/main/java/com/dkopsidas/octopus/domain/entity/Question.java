@@ -22,6 +22,9 @@ public class Question {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "question",//field not column
@@ -53,9 +56,10 @@ public class Question {
     public Question() {
     }
 
-    public Question(Long id, String title, List<Answer> answers, Course course, Instant created, Instant updated) {
+    public Question(Long id, String title, String imageUrl, List<Answer> answers, Course course, Instant created, Instant updated) {
         this.id = id;
         this.title = title;
+        this.imageUrl = imageUrl;
         this.answers = answers;
         this.course = course;
         this.created = created;

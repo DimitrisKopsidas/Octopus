@@ -7,7 +7,8 @@ import java.util.List;
 public record QuestionResponseDto(
         Long id,
         String title,
+        String imageUrl,
         List<AnswerResponseDto> answers,
-        Long courseId//should this be here or ID? jimbo
+        Long courseId
 ) {
 }
