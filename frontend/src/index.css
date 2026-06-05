@@ -114,3 +114,27 @@ html.dark::-webkit-scrollbar-thumb:hover,
 .animate-reveal {
   animation: revealPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+.animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-float   { animation: floatY 5s ease-in-out infinite; }
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-float,
+  .animate-fadeIn,
+  .animate-slideInRight,
+  .animate-reveal {
+    animation: none !important;
+  }
+}

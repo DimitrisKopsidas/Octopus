@@ -132,17 +132,29 @@ export function useQuestionForm({ courseId, initialQuestion, onCreated, onUpdate
         isCorrect: correctSet.has(i),
       }))
       if (isEdit) {
-        await questionsApi.update(
-          initialQuestion.id,
-          { title: title.trim(), answers: answersPayload, imageUrl: existingImageUrl },
-          imageFile
-        )
+        const id = initialQuestion.id
+        await questionsApi.update(id, {
+          title: title.trim(),
+          answers: answersPayload,
+          imageUrl: existingImageUrl,
+        })
+        // Image is handled separately: upload a freshly picked file, or delete a removed one.
+        if (imageFile) {
+          await questionsApi.uploadImage(id, imageFile)
+        } else if (initialQuestion.imageUrl && !existingImageUrl) {
+          await questionsApi.deleteImage(id)
+        }
         onUpdated?.()
       } else {
-        await questionsApi.create(
-          { title: title.trim(), courseId: Number(courseId), answers: answersPayload },
-          imageFile
-        )
+        const created = await questionsApi.create({
+          title: title.trim(),
+          courseId: Number(courseId),
+          answers: answersPayload,
+        })
+        // Save the question first, then attach its image (filename needs the question id).
+        if (imageFile && created?.id != null) {
+          await questionsApi.uploadImage(created.id, imageFile)
+        }
         onCreated?.()
       }
     } catch (err) {

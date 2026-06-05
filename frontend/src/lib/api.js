@@ -32,6 +32,8 @@ http.interceptors.response.use(
       error.message = 'Το αίτημα άργησε πολύ.'
     } else if (!error.response) {
       error.message = 'Πρόβλημα σύνδεσης με τον server.'
+    } else if (error.response.status === 413) {
+      error.response.data = { message: 'Η εικόνα είναι πολύ μεγάλη (μέγιστο 1MB).' }
     }
     return Promise.reject(error)
   }
@@ -51,20 +53,6 @@ export function extractErrorMessage(err, fallback = 'Σφάλμα.') {
   return err?.message || fallback
 }
 
-// Builds the request body + per-request config for question create/update.
-// - No image  → plain JSON (existing contract)
-// - With image → multipart/form-data with two parts + a longer timeout:
-//     `request` (application/json) = the DTO
-//     `image`   (file)             = the picked image
-// Backend (Spring): @RequestPart("request") Dto, @RequestPart(value="image", required=false) MultipartFile
-function questionBody(payload, imageFile) {
-  if (!imageFile) return { data: payload, config: undefined }
-  const fd = new FormData()
-  fd.append('request', new Blob([JSON.stringify(payload)], { type: 'application/json' }))
-  fd.append('image', imageFile)
-  return { data: fd, config: { timeout: UPLOAD_TIMEOUT } }
-}
-
 export const coursesApi = {
   list: () => unwrap(http.get('/courses')),
   listWithContent: () => unwrap(http.get('/courses/with-content')),
@@ -79,14 +67,16 @@ export const questionsApi = {
     unwrap(http.get(`/questions/${courseId}/setNum=${setNum}`)),
   byRandomCount: (courseId, count) =>
     unwrap(http.get(`/questions/${courseId}/randomCount=${count}`)),
-  create: (payload, imageFile) => {
-    const body = questionBody(payload, imageFile)
-    return unwrap(http.post('/questions', body.data, body.config))
+  create: (payload) => unwrap(http.post('/questions', payload)),
+  update: (id, payload) => unwrap(http.put(`/questions/${id}`, payload)),
+  // Image is a separate two-step concern: save the question first (to get its id),
+  // then upload/delete its image via these endpoints (multipart "file" param).
+  uploadImage: (id, file) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    return unwrap(http.post(`/questions/${id}/image`, fd, { timeout: UPLOAD_TIMEOUT }))
   },
-  update: (id, payload, imageFile) => {
-    const body = questionBody(payload, imageFile)
-    return unwrap(http.put(`/questions/${id}`, body.data, body.config))
-  },
+  deleteImage: (id) => unwrap(http.delete(`/questions/${id}/image`)),
   remove: (id) => http.delete(`/questions/${id}`),
 }
 

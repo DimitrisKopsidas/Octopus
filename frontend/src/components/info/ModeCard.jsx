@@ -1,7 +1,7 @@
 // Study-mode explainer card. Used by Info page.
 function ModeCard({ emoji, title, description, bullets }) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col h-full">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-6 flex flex-col h-full">
       <div className="text-3xl mb-3">{emoji}</div>
       <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{title}</h3>
       <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{description}</p>

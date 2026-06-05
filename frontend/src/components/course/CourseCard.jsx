@@ -25,7 +25,7 @@ function CourseCard({ course, hasContent, disabled }) {
           </p>
         </div>
         {!disabled && (
-          <span className="text-brand-600 dark:text-brand-400 text-xl shrink-0">→</span>
+          <span className="text-brand-600 dark:text-brand-400 text-xl shrink-0 transition-transform group-hover:translate-x-1">→</span>
         )}
       </div>
       <div className="mt-auto pt-4 flex justify-end">
@@ -49,7 +49,7 @@ function CourseCard({ course, hasContent, disabled }) {
   return (
     <Link
       to={`/courses/${course.id}/start`}
-      className="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-600 transition-all"
+      className="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-600 hover:-translate-y-0.5 transition-all"
     >
       {inner}
     </Link>

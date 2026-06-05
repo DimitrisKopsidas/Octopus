@@ -3,14 +3,12 @@
     "title": "Πληροφορίες",
     "subtitlePrefix": "Όλα όσα πρέπει να ξέρεις για το",
     "brand": "Octopus",
-    "subtitleSuffix": "— πώς δουλεύει, πώς θα το χρησιμοποιήσεις σωστά, και πώς μπορείς να βοηθήσεις."
+    "subtitleSuffix": ": πώς δουλεύει, πώς θα το χρησιμοποιήσεις σωστά, και πώς μπορείς να βοηθήσεις."
   },
   "whatIs": {
     "title": "Τι είναι το Octopus;",
     "paragraphs": [
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi magnam praesentium quaerat veritatis eius illo laborum voluptatibus eaque esse est, at voluptate veniam cupiditate ducimus non laudantium impedit maxime enim?",
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi magnam praesentium quaerat veritatis eius illo laborum voluptatibus eaque esse est, at voluptate veniam cupiditate ducimus non laudantium impedit maxime enim?"
-    ]
+      "lorem Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a diam lectus. Sed sit amet ipsum mauris. Maecenas congue ligula ac quam viverra nec consectetur ante hendrerit. Donec et mollis dolor."]
   },
   "howItWorks": {
     "title": "Πώς δουλεύει",
@@ -65,10 +63,10 @@
   },
   "shortcuts": {
     "title": "Συντομεύσεις πληκτρολογίου",
-    "subtitle": "Στη σελίδα του τεστ — fast users τις λατρεύουν.",
+    "subtitle": "Στη σελίδα του τεστ. Οι γρήγοροι χρήστες τις λατρεύουν.",
     "items": [
       { "keys": ["←", "→"], "label": "Προηγούμενη / Επόμενη ερώτηση" },
-      { "keys": ["1", "2", "3", "4", "5"], "label": "Επιλογή απάντησης A–E" },
+      { "keys": ["1", "2", "3", "4", "5"], "label": "Επιλογή απάντησης A-E" },
       { "keys": ["0"], "label": "Καθαρισμός επιλογής" },
       { "keys": ["F"], "label": "Σήμανση ερώτησης για επανέλεγχο" },
       { "keys": ["Esc"], "label": "Κλείσιμο modal" }
@@ -92,7 +90,7 @@
       },
       {
         "q": "Διαφορά Συστηματικής Μελέτης και Προσαρμοσμένου Τεστ;",
-        "a": "Η Συστηματική σε χωρίζει την ύλη σε σταθερά, μη-επικαλυπτόμενα σετ ίσα με το μέγεθος της εξέτασης — εξασφαλίζει 100% κάλυψη. Το Προσαρμοσμένο σου δίνει N τυχαίες ερωτήσεις με ρυθμίσεις της δικής σου επιλογής."
+        "a": "Η Συστηματική σε χωρίζει την ύλη σε σταθερά, μη-επικαλυπτόμενα σετ ίσα με το μέγεθος της εξέτασης, εξασφαλίζοντας 100% κάλυψη. Το Προσαρμοσμένο σου δίνει N τυχαίες ερωτήσεις με ρυθμίσεις της δικής σου επιλογής."
       },
       {
         "q": "Τι γίνεται αν κλείσει η σελίδα ή πέσει το δίκτυο;",

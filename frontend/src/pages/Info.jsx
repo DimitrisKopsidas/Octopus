@@ -16,7 +16,7 @@ function Info() {
   return (
     <div className="max-w-4xl mx-auto space-y-16">
 
-      <section className="text-center pt-8">
+      <section className="text-center pt-8 animate-fade-up">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-950/50 mb-4">
           <img src={logo} alt="Octopus" className="w-12 h-12" />
         </div>

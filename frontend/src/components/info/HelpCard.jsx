@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 function HelpCard({ emoji, title, description, ctaLabel, kind, href, to, highlight }) {
   return (
     <div
-      className={`rounded-xl border shadow-sm p-6 flex flex-col h-full ${
+      className={`rounded-xl border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-6 flex flex-col h-full ${
         highlight
           ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/60'
           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'

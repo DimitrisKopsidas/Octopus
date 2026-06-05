@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { resolveImageUrl } from '../../lib/api'
 
-const MAX_MB = 5
+const MAX_MB = 1
 const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
 // Image picker with live preview. The actual file lives in the parent (QuestionForm).
