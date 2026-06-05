@@ -52,26 +52,41 @@ function Info() {
       <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.howToHelp.title}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.howToHelp.subtitle}</p>
-        <div className={`grid grid-cols-1 ${
-          t.howToHelp.cards.length === 1
-            ? 'max-w-md mx-auto w-full'
-            : t.howToHelp.cards.length === 2
+        <div className={`grid grid-cols-1 ${t.howToHelp.cards.length === 1
+          ? 'max-w-md mx-auto w-full'
+          : t.howToHelp.cards.length === 2
             ? 'md:grid-cols-2 max-w-2xl mx-auto w-full'
             : 'md:grid-cols-3'
-        } gap-4`}>
-          {t.howToHelp.cards.map((card) => (
-            <HelpCard
-              key={card.title}
-              emoji={card.emoji}
-              title={card.title}
-              description={card.description}
-              ctaLabel={card.cta}
-              kind={card.kind}
-              href={card.kind === 'external' ? resolveHref(card.target) : undefined}
-              to={card.kind === 'internal' ? card.target : undefined}
-              highlight={card.highlight}
-            />
-          ))}
+          } gap-4`}>
+          {t.howToHelp.cards.map((card, index) => {
+            const ctaVariants = [
+              'bg-orange-500 text-white hover:bg-orange-600 shadow-sm',
+              'bg-[#5865F2] text-white hover:bg-[#4752C4] shadow-sm',
+              'bg-brand-500 text-white hover:bg-brand-600 shadow-sm',
+            ];
+
+            const cardVariants = [
+              'border-orange-500/40 dark:border-orange-500/20 shadow-[0_0_15px_-3px_rgba(249,115,22,0.1)]',
+              'border-[#5865F2]/30 dark:border-[#5865F2]/20 shadow-[0_0_15px_-3px_rgba(88,101,242,0.1)]',
+              'border-brand-500/50 dark:border-brand-500/30 shadow-[0_0_15px_-3px_rgba(34,197,94,0.1)] dark:shadow-[0_0_20px_-5px_rgba(34,197,94,0.15)]', 
+            ];
+
+            return (
+              <HelpCard
+                key={card.title}
+                emoji={card.emoji}
+                title={card.title}
+                description={card.description}
+                ctaClassName={ctaVariants[index]}
+                ctaLabel={card.cta}
+                kind={card.kind}
+                href={card.kind === 'external' ? resolveHref(card.target) : undefined}
+                to={card.kind === 'internal' ? card.target : undefined}
+                highlight={card.highlight}
+                className={cardVariants[index]}
+              />
+            );
+          })}
         </div>
       </section>
 

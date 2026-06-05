@@ -40,7 +40,8 @@
   },
   "howToHelp": {
     "title": "Πώς να βοηθήσεις",
-    "subtitle": "Δύο τρόποι για να συνεισφέρεις στο project.",
+    "subtitle": "Τρεις τρόποι για να συνεισφέρεις στο project.",
+    "bmcUrl": "https://buymeacoffee.com/octopus_academic",
     "cards": [
       {
         "emoji": "☕",
@@ -48,7 +49,7 @@
         "description": "Κράτα το project ζωντανό. Οι supporters παίρνουν badge και ξεχωριστή εμφάνιση στα leaderboards.",
         "cta": "Buy me a coffee",
         "kind": "external",
-        "target": "https://buymeacoffee.com/octopus_academic",
+        "target": "bmcUrl",
         "highlight": true
       },
       {
@@ -58,6 +59,14 @@
         "cta": "Discord Κανάλι",
         "kind": "external",
         "target": "https://discord.gg/GV6nFxU96W"
+      },
+      {
+        "emoji": "🛠️",
+        "title": "Γινε μελος της ομαδας",
+        "description": "Ακολουθησε το link για να δεις το repo στο Github και στειλε μηνυμα για να γινει μελος της ομαδας.",
+        "cta": "Github Repo",
+        "kind": "external",
+        "target": "https://github.com/DimitrisKopsidas/Octopus"
       }
     ]
   },
