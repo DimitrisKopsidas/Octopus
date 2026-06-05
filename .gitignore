@@ -44,3 +44,6 @@ build/
 
 # Spring Boot prod properties (contains domain info)
 **/application-prod.properties
+
+# Images folder for dev testing
+images/

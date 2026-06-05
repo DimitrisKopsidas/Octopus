@@ -16,5 +16,5 @@ public record UpdateQuestionRequestDto(
         List<AnswerRequestDto> answers
 ) {
     private static final String ERROR_MESSAGE_TITLE_LENGTH = "Title must be between 1 and 255 characters";
-    private static final String ERROR_MESSAGE_ANSWER_COUNT = "Answer count cannot be less than 3 and more than 5";
+    private static final String ERROR_MESSAGE_ANSWER_COUNT = "Answer count cannot be less than 2 and more than 10";
 }

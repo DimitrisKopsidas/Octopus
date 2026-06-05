@@ -17,7 +17,9 @@ import com.dkopsidas.octopus.repository.QuestionRepository;
 import com.dkopsidas.octopus.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +31,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final CourseRepository courseRepository;
     private final QuestionMapper questionMapper;
+    private final ImageService imageService;
 
     @Override
     public QuestionResponseDto createQuestion(CreateQuestionRequestDto createRequest) {
@@ -109,6 +112,26 @@ public class QuestionServiceImpl implements QuestionService {
         allQuestions = scrambleQuestions(allQuestions);
 
         return questionMapper.toDto(allQuestions.subList(0, randomCount));
+    }
+
+    public QuestionResponseDto uploadImage(Long questionId, MultipartFile file) throws IOException {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException(questionId));
+
+        String imageUrl = imageService.saveImage(questionId, file);
+        question.setImageUrl(imageUrl);
+
+        return questionMapper.toDto(questionRepository.save(question));
+    }
+
+    public QuestionResponseDto deleteImage(Long questionId) throws IOException {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException(questionId));
+
+        imageService.deleteImage(questionId);
+        question.setImageUrl(null);
+
+        return questionMapper.toDto(questionRepository.save(question));
     }
 
     private void checkCorrectAnswerCount(Question question) {

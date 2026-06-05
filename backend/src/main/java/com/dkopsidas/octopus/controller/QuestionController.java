@@ -10,9 +10,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -49,6 +52,19 @@ public class QuestionController {
     ) {
         List<QuestionResponseDto> questionResponseDtos = questionService.listQuestionsByRandomCount(courseId, randomCount);
         return ResponseEntity.ok(questionResponseDtos);
+    }
+
+    @PostMapping(path = "/{questionId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<QuestionResponseDto> uploadImage(
+            @PathVariable Long questionId,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(questionService.uploadImage(questionId, file));
+    }
+
+    @DeleteMapping(path = "/{questionId}/image")
+    public ResponseEntity<QuestionResponseDto> deleteImage(
+            @PathVariable Long questionId) throws IOException {
+        return ResponseEntity.ok(questionService.deleteImage(questionId));
     }
 
     //BASIC CRUD---------------------------------------------------------------------------------------
