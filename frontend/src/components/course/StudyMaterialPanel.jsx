@@ -6,7 +6,7 @@ import Pagination from '../ui/Pagination'
 import ErrorState from '../ui/ErrorState'
 import t from '../../content/courseStart.json'
 
-const PER_PAGE = 8
+const PER_PAGE = 10
 
 function StudyMaterialPanel({ courseId }) {
   const [questions, setQuestions] = useState(null)

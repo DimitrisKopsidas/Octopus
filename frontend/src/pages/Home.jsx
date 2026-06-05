@@ -31,12 +31,12 @@ function Home() {
           >
             {t.hero.ctaPractice}
           </Link>
-          <Link
-            to="/admin"
-            className="inline-block bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-700 dark:text-brand-300 font-medium px-6 py-3 rounded-md transition-colors border border-slate-200 dark:border-slate-700"
-          >
-            {t.hero.ctaManage}
-          </Link>
+{/*           <Link */}
+{/*             to="/admin" */}
+{/*             className="inline-block bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-brand-700 dark:text-brand-300 font-medium px-6 py-3 rounded-md transition-colors border border-slate-200 dark:border-slate-700" */}
+{/*           > */}
+{/*             {t.hero.ctaManage} */}
+{/*           </Link> */}
         </div>
 
         {(stats.tests != null || stats.courses != null) && (
