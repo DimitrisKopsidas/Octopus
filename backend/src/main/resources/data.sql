@@ -1,5 +1,3 @@
-TRUNCATE TABLE bundle_answers, bundles, answers, questions, players, courses RESTART IDENTITY CASCADE;
-
 INSERT INTO COURSES(ID,NAME,SEMESTER, QUESTION_SET_SIZE, DEFAULT_TIMER_MINUTES) VALUES
 (1101, 'Μαθηματικά Ι', 1, 3, 15),
 (1102, 'Δομημένος Προγραμματισμός', 1, 10, 15),
