@@ -25,6 +25,9 @@ public class Question {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "question",//field not column
@@ -56,13 +59,22 @@ public class Question {
     public Question() {
     }
 
-    public Question(Long id, String title, String imageUrl, List<Answer> answers, Course course, Instant created, Instant updated) {
+    public Question(Long id, String title, String imageUrl, boolean isActive, List<Answer> answers, Course course, Instant created, Instant updated) {
         this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
+        this.isActive = isActive;
         this.answers = answers;
         this.course = course;
         this.created = created;
         this.updated = updated;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public boolean getIsActive() {
+        return this.isActive;
     }
 }

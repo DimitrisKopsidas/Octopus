@@ -77,7 +77,7 @@ export const questionsApi = {
     return unwrap(http.post(`/questions/${id}/image`, fd, { timeout: UPLOAD_TIMEOUT }))
   },
   deleteImage: (id) => unwrap(http.delete(`/questions/${id}/image`)),
-  remove: (id) => http.delete(`/questions/${id}`),
+  remove: (id) => http.patch(`/questions/${id}`),
 }
 
 export const bundlesApi = {

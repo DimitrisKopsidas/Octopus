@@ -47,7 +47,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<QuestionResponseDto> listQuestions(Long courseId) {
-        return questionMapper.toDto(questionRepository.findAllByCourseId(courseId));
+        return questionMapper.toDto(questionRepository.findAllByCourseIdAndIsActiveTrue(courseId));
     }
 
     @Override
@@ -66,8 +66,13 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void deleteQuestion(Long questionId) {
-        questionRepository.deleteById(questionId);
+    public QuestionResponseDto deactivateQuestion(Long questionId) {
+        Question question = questionRepository.findById(questionId).
+                orElseThrow(() -> new QuestionNotFoundException(questionId));
+
+        question.setIsActive(false);
+
+        return questionMapper.toDto(questionRepository.save(question));
     }
 
     @Override
@@ -88,7 +93,7 @@ public class QuestionServiceImpl implements QuestionService {
         int setSize = courseFromDto.getQuestionSetSize();
         int fromIndex = setNum * setSize;
 
-        List<Question> allQuestions = questionRepository.findAllByCourseId(courseId);
+        List<Question> allQuestions = questionRepository.findAllByCourseIdAndIsActiveTrue(courseId);
 
         if (fromIndex >= allQuestions.size()) {
             throw new SimpleException("Set number " + setNum + " does not exist for this course");
@@ -104,7 +109,7 @@ public class QuestionServiceImpl implements QuestionService {
         Course courseFromDto = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(courseId));
 
-        List<Question> allQuestions = questionRepository.findAllByCourseId(courseId);
+        List<Question> allQuestions = questionRepository.findAllByCourseIdAndIsActiveTrue(courseId);
 
         if (randomCount > allQuestions.size())
             throw new SimpleException("Random count: " + randomCount + " exceeds the total question count for this course");

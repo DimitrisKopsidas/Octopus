@@ -12,6 +12,7 @@ public record UpdateQuestionRequestDto(
         @Length(max = 255, message = ERROR_MESSAGE_TITLE_LENGTH)
         String title,
         String imageUrl,
+        boolean isActive,
         @Size(min = 2, max = 10, message = ERROR_MESSAGE_ANSWER_COUNT)
         List<AnswerRequestDto> answers
 ) {

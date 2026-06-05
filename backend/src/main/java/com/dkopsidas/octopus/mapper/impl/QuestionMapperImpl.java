@@ -24,6 +24,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 null,
                 dto.title(),
                 dto.imageUrl(),
+                true,
                 new ArrayList<>(),
                 courseById,
                 Instant.now(),
@@ -48,6 +49,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 null,
                 dto.title(),
                 dto.imageUrl(),
+                dto.isActive(),
                 new ArrayList<>(),
                 null,
                 null,
@@ -79,6 +81,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 question.getId(),
                 question.getTitle(),
                 question.getImageUrl(),
+                question.getIsActive(),
                 answers,
                 question.getCourse().getId()
         );

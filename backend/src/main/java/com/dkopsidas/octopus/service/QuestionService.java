@@ -17,7 +17,7 @@ public interface QuestionService {
 
     QuestionResponseDto updateQuestion(Long questionId, UpdateQuestionRequestDto dto);
 
-    void deleteQuestion(Long questionId);
+    QuestionResponseDto deactivateQuestion(Long questionId);
 
     SettingsInfoResponseDto listSettingsInfo(Long courseId);
 

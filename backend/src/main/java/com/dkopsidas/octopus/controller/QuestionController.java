@@ -95,12 +95,12 @@ public class QuestionController {
         return ResponseEntity.ok(updatedQuestion);
     }
 
-    @DeleteMapping(path = "/{questionId}")
-    public ResponseEntity<Void> deleteQuestion (
+    @PatchMapping(path = "/{questionId}")
+    public ResponseEntity<QuestionResponseDto> deactivateQuestion (
             @PathVariable Long questionId) {
         checkIsReadOnly();
-        questionService.deleteQuestion(questionId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        QuestionResponseDto updatedQuestion = questionService.deactivateQuestion(questionId);
+        return ResponseEntity.ok(updatedQuestion);
     }
 
     private void checkIsReadOnly(){

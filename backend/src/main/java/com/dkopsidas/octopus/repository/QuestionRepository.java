@@ -7,7 +7,7 @@ import java.util.List;
 
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    List<Question> findAllByCourseId(Long courseId);
+    List<Question> findAllByCourseIdAndIsActiveTrue(Long courseId);
 
     Long countByCourseId(Long courseId);
 }
