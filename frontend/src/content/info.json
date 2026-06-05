@@ -50,7 +50,7 @@
         "description": "Κράτα το project ζωντανό. Οι supporters παίρνουν badge και ξεχωριστή εμφάνιση στα leaderboards.",
         "cta": "Buy me a coffee",
         "kind": "external",
-        "target": "https://buymeacoffee.com/octopus",
+        "target": "https://buymeacoffee.com/octopus_academic",
         "highlight": true
       },
       {
@@ -59,7 +59,7 @@
         "description": "Πες μας τι θες να βελτιωθεί, αν βρήκες κάποιο bug, ή πρότεινε νέες ιδέες. Κάθε σχόλιο μετράει.",
         "cta": "Discord Κανάλι",
         "kind": "external",
-        "target": "https://discord.gg/MZKMrnzPVq"
+        "target": "https://discord.gg/GV6nFxU96W"
       }
     ]
   },
