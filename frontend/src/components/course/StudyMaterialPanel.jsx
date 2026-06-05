@@ -8,7 +8,8 @@ import t from '../../content/courseStart.json'
 
 const PER_PAGE = 10
 
-function StudyMaterialPanel({ courseId }) {
+function StudyMaterialPanel({ courseId, setSize }) {
+  const PER_PAGE = setSize || 10
   const [questions, setQuestions] = useState(null)
   const [error, setError] = useState(null)
   const [page, setPage] = useState(1) // 1-indexed
@@ -32,7 +33,7 @@ function StudyMaterialPanel({ courseId }) {
 
   const pageQuestions = useMemo(
     () => (questions ? questions.slice(start, start + PER_PAGE) : []),
-    [questions, start]
+    [questions, start, PER_PAGE]
   )
 
   const goToPage = useCallback((p) => {

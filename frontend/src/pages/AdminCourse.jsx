@@ -166,7 +166,7 @@ function AdminCourse() {
         <QuestionForm
           courseId={courseId}
           initialQuestion={modalState.editing}
-          onCreated={() => { closeModal(); reloadQuestions(); invalidateWithContent(); toast.success(t.toast.questionCreated) }}
+          onCreated={() => { reloadQuestions(); invalidateWithContent(); toast.success(t.toast.questionCreated) }}
           onUpdated={() => { closeModal(); reloadQuestions(); toast.success(t.toast.questionUpdated) }}
           onCancel={closeModal}
         />

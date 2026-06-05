@@ -174,4 +174,18 @@ export function useQuestionForm({ courseId, initialQuestion, onCreated, onUpdate
     submitting, error,
     handleSubmit,
   }
+
+  function resetForNew() {
+      setTitle('')
+      setError(null)
+      setImageFile(null)
+      setExistingImageUrl(null)
+      if (questionType === 'truefalse') {
+        setAnswers(TF_ANSWERS.map((a) => ({ ...a })))
+        setCorrectSet(new Set([0]))
+      } else {
+        setAnswers([emptyAnswer(), emptyAnswer(), emptyAnswer(), emptyAnswer()])
+        setCorrectSet(new Set())
+      }
+    }
 }

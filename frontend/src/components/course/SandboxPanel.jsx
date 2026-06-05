@@ -22,13 +22,13 @@ function SandboxPanel({
       </header>
 
       <div className="px-6 py-5 space-y-6">
-        {coveragePercentage < 100 && (
-          <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/60 p-4">
-            <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
-              {t.sandbox.warningTemplate}
-            </p>
-          </div>
-        )}
+{/*         {coveragePercentage < 100 && ( */}
+{/*           <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/60 p-4"> */}
+{/*             <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed"> */}
+{/*               {t.sandbox.warningTemplate} */}
+{/*             </p> */}
+{/*           </div> */}
+{/*         )} */}
 
         <section>
           <div className="flex items-baseline justify-between mb-3">

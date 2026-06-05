@@ -58,7 +58,7 @@ function CourseStart() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             <div className="md:col-span-2 space-y-6">
-              {activeTab === 'study' && <StudyMaterialPanel courseId={courseId} />}
+              {activeTab === 'study' && <StudyMaterialPanel courseId={courseId} setSize={SET_SIZE} />}
 
               {activeTab === 'systematic' && (
                 <SystematicStudyPanel

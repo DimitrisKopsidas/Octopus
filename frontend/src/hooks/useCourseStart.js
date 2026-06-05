@@ -8,7 +8,7 @@ import { useCourseSettings } from './useCourseSettings'
 import { toast } from '../store/toastStore'
 import t from '../content/courseStart.json'
 
-const TIMER_PRESET_MINUTES = [null, 5, 10, 15, 30]
+const TIMER_PRESET_MINUTES = [null, 10, 15, 30]
 
 // All data, derivation and start-test logic for the CourseStart page.
 // Keeps the page itself purely presentational.
