@@ -11,6 +11,15 @@ In order to encourage studious behaviour, aspects of 'gamefication' will be incl
 The application and its development have been modeled around the department of Information and Electronic Engineering of the International Hellenic University, where I got my degree.
 However it can also be applied to any other institution where content is available and applicable in the app.
 
-Backend tech stack: Spring Boot, PostgreSQL, Docker
+Tech stack
+Backend : Spring Boot, PostgreSQL, Docker
+Frontend: React, Tailwind
 
-Frontend tech stack: TBA
+The Octopus Team:
+Kopsidas(corpora1984): Backend development and architecture design
+Retsilas(rets5820): Frontend development and UX engineer
+Tsiftelidis(mastertsif): QA and content creation
+
+With help by:
+Thomas(bonuschromosome): Hosting and launch
+Helper team from IEE IHU Discord for ideas and further content creation
