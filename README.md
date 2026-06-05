@@ -17,9 +17,13 @@ Frontend: React, Tailwind
 
 The Octopus Team:
 Kopsidas(corpora1984): Backend development and architecture design
+
 Retsilas(rets5820): Frontend development and UX engineer
+
 Tsiftelidis(mastertsif): QA and content creation
+
 
 With help by:
 Thomas(bonuschromosome): Hosting and launch
+
 Helper team from IEE IHU Discord for ideas and further content creation
