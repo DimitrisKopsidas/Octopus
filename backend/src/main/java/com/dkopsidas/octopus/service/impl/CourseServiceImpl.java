@@ -36,12 +36,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseResponseDto> listCoursesWithQuestions() {
-        return courseMapper.toDto(courseRepository.findAllByQuestionsIsNotEmpty());
+        return courseMapper.toDto(courseRepository.findDistinctByQuestionsIsActiveTrue());
     }
 
     @Override
     public Integer listCoursesCountWithQuestions() {
-        return courseRepository.countByQuestionsIsNotEmpty();
+        return courseRepository.countDistinctByQuestionsIsActiveTrue();
     }
 
     @Override
