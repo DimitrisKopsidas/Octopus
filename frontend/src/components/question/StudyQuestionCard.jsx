@@ -14,7 +14,7 @@ function StudyQuestionCard({ number, question }) {
             {number}
           </span>
           <div className="min-w-0">
-            <h3 className="font-semibold text-slate-900 dark:text-white leading-snug">{question.title}</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white leading-snug break-words">{question.title}</h3>
             {isMulti && (
               <p className="mt-1 text-xs font-medium text-brand-700 dark:text-brand-400 inline-flex items-center gap-1.5">
                 <span aria-hidden="true">☑</span> {t.study.multiHint}
@@ -35,11 +35,11 @@ function StudyQuestionCard({ number, question }) {
               ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800'
               : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800'
             return (
-              <li key={a.id} className={`flex items-center gap-3 px-4 py-2.5 rounded-lg border ${tone}`}>
+              <li key={a.id} className={`flex items-start gap-3 px-4 py-2.5 rounded-lg border ${tone}`}>
                 <span className="text-base shrink-0">{a.isCorrect ? '✓' : '·'}</span>
-                <span className="flex-1">{a.title}</span>
+                <span className="flex-1 min-w-0 break-words">{a.title}</span>
                 {a.isCorrect && (
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.5 rounded shrink-0">
+                  <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.5 rounded shrink-0">
                     {t.study.correctTag}
                   </span>
                 )}

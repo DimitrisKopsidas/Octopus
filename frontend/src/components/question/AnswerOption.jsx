@@ -21,7 +21,7 @@ function AnswerOption({ label, letter, selected, onClick, multi = false }) {
       >
         {multi && selected ? '✓' : letter}
       </span>
-      <span className="flex-1">{label}</span>
+      <span className="flex-1 min-w-0 break-words">{label}</span>
     </button>
   )
 }

@@ -153,12 +153,9 @@ function Test() {
       />
 
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8">
-        <div className="flex items-start justify-between gap-3 mb-6">
-          <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white leading-snug">
-            {currentQuestion.title}
-          </h2>
-          <FlagButton flagged={isCurrentFlagged} onToggle={() => toggleFlag(currentQuestion.id)} />
-        </div>
+        <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white leading-snug break-words mb-6">
+          {currentQuestion.title}
+        </h2>
 
         {currentQuestion.imageUrl && (
           <div className="mb-6 flex justify-center">
@@ -185,8 +182,10 @@ function Test() {
           ))}
         </div>
 
-        <div className="mt-4 h-5 flex items-center justify-between gap-3">
-          <span className="text-xs inline-flex items-center gap-1.5 min-w-0">
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <FlagButton flagged={isCurrentFlagged} onToggle={() => toggleFlag(currentQuestion.id)} />
+
+          <div className="flex items-center gap-3 min-w-0 text-xs">
             {flash === 'saved' && (
               <span className="text-emerald-700 dark:text-emerald-400 font-medium inline-flex items-center gap-1.5">
                 <span aria-hidden="true">✓</span> {t.flash.saved}
@@ -197,17 +196,17 @@ function Test() {
                 <span aria-hidden="true">↺</span> {t.flash.cleared}
               </span>
             )}
-          </span>
-          {hasChoice && (
-            <button
-              type="button"
-              onClick={() => handleClear(currentQuestion.id)}
-              title={t.clear.tooltip}
-              className="shrink-0 text-xs text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium inline-flex items-center gap-1 transition-colors"
-            >
-              <span aria-hidden="true">×</span> {t.clear.label}
-            </button>
-          )}
+            {hasChoice && (
+              <button
+                type="button"
+                onClick={() => handleClear(currentQuestion.id)}
+                title={t.clear.tooltip}
+                className="shrink-0 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 font-medium inline-flex items-center gap-1 transition-colors"
+              >
+                <span aria-hidden="true">×</span> {t.clear.label}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

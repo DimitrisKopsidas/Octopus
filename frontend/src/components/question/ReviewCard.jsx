@@ -24,14 +24,14 @@ function ReviewCard({ index, question, chosenAnswerId }) {
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <div className={`px-5 py-3 border-b flex items-center justify-between gap-3 ${headerTone}`}>
-        <h3 className="font-semibold text-slate-900 dark:text-white">
+      <div className={`px-5 py-3 border-b ${headerTone}`}>
+        <span className={`inline-block mb-2 text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${badgeTone}`}>
+          {!wasAnswered ? t.review.noAnswer : isCorrect ? t.review.correct : t.review.wrong}
+        </span>
+        <h3 className="font-semibold text-slate-900 dark:text-white break-words">
           <span className="text-slate-400 dark:text-slate-500 mr-2">{index}.</span>
           {question.title}
         </h3>
-        <span className={`text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded shrink-0 ${badgeTone}`}>
-          {!wasAnswered ? t.review.noAnswer : isCorrect ? t.review.correct : t.review.wrong}
-        </span>
       </div>
       {question.imageUrl && (
         <div className="px-3 pt-3 flex justify-center">
@@ -49,16 +49,20 @@ function ReviewCard({ index, question, chosenAnswerId }) {
               : 'bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 border border-transparent'
 
           return (
-            <li key={a.id} className={`flex items-center gap-2 text-sm px-3 py-2 rounded-md ${rowTone}`}>
+            <li key={a.id} className={`flex items-start gap-2 text-sm px-3 py-2 rounded-md ${rowTone}`}>
               <span className="text-base shrink-0">
                 {isCorrectAnswer ? '✓' : isChosen ? '✗' : '·'}
               </span>
-              <span className="flex-1">{a.title}</span>
-              {isChosen && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded shrink-0">
-                  {t.review.yourChoice}
-                </span>
-              )}
+              <div className="flex-1 min-w-0">
+                <span className="break-words">{a.title}</span>
+                {isChosen && (
+                  <div className="mt-1">
+                    <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-1.5 py-0.5 rounded">
+                      {t.review.yourChoice}
+                    </span>
+                  </div>
+                )}
+              </div>
             </li>
           )
         })}
