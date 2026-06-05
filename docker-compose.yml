@@ -31,6 +31,8 @@ services:
     build: ./frontend
     ports:
       - "80:80"
+    volumes:
+      - /var/www/octopus/images:/var/www/octopus/images
     depends_on:
       - backend
 
