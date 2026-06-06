@@ -115,13 +115,13 @@
   },
   "roadmap": {
     "title": "Roadmap",
-    "subtitle": "Τα νέα features που προγραμματίζονται για τα επόμενα versions.",
+    "subtitle": "Νέα features που προγραμματίζονται για τα επόμενα versions.",
     "items": [
       { "emoji": "👥", "text": "V1.1 - User registration και login (μη υποχρεωτικά για χρήση της εφαρμογής)" },
       { "emoji": "📈", "text": "V1.2 - Ιστορικό quiz στο προφίλ σου, παρακολούθηση προόδου, επίλυση quiz λανθασμένων ερωτήσεων" },
       { "emoji": "🏆", "text": "V1.3 - Leaderboards (Best Score / Most Quizes Solved / Streak)" },
       { "emoji": "☕", "text": "V1.4 - Donor badges με ορατή αναγνώριση" },
-      { "emoji": "\uD83E\uDDEE", "text": "V2.0 - Επίλυση μαθηματικών ασκήσεων(κυκλώματα, μαθηματικά/στατιστική, σήματα) με άμεσο feedback" }
+      { "emoji": "\uD83E\uDDEE", "text": "V2.0 - Επίλυση μαθηματικών ασκήσεων (κυκλώματα, μαθηματικά/στατιστική, σήματα) με άμεσο feedback" }
     ]
   },
   "footer": {
