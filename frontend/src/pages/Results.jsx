@@ -88,8 +88,13 @@ function Results() {
       </div>
 
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-1">
-          {courseName}
+        <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold mb-1 flex items-center gap-2 flex-wrap">
+          <span>{courseName}</span>
+          {setIndex != null && (
+            <span className="normal-case tracking-normal text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded">
+              {t.setLabel.replace('{n}', setIndex + 1)}
+            </span>
+          )}
         </p>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t.title}</h1>
       </div>

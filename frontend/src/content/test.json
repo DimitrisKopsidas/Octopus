@@ -1,6 +1,7 @@
 {
   "questionLabelTemplate": "Ερώτηση {current} από {total}",
   "answeredTemplate": "· απαντημένες {count}/{total}",
+  "setLabel": "Σετ {n}",
   "cancelButton": "Ακύρωση",
   "prevButton": "← Προηγούμενη",
   "nextButton": "Επόμενη →",

@@ -27,6 +27,7 @@ function Test() {
   const startedAt = useTestStore((s) => s.startedAt)
   const endedAt = useTestStore((s) => s.endedAt)
   const courseName = useTestStore((s) => s.courseName)
+  const setIndex = useTestStore((s) => s.setIndex)
   const selectAnswer = useTestStore((s) => s.selectAnswer)
   const toggleAnswer = useTestStore((s) => s.toggleAnswer)
   const clearAnswer = useTestStore((s) => s.clearAnswer)
@@ -110,10 +111,15 @@ function Test() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <header className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
-            {courseName}
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-2 flex-wrap">
+            <span>{courseName}</span>
+            {setIndex != null && (
+              <span className="normal-case tracking-normal text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded">
+                {t.setLabel.replace('{n}', setIndex + 1)}
+              </span>
+            )}
           </p>
           <p className="text-sm text-slate-700 dark:text-slate-300 mt-0.5">
             {t.questionLabelTemplate.split('{current}')[0]}
@@ -125,7 +131,7 @@ function Test() {
             </span>
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3 sm:justify-end shrink-0">
           {remaining != null && <Countdown seconds={remaining} />}
           <button
             type="button"
