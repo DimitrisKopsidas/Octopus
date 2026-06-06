@@ -27,14 +27,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(PlayerNotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handlePlayerNotFoundException(PlayerNotFoundException ex) {
-        UUID playerNotFoundId = ex.getId();
-        String errorMessage = String.format("Player with ID '%s' not found", playerNotFoundId);
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto(errorMessage);
-        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(SimpleException.class)
     public ResponseEntity<String> handleSimpleExceptions(SimpleException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());

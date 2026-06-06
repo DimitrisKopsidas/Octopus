@@ -58,12 +58,14 @@ public class QuestionController {
     public ResponseEntity<QuestionResponseDto> uploadImage(
             @PathVariable Long questionId,
             @RequestParam("file") MultipartFile file) throws IOException {
+        checkIsReadOnly();
         return ResponseEntity.ok(questionService.uploadImage(questionId, file));
     }
 
     @DeleteMapping(path = "/{questionId}/image")
     public ResponseEntity<QuestionResponseDto> deleteImage(
             @PathVariable Long questionId) throws IOException {
+        checkIsReadOnly();
         return ResponseEntity.ok(questionService.deleteImage(questionId));
     }
 
