@@ -1,8 +1,8 @@
 {
   "backLabel": "Πίσω στα μαθήματα",
   "fallbackTitle": "Μάθημα {courseId}",
-  "subheader": "Κωδικός: {id} · Εξάμηνο: {semester} · {count} ερωτήσεις · σετ {setSize} · χρόνος {timer}′",
-  "settingsButton": "Ρυθμίσεις",
+  "subheader": "Κωδικός: {id} · Εξάμηνο: {semester} · {count} ερωτήσεις · μέγεθος quiz {setSize} · χρόνικό όριο quiz {timer}′",
+  "settingsButton": "Ρυθμίσεις μαθήματος",
   "newQuestionButton": "+ Νέα ερώτηση",
   "loading": "Φόρτωση ερωτήσεων…",
   "errorFallback": "Σφάλμα φόρτωσης.",

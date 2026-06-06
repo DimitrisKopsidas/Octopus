@@ -39,15 +39,15 @@ function Info() {
         </div>
       </section>
 
-      <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.howItWorks.title}</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.howItWorks.subtitle}</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {t.howItWorks.modes.map((mode) => (
-            <ModeCard key={mode.title} {...mode} />
-          ))}
-        </div>
-      </section>
+{/*       <section> */}
+{/*         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.howItWorks.title}</h2> */}
+{/*         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.howItWorks.subtitle}</p> */}
+{/*         <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
+{/*           {t.howItWorks.modes.map((mode) => ( */}
+{/*             <ModeCard key={mode.title} {...mode} /> */}
+{/*           ))} */}
+{/*         </div> */}
+{/*       </section> */}
 
       <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.howToHelp.title}</h2>
@@ -91,6 +91,34 @@ function Info() {
       </section>
 
       <section>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.roadmap.title}</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.roadmap.subtitle}</p>
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+            <ul className="space-y-3 text-sm">
+              {t.roadmap.items.map((item, i) => (
+                <RoadmapItem key={i} emoji={item.emoji}>{item.text}</RoadmapItem>
+              ))}
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.faq.title}</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.faq.subtitle}</p>
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm divide-y divide-slate-200 dark:divide-slate-800">
+        {t.faq.items.map((item, i) => (
+          <details key={i} className="group p-5">
+            <summary className="flex items-center justify-between cursor-pointer text-slate-900 dark:text-white font-medium list-none">
+              <span>{item.q}</span>
+              <span className="text-brand-600 dark:text-brand-400 text-xl transition-transform group-open:rotate-45 select-none">+</span>
+            </summary>
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.shortcuts.title}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.shortcuts.subtitle}</p>
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
@@ -107,41 +135,13 @@ function Info() {
         </div>
       </section>
 
-      <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.faq.title}</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.faq.subtitle}</p>
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm divide-y divide-slate-200 dark:divide-slate-800">
-          {t.faq.items.map((item, i) => (
-            <details key={i} className="group p-5">
-              <summary className="flex items-center justify-between cursor-pointer text-slate-900 dark:text-white font-medium list-none">
-                <span>{item.q}</span>
-                <span className="text-brand-600 dark:text-brand-400 text-xl transition-transform group-open:rotate-45 select-none">+</span>
-              </summary>
-              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{item.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.roadmap.title}</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.roadmap.subtitle}</p>
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-          <ul className="space-y-3 text-sm">
-            {t.roadmap.items.map((item, i) => (
-              <RoadmapItem key={i} emoji={item.emoji}>{item.text}</RoadmapItem>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="text-center py-8 border-t border-slate-200 dark:border-slate-800">
-        <p className="text-sm text-slate-500 dark:text-slate-400">{t.footer.tagline}</p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t.footer.credit}</p>
-        <Link to="/" className="inline-block mt-4 text-sm text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium">
-          {t.footer.backLink}
-        </Link>
-      </section>
+{/*       <section className="text-center py-8 border-t border-slate-200 dark:border-slate-800"> */}
+{/*         <p className="text-sm text-slate-500 dark:text-slate-400">{t.footer.tagline}</p> */}
+{/*         <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t.footer.credit}</p> */}
+{/*         <Link to="/" className="inline-block mt-4 text-sm text-brand-700 dark:text-brand-400 hover:text-brand-800 dark:hover:text-brand-300 font-medium"> */}
+{/*           {t.footer.backLink} */}
+{/*         </Link> */}
+{/*       </section> */}
     </div>
   )
 }

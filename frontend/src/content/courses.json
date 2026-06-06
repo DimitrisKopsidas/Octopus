@@ -9,7 +9,7 @@
   "retry": "Δοκίμασε ξανά",
   "empty": "Δεν βρέθηκαν μαθήματα με αυτά τα κριτήρια.",
   "showMore": "Εμφάνιση περισσότερων",
-  "emptyDisabledTooltip": "Δεν υπάρχουν ερωτήσεις ακόμα για αυτό το μάθημα",
+  "emptyDisabledTooltip": "Δεν υπάρχει content ακόμα για αυτό το μάθημα",
   "courseCard": {
     "semesterPrefix": "Εξάμηνο",
     "codePrefix": "Κωδικός:"
@@ -19,7 +19,7 @@
     "semesterTitle": "Εξάμηνο",
     "allLabel": "Όλα",
     "contentTitle": "Περιεχόμενο",
-    "onlyWithContent": "Μόνο μαθήματα με ερωτήσεις",
+    "onlyWithContent": "Μόνο μαθήματα με content",
     "reset": "Καθαρισμός φίλτρων",
     "apply": "Εφαρμογή"
   }
