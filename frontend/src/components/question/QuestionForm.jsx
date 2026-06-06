@@ -39,14 +39,14 @@ function QuestionForm({ courseId, initialQuestion, onCreated, onUpdated, onCance
             value={form.title}
             onChange={(e) => form.setTitle(e.target.value)}
             rows={3}
-            maxLength={255}
+            maxLength={510}
             placeholder={form.questionType === 'truefalse'
               ? 'π.χ. Η Java είναι interpreted γλώσσα.'
               : 'π.χ. Τι σημαίνει το ακρωνύμιο JVM;'}
             className="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
           />
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 text-right">
-            {form.title.length}/255
+            {form.title.length}/510
           </p>
         </section>
 

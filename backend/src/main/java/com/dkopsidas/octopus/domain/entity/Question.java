@@ -19,7 +19,7 @@ public class Question {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 510)
     private String title;
 
     @Column(name = "image_url")
