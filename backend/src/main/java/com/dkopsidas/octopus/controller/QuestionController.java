@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping(path = "/api/v1/questions")
 public class QuestionController {
 
-    @Value("${app.readonly:false}")
+    @Value("${app.readonly:true}")
     private boolean readOnly;
 
     private final QuestionService questionService;

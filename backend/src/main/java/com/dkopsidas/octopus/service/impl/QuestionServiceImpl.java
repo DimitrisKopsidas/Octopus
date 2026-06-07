@@ -80,7 +80,7 @@ public class QuestionServiceImpl implements QuestionService {
         Course courseFromDto = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFoundException(courseId));
 
         return new SettingsInfoResponseDto(
-                questionRepository.countByCourseId(courseId),
+                questionRepository.countByCourseIdAndIsActiveTrue(courseId),
                 courseFromDto.getQuestionSetSize(),
                 courseFromDto.getDefaultTimerMinutes()
         );

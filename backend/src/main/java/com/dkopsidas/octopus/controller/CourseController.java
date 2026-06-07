@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping(path = "/api/v1/courses")
 public class CourseController {
 
-    @Value("${app.readonly:false}")
+    @Value("${app.readonly:true}")
     private boolean readOnly;
 
     private final CourseService courseService;

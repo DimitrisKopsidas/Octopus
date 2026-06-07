@@ -9,5 +9,5 @@ import java.util.List;
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findAllByCourseIdAndIsActiveTrue(Long courseId);
 
-    Long countByCourseId(Long courseId);
+    Long countByCourseIdAndIsActiveTrue(Long courseId);
 }
