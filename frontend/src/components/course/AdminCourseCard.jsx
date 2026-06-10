@@ -11,7 +11,7 @@ function AdminCourseCard({ course, hasContent }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-semibold text-slate-900 dark:text-white leading-snug group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors">
+          <h3 className="font-semibold text-slate-900 dark:text-slate-200 leading-snug group-hover:text-brand-700 dark:group-hover:text-brand-300 transition-colors">
             {course.name}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">

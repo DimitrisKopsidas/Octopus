@@ -39,7 +39,7 @@ function ErrorState({
       <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-950/40 text-3xl mb-4">
         {icon}
       </div>
-      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">{title}</h3>
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-1">{title}</h3>
       <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-6">{message}</p>
       {onRetry && (
         <RetryButton onClick={handleRetry} retrying={retrying} label={retryLabel} />

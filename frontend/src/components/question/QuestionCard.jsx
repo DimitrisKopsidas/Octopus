@@ -6,7 +6,7 @@ function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
       <div className="mb-3">
-        <h3 className="font-semibold text-slate-900 dark:text-white break-words">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-200 break-words">
           <span className="text-slate-400 dark:text-slate-500 mr-2">{index}.</span>
           {question.title}
         </h3>

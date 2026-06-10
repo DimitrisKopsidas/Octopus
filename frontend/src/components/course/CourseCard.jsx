@@ -15,7 +15,7 @@ function CourseCard({ course, hasContent, disabled }) {
             className={`font-semibold leading-snug transition-colors ${
               disabled
                 ? 'text-slate-600 dark:text-slate-400'
-                : 'text-slate-900 dark:text-white group-hover:text-brand-700 dark:group-hover:text-brand-300'
+                : 'text-slate-900 dark:text-slate-200 group-hover:text-brand-700 dark:group-hover:text-brand-300'
             }`}
           >
             {course.name}

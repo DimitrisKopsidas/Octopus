@@ -17,7 +17,7 @@ function SandboxPanel({
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
       <header className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30">
-        <h2 className="font-semibold text-slate-900 dark:text-white text-sm">{t.sandbox.title}</h2>
+        <h2 className="font-semibold text-slate-900 dark:text-slate-200 text-sm">{t.sandbox.title}</h2>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t.sandbox.subtitle}</p>
       </header>
 

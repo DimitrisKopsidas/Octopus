@@ -9,7 +9,7 @@ function QuestionForm({ courseId, initialQuestion, onCreated, onUpdated, onCance
 
   // --- Tab bar classes ---
   const tabBase = 'flex-1 py-2 text-sm font-medium rounded-md transition-colors text-center'
-  const tabActive = `${tabBase} bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm`
+  const tabActive = `${tabBase} bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 shadow-sm`
   const tabInactive = `${tabBase} text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300`
 
   return (

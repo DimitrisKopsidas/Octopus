@@ -41,7 +41,7 @@ function JourneyHero({ activeTab, onSelect }) {
                 >
                   {i + 1}
                 </span>
-                <span className={`text-sm font-semibold ${active ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
+                <span className={`text-sm font-semibold ${active ? 'text-slate-900 dark:text-slate-200' : 'text-slate-700 dark:text-slate-300'}`}>
                   {step.title}
                 </span>
               </div>

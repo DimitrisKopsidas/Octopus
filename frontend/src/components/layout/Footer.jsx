@@ -29,7 +29,7 @@ function Footer() {
           <div className="max-w-sm">
             <div className="flex items-center gap-2 mb-3">
               <img src={logo} alt="Octopus" className="w-7 h-7" />
-              <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">{t.brand}</span>
+              <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-slate-200">{t.brand}</span>
               <span className="text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 bg-brand-100/70 dark:bg-brand-900/40 px-1.5 py-0.5 rounded-full">
                 {t.footer.version}
               </span>

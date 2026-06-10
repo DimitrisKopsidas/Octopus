@@ -8,7 +8,7 @@ function AnswerOption({ label, letter, selected, onClick, multi = false }) {
       aria-pressed={selected}
       className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all ${
         selected
-          ? 'bg-brand-50 dark:bg-brand-950/30 border-brand-500 text-slate-900 dark:text-white'
+          ? 'bg-brand-50 dark:bg-brand-950/30 border-brand-500 text-slate-900 dark:text-slate-200'
           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 text-slate-900 dark:text-slate-100'
       }`}
     >

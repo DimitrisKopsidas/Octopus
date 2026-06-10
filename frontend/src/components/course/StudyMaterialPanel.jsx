@@ -81,7 +81,7 @@ function StudyMaterialPanel({ courseId, setSize }) {
   return (
     <div ref={topRef} className="scroll-mt-20">
       <div className="mb-4 flex items-baseline justify-between gap-3">
-        <h2 className="font-semibold text-slate-900 dark:text-white">{t.study.title}</h2>
+        <h2 className="font-semibold text-slate-900 dark:text-slate-200">{t.study.title}</h2>
         <span className="text-xs font-medium text-slate-500 dark:text-slate-400 tabular-nums">
           {t.study.countTemplate.replace('{total}', total)}
         </span>

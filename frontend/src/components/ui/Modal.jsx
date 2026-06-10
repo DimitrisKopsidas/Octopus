@@ -43,7 +43,7 @@ function Modal({ open, onClose, title, children, size = 'lg' }) {
       >
         {title && (
           <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
-            <h2 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-white">
+            <h2 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-slate-200">
               {title}
             </h2>
             <button

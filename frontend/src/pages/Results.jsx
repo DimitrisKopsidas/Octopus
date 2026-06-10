@@ -96,7 +96,7 @@ function Results() {
             </span>
           )}
         </p>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{t.title}</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-200">{t.title}</h1>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -107,14 +107,14 @@ function Results() {
           <span className={`text-3xl font-bold ${scoreTone}`}>{percent}%</span>
         </StatCard>
         <StatCard label={t.stats.duration}>
-          <span className="text-3xl font-bold text-slate-900 dark:text-white">
+          <span className="text-3xl font-bold text-slate-900 dark:text-slate-200">
             {formatDuration(durationMs)}
           </span>
         </StatCard>
       </div>
 
       <div className="mb-6 flex items-center justify-between gap-3 flex-wrap">
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{t.reviewTitle}</h2>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-200">{t.reviewTitle}</h2>
         <button
           type="button"
           onClick={tryAgain}

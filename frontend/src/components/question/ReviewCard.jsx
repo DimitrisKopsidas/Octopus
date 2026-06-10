@@ -28,7 +28,7 @@ function ReviewCard({ index, question, chosenAnswerId }) {
         <span className={`inline-block mb-2 text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${badgeTone}`}>
           {!wasAnswered ? t.review.noAnswer : isCorrect ? t.review.correct : t.review.wrong}
         </span>
-        <h3 className="font-semibold text-slate-900 dark:text-white break-words">
+        <h3 className="font-semibold text-slate-900 dark:text-slate-200 break-words">
           <span className="text-slate-400 dark:text-slate-500 mr-2">{index}.</span>
           {question.title}
         </h3>

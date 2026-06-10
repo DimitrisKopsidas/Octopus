@@ -123,7 +123,7 @@ function Test() {
           </p>
           <p className="text-sm text-slate-700 dark:text-slate-300 mt-0.5">
             {t.questionLabelTemplate.split('{current}')[0]}
-            <strong className="text-slate-900 dark:text-white">{currentIndex + 1}</strong>
+            <strong className="text-slate-900 dark:text-slate-200">{currentIndex + 1}</strong>
             {t.questionLabelTemplate.split('{current}')[1].replace('{total}', total)}
             <span className="ml-3 text-slate-500 dark:text-slate-400">
               {' '}
@@ -159,7 +159,7 @@ function Test() {
       />
 
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8">
-        <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white leading-snug break-words mb-6">
+        <h2 className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-slate-200 leading-snug break-words mb-6">
           {currentQuestion.title}
         </h2>
 

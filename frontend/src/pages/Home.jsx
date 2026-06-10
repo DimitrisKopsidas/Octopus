@@ -21,7 +21,7 @@ function Home() {
       <section className="pt-10 sm:pt-14 lg:pt-20 pb-16">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-6 items-center">
           <div className="lg:col-span-7 text-center lg:text-left animate-fade-up">
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-200 leading-[1.1]">
               {t.hero.titlePrefix}{' '}
               <span className="text-brand-600 dark:text-brand-400">{t.hero.brand}</span>
             </h1>
@@ -69,7 +69,7 @@ function Home() {
 
       {/* HOW IT WORKS — connected numbered stepper */}
       <section className="py-16 lg:py-20 animate-fade-up" style={{ animationDelay: '0.16s' }}>
-        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-200 mb-12 text-center">
           {t.howItWorks.title}
         </h2>
 
@@ -115,7 +115,7 @@ function Step({ number, title, body }) {
       <div className="relative z-10 mx-auto w-14 h-14 rounded-full bg-white dark:bg-slate-900 border-2 border-brand-500 dark:border-brand-600 text-brand-600 dark:text-brand-400 flex items-center justify-center shadow-sm font-bold text-lg select-none">
         {number}
       </div>
-      <h3 className="mt-5 font-semibold text-slate-900 dark:text-white text-lg">{title}</h3>
+      <h3 className="mt-5 font-semibold text-slate-900 dark:text-slate-200 text-lg">{title}</h3>
       <p className="mt-2 text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">
         {body}
       </p>

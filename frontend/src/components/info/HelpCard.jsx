@@ -19,7 +19,7 @@ function HelpCard({ emoji, title, description, ctaLabel, kind, href, to, highlig
   return (
     <div className={`rounded-xl border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all p-6 flex flex-col h-full ${cardTone} ${className}`}>
       <div className="text-3xl mb-3">{emoji}</div>
-      <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{title}</h3>
+      <h3 className="font-semibold text-slate-900 dark:text-slate-200 mb-1">{title}</h3>
       <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 flex-1">{description}</p>
       {kind === 'external' ? (
         <a

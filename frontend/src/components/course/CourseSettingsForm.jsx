@@ -45,7 +45,7 @@ function CourseSettingsForm({ course, onSaved, onCancel }) {
             min={1}
             value={questionSetSize}
             onChange={(e) => setQuestionSetSize(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            className="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
             Πόσες ερωτήσεις περιέχει κάθε σετ στη Συστηματική Μελέτη. Συνήθως ίσο με τον αριθμό ερωτήσεων της εξέτασης.
@@ -61,7 +61,7 @@ function CourseSettingsForm({ course, onSaved, onCancel }) {
             min={5}
             value={defaultTimerMinutes}
             onChange={(e) => setDefaultTimerMinutes(e.target.value)}
-            className="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            className="w-full px-3.5 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
             Προτεινόμενος χρόνος για ένα τεστ. Ελάχιστο 5 λεπτά. ΠΡΟΣΟΧΗ οι default τιμές είναι 0, 10, 15 και 30 λεπτά.

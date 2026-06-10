@@ -14,7 +14,7 @@ function StudyQuestionCard({ number, question }) {
             {number}
           </span>
           <div className="min-w-0">
-            <h3 className="font-semibold text-slate-900 dark:text-white leading-snug break-words">{question.title}</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-slate-200 leading-snug break-words">{question.title}</h3>
             {isMulti && (
               <p className="mt-1 text-xs font-medium text-brand-700 dark:text-brand-400 inline-flex items-center gap-1.5">
                 <span aria-hidden="true">☑</span> {t.study.multiHint}

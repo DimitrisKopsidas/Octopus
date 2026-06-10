@@ -29,7 +29,7 @@ function CourseStart() {
       </div>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-200">
           {course ? course.name : t.fallbackTitle.replace('{courseId}', courseId)}
         </h1>
         {course && (

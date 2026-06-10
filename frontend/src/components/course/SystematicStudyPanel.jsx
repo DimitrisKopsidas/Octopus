@@ -76,7 +76,7 @@ function SetCard({ set, completed, defaultTimerMinutes, starting, onStart }) {
     >
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h4 className="font-semibold text-slate-900 dark:text-white text-sm">
+          <h4 className="font-semibold text-slate-900 dark:text-slate-200 text-sm">
             {t.systematic.setLabel} {set.index + 1}
           </h4>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">

@@ -7,13 +7,13 @@ function CourseInfoCard({ course, questionCount, coverage }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
       <header className="px-5 py-3 border-b border-slate-200 dark:border-slate-800">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-200 flex items-center gap-2">
           {t.info.title}
         </h2>
       </header>
       <dl className="px-5 py-4 space-y-3 text-sm">
         <InfoRow label={t.info.availableQuestions}>
-          <span className="font-semibold text-slate-900 dark:text-white tabular-nums">
+          <span className="font-semibold text-slate-900 dark:text-slate-200 tabular-nums">
             {questionCount}
           </span>
         </InfoRow>

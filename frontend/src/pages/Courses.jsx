@@ -105,7 +105,7 @@ function Courses() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{t.title}</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-200 mb-2">{t.title}</h1>
         <p className="text-slate-600 dark:text-slate-400">{t.subtitle}</p>
       </div>
 

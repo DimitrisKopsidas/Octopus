@@ -20,7 +20,7 @@ function Info() {
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-brand-50 dark:bg-brand-950/50 mb-4">
           <img src={logo} alt="Octopus" className="w-12 h-12" />
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
+        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-slate-200 mb-3 tracking-tight">
           {t.hero.title}
         </h1>
         <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
@@ -31,7 +31,7 @@ function Info() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">{t.whatIs.title}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-3">{t.whatIs.title}</h2>
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4">
           {t.whatIs.paragraphs.map((p, i) => (
             <p key={i} className="text-slate-700 dark:text-slate-300 leading-relaxed">{p}</p>
@@ -40,7 +40,7 @@ function Info() {
       </section>
 
 {/*       <section> */}
-{/*         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.howItWorks.title}</h2> */}
+{/*         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-1">{t.howItWorks.title}</h2> */}
 {/*         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.howItWorks.subtitle}</p> */}
 {/*         <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> */}
 {/*           {t.howItWorks.modes.map((mode) => ( */}
@@ -50,7 +50,7 @@ function Info() {
 {/*       </section> */}
 
       <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.howToHelp.title}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-1">{t.howToHelp.title}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.howToHelp.subtitle}</p>
         <div className={`grid grid-cols-1 ${t.howToHelp.cards.length === 1
           ? 'max-w-md mx-auto w-full'
@@ -91,7 +91,7 @@ function Info() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.roadmap.title}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-1">{t.roadmap.title}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.roadmap.subtitle}</p>
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
             <ul className="space-y-3 text-sm">
@@ -103,12 +103,12 @@ function Info() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.faq.title}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-1">{t.faq.title}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.faq.subtitle}</p>
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm divide-y divide-slate-200 dark:divide-slate-800">
         {t.faq.items.map((item, i) => (
           <details key={i} className="group p-5">
-            <summary className="flex items-center justify-between cursor-pointer text-slate-900 dark:text-white font-medium list-none">
+            <summary className="flex items-center justify-between cursor-pointer text-slate-900 dark:text-slate-200 font-medium list-none">
               <span>{item.q}</span>
               <span className="text-brand-600 dark:text-brand-400 text-xl transition-transform group-open:rotate-45 select-none">+</span>
             </summary>
@@ -119,7 +119,7 @@ function Info() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t.shortcuts.title}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-200 mb-1">{t.shortcuts.title}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t.shortcuts.subtitle}</p>
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
           <dl className="space-y-3">

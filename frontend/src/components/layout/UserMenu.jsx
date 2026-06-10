@@ -60,7 +60,7 @@ function UserMenu() {
           className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden z-50"
         >
           <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 truncate">
               {user.displayName}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
