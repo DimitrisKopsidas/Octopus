@@ -114,6 +114,21 @@ Version 0.4.10
 [x] Changed flash cards tab to show all answears with scalable pagination
 
 
+Version 0.4.11
+[x] Quiz flow, filters, test-page redesign & UX fixes
+- (x) Custom timer in simulation: free-minutes input next to the preset times (Sandbox); spinner arrows removed; presets reflow evenly regardless of count
+- (x) Results: unanswered questions now amber/orange (distinct from solid-red wrong)
+- (x) Systematic results: "Επανάληψη Quiz" + "Επόμενο Quiz" buttons (next hidden on the last set); track totalSets in the test session store
+- (x) Sandbox results: "Νέο quiz" re-runs a fresh random quiz with the SAME settings (count + timer); secondary "Αλλαγή ρυθμίσεων" returns to setup
+- (x) Courses search is accent- and case-insensitive (NFD normalize + strip diacritics)
+- (x) Floating scroll-to-top button on /courses (appears past 400px, smooth scroll)
+- (x) Multi-select semester filter (empty = Όλα; pick several; clearing all returns to Όλα)
+- (x) Test page desktop redesign: question centered, right sidebar with timer / progress / navigator / cancel; bigger image space; mobile layout unchanged
+- (x) Auto scroll-to-top on every question change (long questions fully visible on phone/desktop)
+- (x) Sidebar polish: prominent timer block (red ≤60s), progress card with large counter, navigator with legend; specific transitions + button press feedback
+- (x) Toasts: one toast at a time (newest wins) + dedupe identical (restart timer instead of stacking)
+
+
 Version 0.5.0
 [] Demo auth interface (no backend yet)
 - (x) Zustand authStore (in-memory only — interface scaffold)

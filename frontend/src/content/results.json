@@ -9,6 +9,9 @@
   },
   "reviewTitle": "Ανασκόπηση",
   "tryAgain": "Νέο quiz",
+  "changeSettings": "Αλλαγή ρυθμίσεων",
+  "redoSet": "Επανάληψη Quiz",
+  "nextChapter": "Επόμενο Quiz →",
   "review": {
     "noAnswer": "Χωρίς απάντηση",
     "correct": "Σωστή",

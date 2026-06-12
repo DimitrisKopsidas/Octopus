@@ -1,9 +1,10 @@
 // Test results page: score stats + per-question review + bundle submit. Route: /test/:courseId/results
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
-import { bundlesApi } from '../lib/api'
+import { bundlesApi, questionsApi, extractErrorMessage } from '../lib/api'
 import { isQuestionCorrect, flattenAnswerIds } from '../lib/scoring'
+import { toast } from '../store/toastStore'
 import BackButton from '../components/ui/BackButton'
 import StatCard from '../components/ui/StatCard'
 import ReviewCard from '../components/question/ReviewCard'
@@ -27,9 +28,13 @@ function Results() {
   const endedAt = useTestStore((s) => s.endedAt)
   const courseName = useTestStore((s) => s.courseName)
   const setIndex = useTestStore((s) => s.setIndex)
+  const totalSets = useTestStore((s) => s.totalSets)
+  const startSession = useTestStore((s) => s.startSession)
   const reset = useTestStore((s) => s.reset)
 
   const submittedRef = useRef(false)
+  const restartingRef = useRef(false) // suppresses the redirect guard during an intentional set restart
+  const [setActionLoading, setSetActionLoading] = useState(false)
 
   const hasResults =
     sessionCourseId != null &&
@@ -38,7 +43,7 @@ function Results() {
     endedAt != null
 
   useEffect(() => {
-    if (!hasResults) navigate(`/courses/${courseId}/start`, { replace: true })
+    if (!hasResults && !restartingRef.current) navigate(`/courses/${courseId}/start`, { replace: true })
   }, [hasResults, courseId, navigate])
 
   useEffect(() => {
@@ -69,6 +74,88 @@ function Results() {
   function tryAgain() {
     reset()
     navigate(`/courses/${courseId}/start`)
+  }
+
+  // Sandbox/simulation: re-run a fresh random quiz with the SAME settings
+  // (same question count + timer), just newly shuffled questions.
+  async function redoRandom() {
+    if (setActionLoading) return
+    setSetActionLoading(true)
+    try {
+      const { count, durationSeconds } = useTestStore.getState()
+      const questions = await questionsApi.byRandomCount(courseId, count)
+      restartingRef.current = true
+      startSession({
+        courseId: Number(courseId),
+        courseName,
+        count,
+        durationSeconds,
+        order: 'random',
+        questions,
+        setIndex: null,
+        totalSets: null,
+      })
+      navigate(`/test/${courseId}`)
+    } catch (err) {
+      restartingRef.current = false
+      toast.error(extractErrorMessage(err, 'Σφάλμα έναρξης'))
+      setSetActionLoading(false)
+    }
+  }
+
+  async function redoSet() {
+    if (setActionLoading || setIndex == null) return
+    setSetActionLoading(true)
+    try {
+      const durationSeconds = useTestStore.getState().durationSeconds
+      const questions = await questionsApi.bySetNum(courseId, setIndex)
+      restartingRef.current = true
+      startSession({
+        courseId: Number(courseId),
+        courseName,
+        count: questions.length,
+        durationSeconds,
+        order: 'sequential',
+        questions,
+        setIndex,
+        totalSets,
+      })
+      navigate(`/test/${courseId}`)
+    } catch (err) {
+      restartingRef.current = false
+      toast.error(extractErrorMessage(err, 'Σφάλμα επανεκκίνησης'))
+      setSetActionLoading(false)
+    }
+  }
+
+  async function nextChapter() {
+    if (setActionLoading || setIndex == null) return
+    const nextIndex = setIndex + 1
+    if (totalSets != null && nextIndex >= totalSets) {
+      navigate(`/courses/${courseId}/start`)
+      return
+    }
+    setSetActionLoading(true)
+    try {
+      const durationSeconds = useTestStore.getState().durationSeconds
+      const questions = await questionsApi.bySetNum(courseId, nextIndex)
+      restartingRef.current = true
+      startSession({
+        courseId: Number(courseId),
+        courseName,
+        count: questions.length,
+        durationSeconds,
+        order: 'sequential',
+        questions,
+        setIndex: nextIndex,
+        totalSets,
+      })
+      navigate(`/test/${courseId}`)
+    } catch (err) {
+      restartingRef.current = false
+      toast.error(extractErrorMessage(err, 'Σφάλμα φόρτωσης επόμενου κεφαλαίου'))
+      setSetActionLoading(false)
+    }
   }
 
   if (!hasResults) return null
@@ -115,13 +202,49 @@ function Results() {
 
       <div className="mb-6 flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-200">{t.reviewTitle}</h2>
-        <button
-          type="button"
-          onClick={tryAgain}
-          className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
-        >
-          {t.tryAgain}
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {setIndex != null ? (
+            <>
+              <button
+                type="button"
+                onClick={redoSet}
+                disabled={setActionLoading}
+                className="px-4 py-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {setActionLoading ? 'Φόρτωση…' : t.redoSet}
+              </button>
+              {(totalSets == null || setIndex + 1 < totalSets) && (
+                <button
+                  type="button"
+                  onClick={nextChapter}
+                  disabled={setActionLoading}
+                  className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors"
+                >
+                  {setActionLoading ? 'Φόρτωση…' : t.nextChapter}
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={tryAgain}
+                disabled={setActionLoading}
+                className="px-4 py-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {t.changeSettings}
+              </button>
+              <button
+                type="button"
+                onClick={redoRandom}
+                disabled={setActionLoading}
+                className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors"
+              >
+                {setActionLoading ? 'Φόρτωση…' : t.tryAgain}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4">

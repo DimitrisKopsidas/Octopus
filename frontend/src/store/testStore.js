@@ -15,6 +15,7 @@ const initialState = {
   startedAt: null,
   endedAt: null,
   setIndex: null,        // null for custom test, number (0, 1, 2...) for fixed sets
+  totalSets: null,       // total number of sets (systematic only)
 }
 
 export const useTestStore = create(
@@ -22,7 +23,7 @@ export const useTestStore = create(
     (set) => ({
       ...initialState,
 
-      startSession: ({ courseId, courseName, count, durationSeconds, order, questions, setIndex = null }) =>
+      startSession: ({ courseId, courseName, count, durationSeconds, order, questions, setIndex = null, totalSets = null }) =>
         set({
           courseId,
           courseName,
@@ -36,6 +37,7 @@ export const useTestStore = create(
           startedAt: Date.now(),
           endedAt: null,
           setIndex,
+          totalSets,
         }),
 
       // Single-correct questions: store one id, replacing any previous choice.
@@ -111,6 +113,7 @@ export const useTestStore = create(
         startedAt: state.startedAt,
         endedAt: state.endedAt,
         setIndex: state.setIndex,
+        totalSets: state.totalSets,
       }),
       // Rehydrate Set from Array
       merge: (persisted, current) => ({

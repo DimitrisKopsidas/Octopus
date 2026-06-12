@@ -53,11 +53,13 @@ function ToastContainer() {
 }
 
 function ToastItem({ toast, onClose }) {
+  // `toast.seq` changes when an identical toast is re-fired while still visible,
+  // which restarts the auto-dismiss countdown instead of stacking a duplicate.
   useEffect(() => {
     if (!toast.duration) return
     const timer = setTimeout(onClose, toast.duration)
     return () => clearTimeout(timer)
-  }, [toast.duration, onClose])
+  }, [toast.duration, toast.seq, onClose])
 
   const v = VARIANT[toast.type] || VARIANT.info
 

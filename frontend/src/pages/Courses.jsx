@@ -49,17 +49,24 @@ function Courses() {
   const [query, setQuery] = useState('')
 
   // Applied filters
-  const [semester, setSemester] = useState('all')
+  const [semesters, setSemesters] = useState([])   // empty = all
   const [onlyWithContent, setOnlyWithContent] = useState(false)
 
   // Draft filters (modal state)
   const [filterOpen, setFilterOpen] = useState(false)
-  const [draftSemester, setDraftSemester] = useState('all')
+  const [draftSemesters, setDraftSemesters] = useState([])
   const [draftOnlyWithContent, setDraftOnlyWithContent] = useState(false)
 
   const [visibleCount, setVisibleCount] = useState(6)
+  const [showScrollTop, setShowScrollTop] = useState(false)
 
-  useEffect(() => { setVisibleCount(6) }, [query, semester, onlyWithContent])
+  useEffect(() => { setVisibleCount(6) }, [query, semesters, onlyWithContent])
+
+  useEffect(() => {
+    function onScroll() { setShowScrollTop(window.scrollY > 400) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
   useEffect(() => { loadWithContent() }, [loadWithContent])
 
@@ -70,11 +77,13 @@ function Courses() {
 
   const filtered = useMemo(() => {
     if (!courses) return []
-    const q = query.trim().toLowerCase()
+    const normalize = (s) =>
+      s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    const q = normalize(query.trim())
     return courses
-      .filter(c => semester === 'all' || c.semester === semester)
+      .filter(c => semesters.length === 0 || semesters.includes(c.semester))
       .filter(c => !onlyWithContent || safeWithContentIds.has(c.id))
-      .filter(c => !q || c.name.toLowerCase().includes(q) || String(c.id).includes(q))
+      .filter(c => !q || normalize(c.name).includes(q) || String(c.id).includes(q))
       .sort((a, b) => {
         const aHas = safeWithContentIds.has(a.id) ? 1 : 0
         const bHas = safeWithContentIds.has(b.id) ? 1 : 0
@@ -82,23 +91,23 @@ function Courses() {
         if (a.semester !== b.semester) return a.semester - b.semester
         return a.name.localeCompare(b.name, 'el')
       })
-  }, [courses, query, semester, onlyWithContent, safeWithContentIds])
+  }, [courses, query, semesters, onlyWithContent, safeWithContentIds])
 
-  const activeFilterCount = (semester !== 'all' ? 1 : 0) + (onlyWithContent ? 1 : 0)
-  const draftActiveCount = (draftSemester !== 'all' ? 1 : 0) + (draftOnlyWithContent ? 1 : 0)
+  const activeFilterCount = (semesters.length > 0 ? 1 : 0) + (onlyWithContent ? 1 : 0)
+  const draftActiveCount = (draftSemesters.length > 0 ? 1 : 0) + (draftOnlyWithContent ? 1 : 0)
 
   function openFilters() {
-    setDraftSemester(semester)
+    setDraftSemesters(semesters)
     setDraftOnlyWithContent(onlyWithContent)
     setFilterOpen(true)
   }
   function applyFilters() {
-    setSemester(draftSemester)
+    setSemesters(draftSemesters)
     setOnlyWithContent(draftOnlyWithContent)
     setFilterOpen(false)
   }
   function resetDraft() {
-    setDraftSemester('all')
+    setDraftSemesters([])
     setDraftOnlyWithContent(false)
   }
 
@@ -181,14 +190,27 @@ function Courses() {
       <CoursesFilterModal
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
-        draftSemester={draftSemester}
-        setDraftSemester={setDraftSemester}
+        draftSemesters={draftSemesters}
+        setDraftSemesters={setDraftSemesters}
         draftOnlyWithContent={draftOnlyWithContent}
         setDraftOnlyWithContent={setDraftOnlyWithContent}
         onApply={applyFilters}
         onReset={resetDraft}
         resetDisabled={draftActiveCount === 0}
       />
+
+      {showScrollTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Πάνω"
+          className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-11 h-11 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg transition-colors"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m18 15-6-6-6 6" />
+          </svg>
+        </button>
+      )}
     </div>
   )
 }

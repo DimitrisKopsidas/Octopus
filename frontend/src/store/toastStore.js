@@ -3,17 +3,34 @@ import { create } from 'zustand'
 
 let nextId = 1
 
-export const useToastStore = create((set) => ({
+export const useToastStore = create((set, get) => ({
   toasts: [],
   add: (data) => {
-    const id = nextId++
     const toastObj = {
-      id,
       type: 'info',
       duration: 4000,
+      title: undefined,
       ...data,
     }
-    set((s) => ({ toasts: [...s.toasts, toastObj] }))
+
+    const { toasts } = get()
+
+    // Dedupe: if the same toast (type + title + message) is already on screen,
+    // don't stack a copy — just bump its `seq` so its auto-dismiss timer restarts.
+    const dup = toasts.find(
+      (x) => x.type === toastObj.type && x.title === toastObj.title && x.message === toastObj.message
+    )
+    if (dup) {
+      set((s) => ({
+        toasts: s.toasts.map((x) => (x.id === dup.id ? { ...x, seq: (x.seq || 0) + 1 } : x)),
+      }))
+      return dup.id
+    }
+
+    // Single-toast policy: only one toast visible at a time. A new (distinct)
+    // toast replaces whatever is currently shown — newest wins.
+    const id = nextId++
+    set({ toasts: [{ id, seq: 0, ...toastObj }] })
     return id
   },
   remove: (id) =>

@@ -8,6 +8,14 @@
   "finishButton": "Ολοκλήρωση",
   "navigatorJumpTemplate": "Μετάβαση στην ερώτηση {n}",
   "multiHint": "Πολλαπλές σωστές — επέλεξε όλες τις σωστές απαντήσεις",
+  "sidebar": {
+    "timerLabel": "Υπόλοιπος χρόνος",
+    "questionLabel": "Ερώτηση",
+    "answeredTemplate": "{count} / {total} απαντημένες",
+    "navLabel": "Πλοήγηση",
+    "legendAnswered": "Απαντημένη",
+    "legendFlagged": "Σημειωμένη"
+  },
   "flag": {
     "addLabel": "Σήμανση για επανέλεγχο",
     "removeLabel": "Αφαίρεση σήμανσης",

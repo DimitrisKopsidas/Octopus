@@ -125,6 +125,7 @@ export function useCourseStart(courseId) {
         order: 'sequential',
         questions,
         setIndex: set.index,
+        totalSets,
       })
       navigate(`/test/${courseId}`)
     } catch (err) {

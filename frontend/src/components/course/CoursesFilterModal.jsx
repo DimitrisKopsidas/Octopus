@@ -8,14 +8,20 @@ const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 function CoursesFilterModal({
   open,
   onClose,
-  draftSemester,
-  setDraftSemester,
+  draftSemesters,
+  setDraftSemesters,
   draftOnlyWithContent,
   setDraftOnlyWithContent,
   onApply,
   onReset,
   resetDisabled,
 }) {
+  function toggleSemester(s) {
+    setDraftSemesters(prev =>
+      prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+    )
+  }
+
   return (
     <Modal open={open} onClose={onClose} title={t.filterModal.title} size="md">
       <div className="px-6 py-5 space-y-6">
@@ -26,15 +32,15 @@ function CoursesFilterModal({
           <div className="grid grid-cols-5 gap-2">
             <SemesterButton
               label={t.filterModal.allLabel}
-              active={draftSemester === 'all'}
-              onClick={() => setDraftSemester('all')}
+              active={draftSemesters.length === 0}
+              onClick={() => setDraftSemesters([])}
             />
             {SEMESTERS.map(s => (
               <SemesterButton
                 key={s}
                 label={String(s)}
-                active={draftSemester === s}
-                onClick={() => setDraftSemester(s)}
+                active={draftSemesters.includes(s)}
+                onClick={() => toggleSemester(s)}
               />
             ))}
           </div>
