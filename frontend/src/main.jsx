@@ -3,6 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
+import ScrollToTop from './components/layout/ScrollToTop.jsx'
 import Layout from './components/layout/Layout.jsx'
 import Home from './pages/Home.jsx'
 import Courses from './pages/Courses.jsx'
@@ -19,6 +20,7 @@ import NotFound from './pages/NotFound.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
