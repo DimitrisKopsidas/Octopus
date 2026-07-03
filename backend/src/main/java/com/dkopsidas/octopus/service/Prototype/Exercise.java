@@ -15,9 +15,9 @@ public class Exercise {
 
     private List<String> steps;
 
-    public Exercise(String promnt, String title, String imageUrl, Map<String, Double> variables, List<String> goals, List<String> steps) {
-        this.promnt = promnt;
+    public Exercise(String title, String promnt, String imageUrl, Map<String, Double> variables, List<String> goals, List<String> steps) {
         this.title = title;
+        this.promnt = promnt;
         this.imageUrl = imageUrl;
         this.variables = variables;
         this.goals = goals;
