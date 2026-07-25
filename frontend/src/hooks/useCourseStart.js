@@ -2,9 +2,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { questionsApi, extractErrorMessage } from '../lib/api'
-import { useCoursesStore } from '../store/coursesStore'
 import { useTestStore } from '../store/testStore'
-import { useCourseSettings } from './useCourseSettings'
+import { useCourse, useCourseSettings } from './queries'
 import { toast } from '../store/toastStore'
 import t from '../content/courseStart.json'
 
@@ -16,17 +15,19 @@ export function useCourseStart(courseId) {
   const navigate = useNavigate()
   const startSession = useTestStore((s) => s.startSession)
 
-  const courses = useCoursesStore((s) => s.courses)
-  const coursesError = useCoursesStore((s) => s.error)
-  const loadCourses = useCoursesStore((s) => s.loadCourses)
-  const retryCourses = useCoursesStore((s) => s.retryCourses)
-  const course = useMemo(
-    () => courses?.find((c) => String(c.id) === String(courseId)) || null,
-    [courses, courseId]
-  )
+  const {
+    course,
+    error: coursesError,
+    isPending: coursesPending,
+    refetch: refetchCourses,
+  } = useCourse(courseId, t.errorLoad)
 
-  const { settings, loading: settingsLoading, error: settingsError, retry: retrySettings } =
-    useCourseSettings(courseId, t.errorLoad)
+  const {
+    settings,
+    error: settingsError,
+    isPending: settingsLoading,
+    refetch: refetchSettings,
+  } = useCourseSettings(courseId, t.errorLoad)
 
   const [activeTab, setActiveTab] = useState('study')
   const [count, setCount] = useState(10)
@@ -35,8 +36,6 @@ export function useCourseStart(courseId) {
 
   // Completed sets will come from the user model (backend) — interface only for now.
   const completedSets = {}
-
-  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
 
   // Initialize sandbox defaults once settings arrive
   useEffect(() => {
@@ -49,7 +48,7 @@ export function useCourseStart(courseId) {
   // Page-load error (settings/courses) hides the page; an action error (failing
   // to fetch questions on start) is shown as a toast so the page stays usable.
   const error = settingsError || coursesError
-  const loading = !error && (settingsLoading || courses == null)
+  const loading = !error && (settingsLoading || coursesPending)
 
   const max = settings?.totalQuestionCount || 0
   const SET_SIZE = settings?.setQuestionCount || 25
@@ -134,9 +133,11 @@ export function useCourseStart(courseId) {
     }
   }
 
+  // Background refetch: ErrorState stays mounted (spinner on its button) instead
+  // of collapsing back to skeletons.
   function onRetry() {
-    retryCourses().catch(() => {})
-    retrySettings()
+    refetchCourses()
+    refetchSettings()
   }
 
   return {
