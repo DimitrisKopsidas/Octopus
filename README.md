@@ -31,3 +31,19 @@ With help by:
 Thomas(bonuschromosome): Hosting and launch
 
 Helper team from IEE IHU Discord for ideas and further content creation
+
+
+## Quick start
+
+1. Copy the sample environment file to a real local configuration file:
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+2. Review the values in [.env](.env) if needed.
+3. Start the app with Docker Compose:
+   ```powershell
+   docker compose up --build
+   ```
+4. Open the app in your browser:
+   - Frontend: http://localhost:80
+   - Backend API: http://localhost:8080
