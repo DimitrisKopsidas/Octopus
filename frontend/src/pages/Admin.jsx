@@ -1,6 +1,6 @@
 // Admin dashboard: lists courses with an add-questions action. Route: /admin
-import { useEffect, useMemo, useState } from 'react'
-import { useCoursesStore } from '../store/coursesStore'
+import { useMemo, useState } from 'react'
+import { useCourses, useCoursesWithContent } from '../hooks/queries'
 import AdminCourseCard from '../components/course/AdminCourseCard'
 import AdminCourseCardSkeleton from '../components/course/AdminCourseCardSkeleton'
 import Skeleton from '../components/ui/Skeleton'
@@ -8,24 +8,17 @@ import ErrorState from '../components/ui/ErrorState'
 import t from '../content/admin.json'
 
 function Admin() {
-  const courses = useCoursesStore((s) => s.courses)
-  const withContentIds = useCoursesStore((s) => s.withContentIds)
-  const error = useCoursesStore((s) => s.error)
-  const loadCourses = useCoursesStore((s) => s.loadCourses)
-  const retryCourses = useCoursesStore((s) => s.retryCourses)
-  const loadWithContent = useCoursesStore((s) => s.loadWithContent)
+  const { data: courses, error, isPending, refetch: refetchCourses } = useCourses(t.errorLoad)
+  const { data: withContentIds, refetch: refetchWithContent } = useCoursesWithContent()
 
-  const loading = courses == null && !error
+  const loading = isPending && !error
   const safeWithContentIds = withContentIds ?? new Set()
 
   const [query, setQuery] = useState('')
 
-  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
-  useEffect(() => { loadWithContent() }, [loadWithContent])
-
   function retry() {
-    loadWithContent()
-    return retryCourses().catch(() => {})
+    refetchWithContent()
+    return refetchCourses()
   }
 
   const grouped = useMemo(() => {

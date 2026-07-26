@@ -1,17 +1,11 @@
 // Home / landing page (asymmetric hero, live stats band, how-it-works stepper). Route: /
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { coursesApi, bundlesApi } from '../lib/api'
+import { useHomeStats } from '../hooks/queries'
 import logo from '../assets/hero.png'
 import t from '../content/home.json'
 
 function Home() {
-  const [stats, setStats] = useState({ tests: null, courses: null })
-
-  useEffect(() => {
-    bundlesApi.count().then((v) => setStats((s) => ({ ...s, tests: v }))).catch(() => {})
-    coursesApi.countWithContent().then((v) => setStats((s) => ({ ...s, courses: v }))).catch(() => {})
-  }, [])
+  const stats = useHomeStats()
 
   const hasStats = stats.tests != null || stats.courses != null
 

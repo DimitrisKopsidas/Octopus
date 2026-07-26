@@ -1,6 +1,7 @@
 // State + validation + submit for a question form. Used by QuestionForm.
 import { useState } from 'react'
-import { questionsApi, extractErrorMessage } from '../lib/api'
+import { extractErrorMessage } from '../lib/api'
+import { useCreateQuestion, useUpdateQuestion } from './queries'
 
 export const MIN_ANSWERS = 3
 export const MAX_ANSWERS = 10
@@ -42,8 +43,13 @@ export function useQuestionForm({ courseId, initialQuestion, onCreated, onUpdate
       : [emptyAnswer(), emptyAnswer(), emptyAnswer(), emptyAnswer()]
   )
   const [correctSet, setCorrectSet] = useState(initialCorrectSet(initialQuestion))
-  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
+
+  // Both mutations invalidate the course's question list, its settingsInfo and
+  // the with-content set on success — the caller no longer refetches by hand.
+  const createQuestion = useCreateQuestion(courseId)
+  const updateQuestion = useUpdateQuestion(courseId)
+  const submitting = createQuestion.isPending || updateQuestion.isPending
 
   // Image
   const [imageFile, setImageFile] = useState(null)
@@ -139,43 +145,39 @@ export function useQuestionForm({ courseId, initialQuestion, onCreated, onUpdate
     const validationError = validate()
     if (validationError) { setError(validationError); return }
     setError(null)
-    setSubmitting(true)
     try {
       const answersPayload = answers.map((a, i) => ({
         title: a.title.trim(),
         isCorrect: correctSet.has(i),
       }))
       if (isEdit) {
-        const id = initialQuestion.id
-        await questionsApi.update(id, {
-          title: title.trim(),
-          answers: answersPayload,
-          imageUrl: existingImageUrl,
+        // The mutation owns the image reconciliation (upload new / delete cleared).
+        await updateQuestion.mutateAsync({
+          id: initialQuestion.id,
+          payload: {
+            title: title.trim(),
+            answers: answersPayload,
+            imageUrl: existingImageUrl,
+          },
+          imageFile,
+          hadImage: Boolean(initialQuestion.imageUrl),
+          keepImageUrl: existingImageUrl,
         })
-        // Image is handled separately: upload a freshly picked file, or delete a removed one.
-        if (imageFile) {
-          await questionsApi.uploadImage(id, imageFile)
-        } else if (initialQuestion.imageUrl && !existingImageUrl) {
-          await questionsApi.deleteImage(id)
-        }
         onUpdated?.()
       } else {
-        const created = await questionsApi.create({
-          title: title.trim(),
-          courseId: Number(courseId),
-          answers: answersPayload,
+        await createQuestion.mutateAsync({
+          payload: {
+            title: title.trim(),
+            courseId: Number(courseId),
+            answers: answersPayload,
+          },
+          imageFile,
         })
-        // Save the question first, then attach its image (filename needs the question id).
-        if (imageFile && created?.id != null) {
-          await questionsApi.uploadImage(created.id, imageFile)
-        }
         resetForNew()
         onCreated?.()
       }
     } catch (err) {
       setError(extractErrorMessage(err, 'Σφάλμα αποθήκευσης.'))
-    } finally {
-      setSubmitting(false)
     }
   }
 

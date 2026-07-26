@@ -1,12 +1,17 @@
 // Form to edit a course set size + default timer. Used in AdminCourse settings modal.
 import { useState } from 'react'
-import { coursesApi, extractErrorMessage } from '../../lib/api'
+import { extractErrorMessage } from '../../lib/api'
+import { useUpdateCourseSettings } from '../../hooks/queries'
 
 function CourseSettingsForm({ course, onSaved, onCancel }) {
   const [questionSetSize, setQuestionSetSize] = useState(course?.questionSetSize ?? 25)
   const [defaultTimerMinutes, setDefaultTimerMinutes] = useState(course?.defaultTimerMinutes ?? 30)
-  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
+
+  // Writes the updated course into the cached list and invalidates settingsInfo,
+  // so the AdminCourse header and the CourseStart set sizes both stay correct.
+  const updateSettings = useUpdateCourseSettings(course?.id)
+  const submitting = updateSettings.isPending
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -19,17 +24,14 @@ function CourseSettingsForm({ course, onSaved, onCancel }) {
       return
     }
     setError(null)
-    setSubmitting(true)
     try {
-      const updated = await coursesApi.update(course.id, {
+      const updated = await updateSettings.mutateAsync({
         questionSetSize: Number(questionSetSize),
         defaultTimerMinutes: Number(defaultTimerMinutes),
       })
       onSaved?.(updated)
     } catch (err) {
       setError(extractErrorMessage(err, 'Σφάλμα αποθήκευσης.'))
-    } finally {
-      setSubmitting(false)
     }
   }
 

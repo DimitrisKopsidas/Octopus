@@ -128,6 +128,18 @@ Version 0.4.11
 - (x) Sidebar polish: prominent timer block (red ≤60s), progress card with large counter, navigator with legend; specific transitions + button press feedback
 - (x) Toasts: one toast at a time (newest wins) + dedupe identical (restart timer instead of stacking)
 
+Version 0.4.12
+[x] Server-state migration: TanStack Query replaces the hand-rolled cache
+- (x) Add @tanstack/react-query + devtools (devtools DEV-guarded, tree-shaken out of the production bundle)
+- (x) lib/queryClient.js: single QueryClient (staleTime 5min, no refetchOnWindowFocus, retry 1) + centralised `qk` query-key factory
+- (x) hooks/queries.js: all server state in one place — useCourses, useCoursesWithContent, useCourse, useCourseSettings, useCourseQuestions, useHomeStats
+- (x) Mutations with automatic invalidation: useCreateQuestion, useUpdateQuestion, useDeleteQuestion, useUpdateCourseSettings
+- (x) Fix: settingsInfo (totalQuestionCount) and the with-content set now invalidate after every question write — previously stale until reload
+- (x) Image upload/delete folded into the create/update mutations (single mutationFn instead of caller-sequenced requests)
+- (x) Delete store/coursesStore.js and hooks/useCourseSettings.js (~140 lines of dedup/loading/error/retry/invalidate logic)
+- (x) Migrate Courses, Admin, AdminCourse, Home, useCourseStart, useQuestionForm, CourseSettingsForm off manual useEffect fetching
+- (x) Silent-retry UX preserved via isPending vs isFetching (was two hand-written code paths per consumer)
+- (x) Test-start fetches (byRandomCount / bySetNum) deliberately left as direct calls — commands, not cache
 
 Version 0.5.0
 [] Demo auth interface (no backend yet)

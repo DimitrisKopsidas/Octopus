@@ -1,8 +1,8 @@
 // Admin page for one course: question list + create/edit/delete + settings modals. Route: /admin/courses/:courseId
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { questionsApi, extractErrorMessage } from '../lib/api'
-import { useCoursesStore } from '../store/coursesStore'
+import { extractErrorMessage } from '../lib/api'
+import { useCourse, useCourseQuestions, useDeleteQuestion } from '../hooks/queries'
 import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
 import BackButton from '../components/ui/BackButton'
@@ -17,52 +17,24 @@ import t from '../content/adminCourse.json'
 function AdminCourse() {
   const { courseId } = useParams()
 
-  const courses = useCoursesStore((s) => s.courses)
-  const loadCourses = useCoursesStore((s) => s.loadCourses)
-  const applyCourseUpdate = useCoursesStore((s) => s.applyCourseUpdate)
-  const invalidateWithContent = useCoursesStore((s) => s.invalidateWithContent)
+  const { course } = useCourse(courseId, t.errorFallback)
+  const {
+    questions,
+    error,
+    isPending,
+    refetch: retryQuestions,
+  } = useCourseQuestions(courseId, t.errorFallback)
 
-  const course = useMemo(
-    () => courses?.find((c) => String(c.id) === String(courseId)) || null,
-    [courses, courseId]
-  )
+  // Deleting invalidates the question list, settingsInfo and the with-content
+  // set in one place — see useInvalidateCourseContent in hooks/queries.js.
+  const deleteMutation = useDeleteQuestion(courseId)
+  const deleting = deleteMutation.isPending
 
-  const [questions, setQuestions] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const loading = isPending && !error
+
   const [modalState, setModalState] = useState({ open: false, editing: null })
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [deleting, setDeleting] = useState(false)
-
-  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
-
-  // Full reload: shows loading skeletons (used on first mount).
-  const reloadQuestions = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await questionsApi.listByCourse(courseId)
-      setQuestions(data)
-    } catch (err) {
-      setError(extractErrorMessage(err, t.errorFallback))
-    } finally {
-      setLoading(false)
-    }
-  }, [courseId])
-
-  // Silent retry: keeps ErrorState visible (spinner on button) — no skeleton flash.
-  const retryQuestions = useCallback(async () => {
-    try {
-      const data = await questionsApi.listByCourse(courseId)
-      setQuestions(data)
-      setError(null)
-    } catch (err) {
-      setError(extractErrorMessage(err, t.errorFallback))
-    }
-  }, [courseId])
-
-  useEffect(() => { reloadQuestions() }, [reloadQuestions])
 
   const openCreate = () => setModalState({ open: true, editing: null })
   const openEdit = (question) => setModalState({ open: true, editing: question })
@@ -72,17 +44,12 @@ function AdminCourse() {
 
   async function confirmDelete() {
     if (!deleteTarget) return
-    setDeleting(true)
     try {
-      await questionsApi.remove(deleteTarget.id)
-      setQuestions(prev => prev.filter(q => q.id !== deleteTarget.id))
+      await deleteMutation.mutateAsync(deleteTarget.id)
       setDeleteTarget(null)
-      invalidateWithContent()
       toast.success(t.toast.questionDeleted)
     } catch (err) {
       toast.error(`${t.delete.failurePrefix} ${extractErrorMessage(err, '')}`)
-    } finally {
-      setDeleting(false)
     }
   }
 
@@ -166,8 +133,8 @@ function AdminCourse() {
         <QuestionForm
           courseId={courseId}
           initialQuestion={modalState.editing}
-          onCreated={() => { reloadQuestions(); invalidateWithContent(); toast.success(t.toast.questionCreated) }}
-          onUpdated={() => { closeModal(); reloadQuestions(); toast.success(t.toast.questionUpdated) }}
+          onCreated={() => { toast.success(t.toast.questionCreated) }}
+          onUpdated={() => { closeModal(); toast.success(t.toast.questionUpdated) }}
           onCancel={closeModal}
         />
       </Modal>
@@ -180,8 +147,7 @@ function AdminCourse() {
       >
         <CourseSettingsForm
           course={course}
-          onSaved={(updated) => {
-            applyCourseUpdate(updated)
+          onSaved={() => {
             setSettingsOpen(false)
             toast.success(t.toast.settingsSaved)
           }}

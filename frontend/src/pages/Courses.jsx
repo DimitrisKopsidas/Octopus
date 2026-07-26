@@ -1,6 +1,6 @@
 // Courses listing page: search + semester filter + Show-More pagination. Route: /courses
 import { useEffect, useMemo, useState } from 'react'
-import { useCoursesStore } from '../store/coursesStore'
+import { useCourses, useCoursesWithContent } from '../hooks/queries'
 import CourseCard from '../components/course/CourseCard'
 import CourseCardSkeleton from '../components/course/CourseCardSkeleton'
 import CoursesFilterModal from '../components/course/CoursesFilterModal'
@@ -35,16 +35,14 @@ function ChevronDownIcon() {
 }
 
 function Courses() {
-  const courses = useCoursesStore((s) => s.courses)
-  const withContentIds = useCoursesStore((s) => s.withContentIds)
-  const error = useCoursesStore((s) => s.error)
-  const loadCourses = useCoursesStore((s) => s.loadCourses)
-  const retryCourses = useCoursesStore((s) => s.retryCourses)
-  const loadWithContent = useCoursesStore((s) => s.loadWithContent)
+  const { data: courses, error, isPending, refetch: refetchCourses } = useCourses(t.errorLoad)
+  const { data: withContentIds, refetch: refetchWithContent } = useCoursesWithContent()
 
-  const loading = courses == null && !error
+  // isPending is true only on the very first load, so a retry refetches in the
+  // background with the ErrorState still on screen — no skeleton flash.
+  const loading = isPending && !error
   const withContentLoaded = withContentIds != null
-  const safeWithContentIds = withContentIds ?? new Set()
+  const safeWithContentIds = useMemo(() => withContentIds ?? new Set(), [withContentIds])
 
   const [query, setQuery] = useState('')
 
@@ -67,12 +65,9 @@ function Courses() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-  useEffect(() => { loadCourses().catch(() => {}) }, [loadCourses])
-  useEffect(() => { loadWithContent() }, [loadWithContent])
-
   function retry() {
-    loadWithContent()
-    return retryCourses().catch(() => {})
+    refetchWithContent()
+    return refetchCourses()
   }
 
   const filtered = useMemo(() => {
