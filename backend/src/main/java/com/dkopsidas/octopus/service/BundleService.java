@@ -9,4 +9,6 @@ public interface BundleService {
     BundleResponseDto createBundle(CreateBundleRequestDto dto);
 
     Long countBundle();
+
+    Long countByCourse(Long courseId);
 }
