@@ -22,6 +22,12 @@ public class BundleController {
         return ResponseEntity.ok(count);
     }
 
+    @GetMapping(path = "count/course/{courseId}")
+    public ResponseEntity<Long> countByCourse(@PathVariable Long courseId){
+        Long count = bundleService.countByCourse(courseId);
+        return ResponseEntity.ok(count);
+    }
+
     //BASIC CRUD---------------------------------------------------------------------------------------
     @PostMapping //CREATE QUESTION
     public ResponseEntity<BundleResponseDto> createBundle(
