@@ -6,7 +6,10 @@ import axios from 'axios'
 const DEFAULT_TIMEOUT = 8000 // 8s
 const UPLOAD_TIMEOUT = 60000 // 60s
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+// Relative by default: requests hit the same origin as the page and get proxied
+// to the backend (Vite dev server in development, nginx in production).
+// .env.production still sets VITE_API_BASE_URL, so deployed builds are unaffected.
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 
 const http = axios.create({
   baseURL: API_BASE,

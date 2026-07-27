@@ -33,6 +33,7 @@ services:
       APP_IMAGE_UPLOAD_DIR: ${APP_IMAGE_UPLOAD_DIR}
       APP_IMAGE_BASE_URL: ${APP_IMAGE_BASE_URL}
       APP_READONLY: ${APP_READONLY}
+      HELPER_CODES: ${HELPER_CODES}
     volumes:
       - /var/www/octopus/images:/var/www/octopus/images
 

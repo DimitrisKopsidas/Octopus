@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 public class UserMapperImpl implements UserMapper {
 
     @Override
-    public User toEntity(CreateUserRequestDto dto, String passwordHash) {
+    public User toEntity(CreateUserRequestDto dto, String passwordHash, UserRole role) {
         User user = new User();
         user.setUsername(dto.username().trim());
         user.setDisplayName(dto.displayName().trim());
         user.setPasswordHash(passwordHash);
         user.setYear(dto.year());
-        user.setRole(dto.role() != null ? dto.role() : UserRole.STUDENT);
+        user.setRole(role != null ? role : UserRole.STUDENT);
         user.setActive(true);
 
         return user;

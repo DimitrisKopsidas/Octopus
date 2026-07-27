@@ -20,6 +20,7 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      HELPER_CODES: ${HELPER_CODES}
     volumes:
       - ./images:/var/www/octopus/images
 
