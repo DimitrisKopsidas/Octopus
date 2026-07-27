@@ -8,7 +8,7 @@
 // - Errors are mapped to a plain Greek string via toMessage so ErrorState and
 //   the toast store keep working unchanged.
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -147,6 +147,67 @@ export function useDeleteQuestion(courseId) {
   return useMutation({
     mutationFn: (questionId) => questionsApi.remove(questionId),
     onSuccess: () => invalidate(courseId),
+  })
+}
+
+/* -------------------------------------------------------------------- auth */
+
+// Registration. Hits POST /users, which already exists — no dependency on the
+// session work. The server decides the role from the helper code, so the payload
+// deliberately has no `role` field.
+//
+// Nothing is invalidated on success: registering does not log you in, so there is
+// no cached user to refresh. That changes when useLogin lands.
+export function useRegister() {
+  return useMutation({
+    mutationFn: authApi.register,
+  })
+}
+
+// The logged-in user, or null. This is the single source of truth for "who am I" —
+// no store keeps a second copy.
+//
+// A 401 here is the normal state for most visitors, not an error: everything in
+// the app works logged out. So it must never retry, never block rendering, and
+// never be treated as a failure worth showing.
+export function useMe() {
+  const q = useQuery({
+    queryKey: qk.auth.me(),
+    queryFn: authApi.me,
+    retry: false,
+    staleTime: Infinity, // only login and logout change it
+  })
+  return {
+    user: q.data ?? null,
+    isLoading: q.isPending,
+    isLoggedIn: q.data != null,
+  }
+}
+
+// On success the server has set the session cookie; invalidating `me` makes every
+// consumer re-read it and the whole UI flips to the logged-in state at once.
+export function useLogin() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: authApi.login,
+    onSuccess: (user) => {
+      // The login response carries the user, so seed the cache directly and skip
+      // an immediate extra round trip to /auth/me.
+      qc.setQueryData(qk.auth.me(), user)
+    },
+  })
+}
+
+export function useLogout() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: authApi.logout,
+    // Runs on success and on failure alike: if logout errored we still want the
+    // client to forget the user rather than show a session that may be gone.
+    onSettled: () => {
+      qc.setQueryData(qk.auth.me(), null)
+      qc.invalidateQueries({ queryKey: qk.auth.me() })
+    },
   })
 }
 

@@ -1,14 +1,26 @@
-// Demo register page with role picker (auth UI; route currently disabled in main.jsx)
-import { useEffect, useState } from 'react'
+// Register page: creates a real account via POST /users. Route: /register
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import { useRegister } from '../hooks/queries'
+import { extractErrorMessage } from '../lib/api'
+import { toast } from '../store/toastStore'
 import logo from '../assets/favicon.png'
 import t from '../content/register.json'
 
+// The backend still answers in English, and username-taken / bad-helper-code are
+// the two failures a user can actually act on — so they get a Greek message here.
+// Matching on message text is fragile; once the backend returns error codes (or
+// Greek text) per AUTH_API.md, delete this and show the server message directly.
+function translateServerError(err) {
+  const raw = extractErrorMessage(err, '')
+  if (/already exists/i.test(raw)) return t.errors.usernameTaken
+  if (/helper code/i.test(raw)) return t.errors.helperCodeInvalid
+  return raw || t.errors.serverFallback
+}
+
 function Register() {
   const navigate = useNavigate()
-  const user = useAuthStore((s) => s.user)
-  const register = useAuthStore((s) => s.register)
+  const registerMutation = useRegister()
 
   const [displayName, setDisplayName] = useState('')
   const [username, setUsername] = useState('')
@@ -17,12 +29,11 @@ function Register() {
   const [helperCode, setHelperCode] = useState('')
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    if (user) navigate('/', { replace: true })
-  }, [user, navigate])
+  const submitting = registerMutation.isPending
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    if (submitting) return
     if (!displayName.trim() || !username.trim() || !password) {
       setError(t.errors.requiredAll)
       return
@@ -31,14 +42,22 @@ function Register() {
       setError(t.errors.requiredHelperCode)
       return
     }
-    register({
-      displayName: displayName.trim(),
-      username: username.trim(),
-      password,
-      role,
-      helperCode: role === 'helper' ? helperCode.trim() : undefined,
-    })
-    navigate('/')
+    setError(null)
+    try {
+      // No `role` in the payload: the server derives it from the helper code.
+      // The picker only decides whether the code field is shown.
+      await registerMutation.mutateAsync({
+        displayName: displayName.trim(),
+        username: username.trim(),
+        password,
+        helperCode: role === 'helper' ? helperCode.trim() : undefined,
+      })
+      // Registering does not sign you in — that needs /auth/login.
+      toast.success(t.toast.created)
+      navigate('/login', { replace: true })
+    } catch (err) {
+      setError(translateServerError(err))
+    }
   }
 
   return (
@@ -109,7 +128,9 @@ function Register() {
                 type="text"
                 value={helperCode}
                 onChange={(e) =>
-                  setHelperCode(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))
+                  // Hyphens are part of the code format (HLP-XXXXXXXX). Stripping
+                  // them silently mangled every code into an invalid one.
+                  setHelperCode(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))
                 }
                 placeholder={t.placeholders.helperCode}
                 autoComplete="off"
@@ -126,9 +147,10 @@ function Register() {
 
           <button
             type="submit"
-            className="w-full px-4 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
+            disabled={submitting}
+            className="w-full px-4 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 disabled:bg-brand-600/50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors"
           >
-            {t.submit}
+            {submitting ? t.submitting : t.submit}
           </button>
         </form>
 

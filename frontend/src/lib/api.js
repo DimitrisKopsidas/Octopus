@@ -14,6 +14,10 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 const http = axios.create({
   baseURL: API_BASE,
   timeout: DEFAULT_TIMEOUT,
+  // Send and accept cookies. Required for the httpOnly session cookie, and it is
+  // what lets axios read the XSRF-TOKEN cookie and echo it back as X-XSRF-TOKEN
+  // (those are already its default names, so CSRF needs no further config).
+  withCredentials: true,
 })
 
 // Resolves a question image URL coming from the backend.
@@ -88,4 +92,14 @@ export const bundlesApi = {
   count: () => unwrap(http.get('/bundles/count')),
 }
 
-export default { coursesApi, questionsApi, bundlesApi }
+// `register` hits the existing /users endpoint and works today; the /auth/*
+// routes land with the backend session work and are declared here so both sides
+// build against the same shapes.
+export const authApi = {
+  register: (payload) => unwrap(http.post('/users', payload)),
+  login: (payload) => unwrap(http.post('/auth/login', payload)),
+  me: () => unwrap(http.get('/auth/me')),
+  logout: () => unwrap(http.post('/auth/logout')),
+}
+
+export default { coursesApi, questionsApi, bundlesApi, authApi }
