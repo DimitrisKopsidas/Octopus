@@ -32,27 +32,32 @@ function Modal({ open, onClose, title, children, size = 'lg' }) {
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
+      {/* Glassmorphic Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+        className="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity animate-fadeIn"
         onClick={onClose}
         aria-hidden="true"
       />
+
+      {/* Modal Card */}
       <div
-        className={`relative w-full ${sizeClass} my-8 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[calc(100vh-4rem)]`}
+        className={`relative w-full ${sizeClass} my-8 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col max-h-[calc(100vh-4rem)] animate-reveal overflow-hidden`}
         onClick={e => e.stopPropagation()}
       >
         {title && (
-          <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
-            <h2 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-slate-200">
+          <header className="flex items-center justify-between px-6 py-4.5 border-b border-slate-200/80 dark:border-slate-800 shrink-0">
+            <h2 id="modal-title" className="text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
               aria-label="Κλείσιμο"
-              className="w-9 h-9 flex items-center justify-center rounded-md text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
-              <span className="text-xl leading-none">×</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </header>
         )}

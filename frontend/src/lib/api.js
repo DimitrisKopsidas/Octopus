@@ -14,16 +14,27 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 const http = axios.create({
   baseURL: API_BASE,
   timeout: DEFAULT_TIMEOUT,
-  // Send and accept cookies. Required for the httpOnly session cookie, and it is
-  // what lets axios read the XSRF-TOKEN cookie and echo it back as X-XSRF-TOKEN
-  // (those are already its default names, so CSRF needs no further config).
   withCredentials: true,
 })
 
-// Resolves a question image URL coming from the backend.
-// - Absolute (http/https) or data/blob URL → used as-is
-// - Relative path (e.g. "/images/x.jpg" or "images/x.jpg") → prefixed with the
-//   backend origin so the <img> loads from the API server, not the frontend.
+// In-memory access token storage
+let memoryAccessToken = null
+
+export function setAccessToken(token) {
+  memoryAccessToken = token
+}
+
+export function getAccessToken() {
+  return memoryAccessToken
+}
+
+http.interceptors.request.use((config) => {
+  if (memoryAccessToken) {
+    config.headers.Authorization = `Bearer ${memoryAccessToken}`
+  }
+  return config
+})
+
 export function resolveImageUrl(url) {
   if (!url) return url
   if (/^(https?:)?\/\//i.test(url) || /^(data|blob):/i.test(url)) return url
@@ -31,10 +42,62 @@ export function resolveImageUrl(url) {
   return `${origin}${url.startsWith('/') ? '' : '/'}${url}`
 }
 
-// Normalise hang/network errors for error states
+// Normalise hang/network errors for error states and handle 401 refresh
+let isRefreshing = false
+let failedQueue = []
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
 http.interceptors.response.use(
   (res) => res,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/refresh')
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`
+            return http(originalRequest)
+          })
+          .catch((err) => Promise.reject(err))
+      }
+
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        const refreshData = await authApi.refresh()
+        setAccessToken(refreshData.accessToken)
+        processQueue(null, refreshData.accessToken)
+        originalRequest.headers.Authorization = `Bearer ${refreshData.accessToken}`
+        return http(originalRequest)
+      } catch (refreshErr) {
+        processQueue(refreshErr, null)
+        setAccessToken(null)
+        return Promise.reject(refreshErr)
+      } finally {
+        isRefreshing = false
+      }
+    }
+
     if (error.code === 'ECONNABORTED' || /timeout/i.test(error.message || '')) {
       error.message = 'Το αίτημα άργησε πολύ.'
     } else if (!error.response) {
@@ -92,14 +155,26 @@ export const bundlesApi = {
   count: () => unwrap(http.get('/bundles/count')),
 }
 
-// `register` hits the existing /users endpoint and works today; the /auth/*
-// routes land with the backend session work and are declared here so both sides
-// build against the same shapes.
 export const authApi = {
   register: (payload) => unwrap(http.post('/users', payload)),
   login: (payload) => unwrap(http.post('/auth/login', payload)),
-  me: () => unwrap(http.get('/auth/me')),
+  refresh: () => unwrap(http.post('/auth/refresh')),
+  me: async () => {
+    if (!getAccessToken()) {
+      try {
+        const refreshRes = await authApi.refresh()
+        setAccessToken(refreshRes.accessToken)
+        return refreshRes.user
+      } catch {
+        return null
+      }
+    }
+    return unwrap(http.get('/auth/me'))
+  },
   logout: () => unwrap(http.post('/auth/logout')),
+  accessStudent: () => unwrap(http.get('/access/student')),
+  accessHelper: () => unwrap(http.get('/access/helper')),
+  accessAdmin: () => unwrap(http.get('/access/admin')),
 }
 
 export default { coursesApi, questionsApi, bundlesApi, authApi }

@@ -4,8 +4,11 @@ import { NavLink, Outlet } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import ThemeToggle from './ThemeToggle'
 import MobileNavDrawer from './MobileNavDrawer'
+import UserMenu from './UserMenu'
 import Footer from './Footer'
 import ToastContainer from '../ui/Toast'
+import { useMe } from '../../hooks/queries'
+import { canManageContent } from '../../lib/roles'
 import t from '../../content/layout.json'
 
 const navLinkClass = ({ isActive }) =>
@@ -17,6 +20,10 @@ const navLinkClass = ({ isActive }) =>
 
 function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  // Never gates rendering: the navbar draws immediately and the user-dependent
+  // bits fill in when /auth/me answers. Anonymous visitors are the common case.
+  const { user } = useMe()
+  const showAdmin = canManageContent(user)
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
@@ -30,10 +37,11 @@ function Layout() {
           <div className="hidden md:flex items-center gap-1">
             <NavLink to="/" end className={navLinkClass}>{t.nav.home}</NavLink>
             <NavLink to="/courses" className={navLinkClass}>{t.nav.courses}</NavLink>
-            {/* <NavLink to="/admin" className={navLinkClass}>{t.nav.admin}</NavLink> */}
+            {showAdmin && (
+              <NavLink to="/admin" className={navLinkClass}>{t.nav.admin}</NavLink>
+            )}
             <NavLink to="/info" className={navLinkClass}>{t.nav.info}</NavLink>
-            <ThemeToggle />
-            {/* {user ? (
+            {user ? (
               <UserMenu />
             ) : (
               <NavLink
@@ -42,7 +50,7 @@ function Layout() {
               >
                 {t.nav.login}
               </NavLink>
-            )} */}
+            )}
           </div>
 
           <button

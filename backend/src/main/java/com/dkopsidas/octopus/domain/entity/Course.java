@@ -35,6 +35,10 @@ public class Course {
     @Column(name = "default_timer_minutes", nullable = false)
     private int defaultTimerMinutes;
 
+    @Column(name = "updated_at")
+    @org.hibernate.annotations.UpdateTimestamp
+    private java.time.Instant updatedAt;
+
     public void addQuestion(Question a) {
         questions.add(a);
         a.setCourse(this);

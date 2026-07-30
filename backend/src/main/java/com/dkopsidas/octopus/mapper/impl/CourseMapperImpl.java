@@ -28,7 +28,8 @@ public class CourseMapperImpl implements CourseMapper {
             course.getName(),
             course.getSemester(),
             course.getQuestionSetSize(),
-            course.getDefaultTimerMinutes()
+            course.getDefaultTimerMinutes(),
+            course.getUpdatedAt()
         );
     }
 

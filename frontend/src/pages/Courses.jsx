@@ -1,6 +1,6 @@
 // Courses listing page: search + semester filter + Show-More pagination. Route: /courses
 import { useEffect, useMemo, useState } from 'react'
-import { useCourses, useCoursesWithContent } from '../hooks/queries'
+import { useCourses } from '../hooks/queries'
 import CourseCard from '../components/course/CourseCard'
 import CourseCardSkeleton from '../components/course/CourseCardSkeleton'
 import CoursesFilterModal from '../components/course/CoursesFilterModal'
@@ -36,13 +36,10 @@ function ChevronDownIcon() {
 
 function Courses() {
   const { data: courses, error, isPending, refetch: refetchCourses } = useCourses(t.errorLoad)
-  const { data: withContentIds, refetch: refetchWithContent } = useCoursesWithContent()
 
   // isPending is true only on the very first load, so a retry refetches in the
   // background with the ErrorState still on screen — no skeleton flash.
   const loading = isPending && !error
-  const withContentLoaded = withContentIds != null
-  const safeWithContentIds = useMemo(() => withContentIds ?? new Set(), [withContentIds])
 
   const [query, setQuery] = useState('')
 
@@ -66,7 +63,6 @@ function Courses() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
   function retry() {
-    refetchWithContent()
     return refetchCourses()
   }
 
@@ -77,16 +73,16 @@ function Courses() {
     const q = normalize(query.trim())
     return courses
       .filter(c => semesters.length === 0 || semesters.includes(c.semester))
-      .filter(c => !onlyWithContent || safeWithContentIds.has(c.id))
+      .filter(c => !onlyWithContent || c.questionCount > 0)
       .filter(c => !q || normalize(c.name).includes(q) || String(c.id).includes(q))
       .sort((a, b) => {
-        const aHas = safeWithContentIds.has(a.id) ? 1 : 0
-        const bHas = safeWithContentIds.has(b.id) ? 1 : 0
+        const aHas = a.questionCount > 0 ? 1 : 0
+        const bHas = b.questionCount > 0 ? 1 : 0
         if (aHas !== bHas) return bHas - aHas
         if (a.semester !== b.semester) return a.semester - b.semester
         return a.name.localeCompare(b.name, 'el')
       })
-  }, [courses, query, semesters, onlyWithContent, safeWithContentIds])
+  }, [courses, query, semesters, onlyWithContent])
 
   const activeFilterCount = (semesters.length > 0 ? 1 : 0) + (onlyWithContent ? 1 : 0)
   const draftActiveCount = (draftSemesters.length > 0 ? 1 : 0) + (draftOnlyWithContent ? 1 : 0)
@@ -159,8 +155,8 @@ function Courses() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.slice(0, visibleCount).map(course => {
-          const hasContent = safeWithContentIds.has(course.id)
-          const disabled = withContentLoaded && !hasContent
+          const hasContent = (course.questionCount || 0) > 0
+          const disabled = !hasContent
           return (
             <CourseCard key={course.id} course={course} hasContent={hasContent} disabled={disabled} />
           )
