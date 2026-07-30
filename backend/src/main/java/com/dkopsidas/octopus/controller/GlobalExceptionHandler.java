@@ -31,4 +31,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleSimpleExceptions(SimpleException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @ExceptionHandler({
+            InvalidCredentialsException.class,
+            MissingRefreshTokenException.class,
+            InactiveAccountException.class,
+            RefreshTokenException.class
+    })
+    public ResponseEntity<ErrorResponseDto> handleAuthenticationExceptions(
+            RuntimeException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponseDto(exception.getMessage()));
+    }
 }
