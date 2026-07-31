@@ -10,9 +10,11 @@
     "password": "••••••••"
   },
   "errors": {
-    "required": "Συμπλήρωσε username και κωδικό."
+    "required": "Συμπλήρωσε username και κωδικό.",
+    "invalid": "Λάθος username ή κωδικός."
   },
   "submit": "Σύνδεση",
+  "submitting": "Σύνδεση…",
   "footer": {
     "prompt": "Δεν έχεις λογαριασμό;",
     "link": "Εγγραφή"

@@ -25,6 +25,7 @@ function Register() {
   const [displayName, setDisplayName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [year, setYear] = useState('1')
   const [role, setRole] = useState('student')
   const [helperCode, setHelperCode] = useState('')
   const [error, setError] = useState(null)
@@ -50,6 +51,7 @@ function Register() {
         displayName: displayName.trim(),
         username: username.trim(),
         password,
+        year: year ? Number(year) : 1,
         helperCode: role === 'helper' ? helperCode.trim() : undefined,
       })
       // Registering does not sign you in — that needs /auth/login.
@@ -96,6 +98,23 @@ function Register() {
             onChange={setPassword}
             placeholder={t.placeholders.password}
           />
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              Έτος Σπουδών
+            </label>
+            <select
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className="w-full px-3 py-2 rounded-md bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            >
+              <option value="1">1ο Έτος</option>
+              <option value="2">2ο Έτος</option>
+              <option value="3">3ο Έτος</option>
+              <option value="4">4ο Έτος</option>
+              <option value="5">5ο+ Έτος</option>
+            </select>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">

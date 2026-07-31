@@ -8,6 +8,8 @@ import { queryClient } from './lib/queryClient'
 import './index.css'
 import ScrollToTop from './components/layout/ScrollToTop.jsx'
 import Layout from './components/layout/Layout.jsx'
+import RequireRole from './components/layout/RequireRole.jsx'
+import { ROLE } from './lib/roles'
 import Home from './pages/Home.jsx'
 import Courses from './pages/Courses.jsx'
 import CourseStart from './pages/CourseStart.jsx'
@@ -17,6 +19,11 @@ import Admin from './pages/Admin.jsx'
 import AdminCourse from './pages/AdminCourse.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import Profile from './pages/Profile.jsx'
+import AdminOnly from './pages/AdminOnly.jsx'
+import Settings from './pages/Settings.jsx'
+import Favorites from './pages/Favorites.jsx'
+import Quizzes from './pages/Quizzes.jsx'
 import Info from './pages/Info.jsx'
 import NotFound from './pages/NotFound.jsx'
 
@@ -32,8 +39,19 @@ createRoot(document.getElementById('root')).render(
           <Route path="/courses/:courseId/start" element={<CourseStart />} />
           <Route path="/test/:courseId" element={<Test />} />
           <Route path="/test/:courseId/results" element={<Results />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/admin/courses/:courseId" element={<AdminCourse />} />
+          <Route path="/admin" element={<RequireRole><Admin /></RequireRole>} />
+          <Route
+            path="/admin/courses/:courseId"
+            element={<RequireRole><AdminCourse /></RequireRole>}
+          />
+          <Route
+            path="/admin-only"
+            element={<RequireRole allowedRoles={[ROLE.ADMIN]}><AdminOnly /></RequireRole>}
+          />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/quizzes" element={<Quizzes />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/info" element={<Info />} />

@@ -8,7 +8,7 @@
 // - Errors are mapped to a plain Greek string via toMessage so ErrorState and
 //   the toast store keep working unchanged.
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi, authApi } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi, setAccessToken } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -190,10 +190,10 @@ export function useLogin() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: (user) => {
-      // The login response carries the user, so seed the cache directly and skip
-      // an immediate extra round trip to /auth/me.
-      qc.setQueryData(qk.auth.me(), user)
+    onSuccess: (res) => {
+      // res is AuthResponseDto { accessToken, tokenType, expiresIn, user }
+      setAccessToken(res.accessToken)
+      qc.setQueryData(qk.auth.me(), res.user)
     },
   })
 }
@@ -205,6 +205,7 @@ export function useLogout() {
     // Runs on success and on failure alike: if logout errored we still want the
     // client to forget the user rather than show a session that may be gone.
     onSettled: () => {
+      setAccessToken(null)
       qc.setQueryData(qk.auth.me(), null)
       qc.invalidateQueries({ queryKey: qk.auth.me() })
     },

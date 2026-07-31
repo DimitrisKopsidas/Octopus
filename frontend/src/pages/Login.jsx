@@ -1,38 +1,52 @@
-// Demo login page (auth UI; route currently disabled in main.jsx)
+// Login page. Route: /login
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import { useMe, useLogin } from '../hooks/queries'
+import { extractErrorMessage } from '../lib/api'
 import logo from '../assets/favicon.png'
 import t from '../content/login.json'
 
 function Login() {
   const navigate = useNavigate()
-  const user = useAuthStore((s) => s.user)
-  const login = useAuthStore((s) => s.login)
+  const { user } = useMe()
+  const loginMutation = useLogin()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
 
+  const submitting = loginMutation.isPending
+
+  // Already signed in — nothing to do here.
   useEffect(() => {
     if (user) navigate('/', { replace: true })
   }, [user, navigate])
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    if (submitting) return
     if (!username.trim() || !password) {
       setError(t.errors.required)
       return
     }
-    login({ username: username.trim(), password })
-    navigate('/')
+    setError(null)
+    try {
+      // useLogin seeds the me cache from the response, so the navbar flips to the
+      // logged-in state before this navigation lands.
+      await loginMutation.mutateAsync({ username: username.trim(), password })
+      navigate('/', { replace: true })
+    } catch (err) {
+      // 401 is the expected failure, and it deliberately does not say whether it
+      // was the username or the password that was wrong.
+      setError(extractErrorMessage(err, t.errors.invalid))
+    }
   }
 
   return (
     <div className="max-w-md mx-auto py-8">
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <header className="text-center px-6 pt-8 pb-5">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/50 mb-3">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-3">
             <img src={logo} alt="Octopus" className="w-10 h-10" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-200">
@@ -67,9 +81,10 @@ function Login() {
 
           <button
             type="submit"
-            className="w-full px-4 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 text-white font-medium shadow-sm transition-colors"
+            disabled={submitting}
+            className="w-full px-4 py-2.5 rounded-md bg-brand-600 hover:bg-brand-700 disabled:bg-brand-600/50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors"
           >
-            {t.submit}
+            {submitting ? t.submitting : t.submit}
           </button>
         </form>
 
