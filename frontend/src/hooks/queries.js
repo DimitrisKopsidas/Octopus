@@ -8,7 +8,7 @@
 // - Errors are mapped to a plain Greek string via toMessage so ErrorState and
 //   the toast store keep working unchanged.
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi, authApi, setAccessToken } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, setAccessToken } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -227,3 +227,22 @@ export function useUpdateCourseSettings(courseId) {
     },
   })
 }
+
+/* ------------------------------------------------------------------ audit */
+
+export function useAuditLogs(params = {}, fallbackError = 'Σφάλμα φόρτωσης Audit Logs') {
+  const q = useQuery({
+    queryKey: qk.audit.list(params),
+    queryFn: () => auditApi.getLogs(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    logs: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+

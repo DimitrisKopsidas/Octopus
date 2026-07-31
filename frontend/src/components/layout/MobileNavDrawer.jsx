@@ -63,7 +63,7 @@ function MobileNavDrawer({ open, onClose }) {
             <NavLink to="/" end onClick={onClose} className={mobileNavLinkClass}>{t.nav.home}</NavLink>
             <NavLink to="/courses" onClick={onClose} className={mobileNavLinkClass}>{t.nav.courses}</NavLink>
             {showAdmin && (
-              <NavLink to="/admin" onClick={onClose} className={mobileNavLinkClass}>{t.nav.admin}</NavLink>
+              <NavLink to="/control-panel" onClick={onClose} className={mobileNavLinkClass}>{t.nav.admin}</NavLink>
             )}
             <NavLink to="/info" onClick={onClose} className={mobileNavLinkClass}>{t.nav.info}</NavLink>
           </div>

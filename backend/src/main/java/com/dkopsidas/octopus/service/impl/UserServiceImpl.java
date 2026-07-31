@@ -12,6 +12,9 @@ import com.dkopsidas.octopus.repository.UserRepository;
 import com.dkopsidas.octopus.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.dkopsidas.octopus.domain.entity.AuditAction;
+import com.dkopsidas.octopus.security.audit.AuditEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final HelperCodeService helperCodeService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public UserResponseDto getUser(UUID userId) {
@@ -74,6 +78,15 @@ public class UserServiceImpl implements UserService {
             helperCodeService.assignTo(helperCode, savedUser.getId());
         }
 
+        eventPublisher.publishEvent(AuditEvent.success(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                AuditAction.USER_REGISTERED,
+                "USER",
+                savedUser.getId().toString(),
+                "User created with role: " + savedUser.getRole()
+        ));
+
         return userMapper.toDto(savedUser);
     }
 
@@ -83,7 +96,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         user.setActive(false);
+        User saved = userRepository.save(user);
 
-        return userMapper.toDto(userRepository.save(user));
+        eventPublisher.publishEvent(AuditEvent.success(
+                user.getId(),
+                user.getUsername(),
+                AuditAction.USER_DEACTIVATED,
+                "USER",
+                user.getId().toString(),
+                "User account deactivated"
+        ));
+
+        return userMapper.toDto(saved);
     }
 }

@@ -12,6 +12,10 @@ import com.dkopsidas.octopus.service.BundleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import com.dkopsidas.octopus.domain.entity.AuditAction;
+import com.dkopsidas.octopus.security.audit.AuditEvent;
+import org.springframework.context.ApplicationEventPublisher;
+
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -22,6 +26,7 @@ public class BundleServiceImpl implements BundleService {
     private final BundleRepository bundleRepository;
     private final AnswerRepository answerRepository;
     private final BundleMapper bundleMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public BundleResponseDto createBundle(CreateBundleRequestDto createRequest) {
@@ -34,7 +39,18 @@ public class BundleServiceImpl implements BundleService {
         Bundle bundle = bundleMapper.toEntity(createRequest, answers);
         bundle.setScore(score);
 
-        return bundleMapper.toDto(bundleRepository.save(bundle));
+        Bundle saved = bundleRepository.save(bundle);
+
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.BUNDLE_CREATED,
+                "BUNDLE",
+                saved.getId().toString(),
+                "Created bundle score=" + score + "/" + answers.size()
+        ));
+
+        return bundleMapper.toDto(saved);
     }
 
     @Override

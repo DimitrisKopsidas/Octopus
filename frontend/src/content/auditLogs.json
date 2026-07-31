@@ -1,0 +1,32 @@
+{
+  "title": "Audit Logs & Αρχείο Ασφαλείας",
+  "subtitle": "Πλήρης καταγραφή συμβάντων συστήματος, προσβάσεων, αποτυχιών και μεταβολών δεδομένων.",
+  "refresh": "Ανανέωση",
+  "filters": {
+    "actionAll": "Όλες οι Ενέργειες",
+    "statusAll": "Όλα τα Status",
+    "statusSuccess": "✓ Επιτυχημένο (SUCCESS)",
+    "statusFailed": "✕ Αποτυχημένο (FAILED)",
+    "rangeAll": "Όλες οι Ημερομηνίες",
+    "rangeToday": "Σήμερα",
+    "rangeWeek": "Τελευταία Εβδομάδα",
+    "rangeMonth": "Τελευταίος Μήνας",
+    "rangeYear": "Τελευταίο Έτος"
+  },
+  "table": {
+    "headers": {
+      "timestamp": "Ημερομηνία & Ώρα",
+      "action": "Ενέργεια (Action)",
+      "actor": "Χρήστης (Actor)",
+      "status": "Status",
+      "ip": "IP Address",
+      "details": "Λεπτομέρειες"
+    },
+    "viewDetails": "Προβολή",
+    "empty": "Δεν βρέθηκαν audit logs με τα επιλεγμένα φίλτρα."
+  },
+  "modal": {
+    "title": "Λεπτομέρειες Audit Log",
+    "close": "Κλείσιμο"
+  }
+}

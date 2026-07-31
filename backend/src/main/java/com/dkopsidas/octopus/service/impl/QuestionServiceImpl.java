@@ -16,6 +16,9 @@ import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.QuestionRepository;
 import com.dkopsidas.octopus.service.QuestionService;
 import lombok.RequiredArgsConstructor;
+import com.dkopsidas.octopus.domain.entity.AuditAction;
+import com.dkopsidas.octopus.security.audit.AuditEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +35,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final CourseRepository courseRepository;
     private final QuestionMapper questionMapper;
     private final ImageService imageService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public QuestionResponseDto createQuestion(CreateQuestionRequestDto createRequest) {
@@ -42,7 +46,18 @@ public class QuestionServiceImpl implements QuestionService {
 
         checkCorrectAnswerCount(question);
 
-        return questionMapper.toDto(questionRepository.save(question));
+        Question saved = questionRepository.save(question);
+
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.QUESTION_CREATED,
+                "QUESTION",
+                saved.getId().toString(),
+                "Created question in course " + courseFromDto.getId()
+        ));
+
+        return questionMapper.toDto(saved);
     }
 
     @Override
@@ -62,7 +77,18 @@ public class QuestionServiceImpl implements QuestionService {
         question.setImageUrl(questionFromDto.getImageUrl());
         question.replaceAnswers(questionFromDto.getAnswers());
 
-        return questionMapper.toDto(questionRepository.save(question));
+        Question saved = questionRepository.save(question);
+
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.QUESTION_UPDATED,
+                "QUESTION",
+                saved.getId().toString(),
+                "Updated question titled: " + saved.getTitle()
+        ));
+
+        return questionMapper.toDto(saved);
     }
 
     @Override
@@ -71,8 +97,18 @@ public class QuestionServiceImpl implements QuestionService {
                 orElseThrow(() -> new QuestionNotFoundException(questionId));
 
         question.setIsActive(false);
+        Question saved = questionRepository.save(question);
 
-        return questionMapper.toDto(questionRepository.save(question));
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.QUESTION_DEACTIVATED,
+                "QUESTION",
+                saved.getId().toString(),
+                "Deactivated question"
+        ));
+
+        return questionMapper.toDto(saved);
     }
 
     @Override
@@ -125,8 +161,18 @@ public class QuestionServiceImpl implements QuestionService {
 
         String imageUrl = imageService.saveImage(questionId, file);
         question.setImageUrl(imageUrl);
+        Question saved = questionRepository.save(question);
 
-        return questionMapper.toDto(questionRepository.save(question));
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.QUESTION_IMAGE_UPLOADED,
+                "QUESTION",
+                saved.getId().toString(),
+                "Uploaded image for question " + questionId
+        ));
+
+        return questionMapper.toDto(saved);
     }
 
     public QuestionResponseDto deleteImage(Long questionId) throws IOException {
@@ -135,8 +181,18 @@ public class QuestionServiceImpl implements QuestionService {
 
         imageService.deleteImage(questionId);
         question.setImageUrl(null);
+        Question saved = questionRepository.save(question);
 
-        return questionMapper.toDto(questionRepository.save(question));
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.QUESTION_IMAGE_DELETED,
+                "QUESTION",
+                saved.getId().toString(),
+                "Deleted image for question " + questionId
+        ));
+
+        return questionMapper.toDto(saved);
     }
 
     private void checkCorrectAnswerCount(Question question) {

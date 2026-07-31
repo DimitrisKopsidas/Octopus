@@ -17,6 +17,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dkopsidas.octopus.domain.entity.AuditAction;
+import com.dkopsidas.octopus.security.audit.AuditEvent;
+import org.springframework.context.ApplicationEventPublisher;
+
 import java.util.UUID;
 
 @Service
@@ -30,6 +34,7 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public LoginResult login(LoginRequestDto loginRequest) {
@@ -42,6 +47,14 @@ public class AuthService {
                     )
             );
         } catch (AuthenticationException exception) {
+            eventPublisher.publishEvent(AuditEvent.failure(
+                    null,
+                    loginRequest.username().trim(),
+                    AuditAction.USER_LOGIN_FAILED,
+                    "AUTH",
+                    null,
+                    "Invalid login credentials"
+            ));
             throw new InvalidCredentialsException();
         }
 
@@ -51,9 +64,28 @@ public class AuthService {
 
         User user = userRepository.findById(principal.getId())
                 .filter(User::isActive)
-                .orElseThrow(InvalidCredentialsException::new);
+                .orElseThrow(() -> {
+                    eventPublisher.publishEvent(AuditEvent.failure(
+                            principal.getId(),
+                            principal.getUsername(),
+                            AuditAction.USER_LOGIN_FAILED,
+                            "AUTH",
+                            principal.getId().toString(),
+                            "Inactive user account"
+                    ));
+                    return new InvalidCredentialsException();
+                });
         IssuedAccessToken accessToken = accessTokenService.issueFor(user);
         IssuedRefreshToken refreshToken = refreshTokenService.issueFor(user);
+
+        eventPublisher.publishEvent(AuditEvent.success(
+                user.getId(),
+                user.getUsername(),
+                AuditAction.USER_LOGIN_SUCCESS,
+                "USER",
+                user.getId().toString(),
+                "User successfully logged in"
+        ));
 
         return new LoginResult(toResponse(accessToken, user), refreshToken);
     }
@@ -64,10 +96,32 @@ public class AuthService {
         User user = refreshToken.getUser();
         requireActive(user);
 
+        eventPublisher.publishEvent(AuditEvent.success(
+                user.getId(),
+                user.getUsername(),
+                AuditAction.TOKEN_REFRESHED,
+                "AUTH",
+                user.getId().toString(),
+                "Access token successfully refreshed"
+        ));
+
         return toResponse(accessTokenService.issueFor(user), user);
     }
 
     public void logout(String refreshTokenValue) {
+        try {
+            RefreshToken refreshToken = refreshTokenService.requireValid(refreshTokenValue);
+            User user = refreshToken.getUser();
+            eventPublisher.publishEvent(AuditEvent.success(
+                    user.getId(),
+                    user.getUsername(),
+                    AuditAction.USER_LOGOUT,
+                    "USER",
+                    user.getId().toString(),
+                    "User logged out"
+            ));
+        } catch (Exception ignored) {
+        }
         refreshTokenService.revoke(refreshTokenValue);
     }
 

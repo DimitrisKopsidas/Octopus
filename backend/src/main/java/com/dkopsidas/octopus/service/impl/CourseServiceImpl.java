@@ -13,6 +13,9 @@ import com.dkopsidas.octopus.mapper.CourseMapper;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.service.CourseService;
 import lombok.RequiredArgsConstructor;
+import com.dkopsidas.octopus.domain.entity.AuditAction;
+import com.dkopsidas.octopus.security.audit.AuditEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +26,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public List<CourseResponseDto> listCourses() {
@@ -53,6 +57,17 @@ public class CourseServiceImpl implements CourseService {
         course.setQuestionSetSize(courseFromDto.getQuestionSetSize());
         course.setDefaultTimerMinutes(courseFromDto.getDefaultTimerMinutes());
 
-        return courseMapper.toDto(courseRepository.save(course));
+        Course saved = courseRepository.save(course);
+
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.COURSE_UPDATED,
+                "COURSE",
+                saved.getId().toString(),
+                "Updated questionSetSize=" + saved.getQuestionSetSize() + ", defaultTimerMinutes=" + saved.getDefaultTimerMinutes()
+        ));
+
+        return courseMapper.toDto(saved);
     }
 }

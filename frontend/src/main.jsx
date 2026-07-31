@@ -15,12 +15,15 @@ import Courses from './pages/Courses.jsx'
 import CourseStart from './pages/CourseStart.jsx'
 import Test from './pages/Test.jsx'
 import Results from './pages/Results.jsx'
-import Admin from './pages/Admin.jsx'
+import ControlPanel from './pages/ControlPanel.jsx'
+import ControlPanelCoursesPage from './pages/ControlPanelCoursesPage.jsx'
+import ControlPanelReportsPage from './pages/ControlPanelReportsPage.jsx'
 import AdminCourse from './pages/AdminCourse.jsx'
+import AdminPanel from './pages/AdminPanel.jsx'
+import AuditLogsPage from './pages/AuditLogsPage.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Profile from './pages/Profile.jsx'
-import AdminOnly from './pages/AdminOnly.jsx'
 import Settings from './pages/Settings.jsx'
 import Favorites from './pages/Favorites.jsx'
 import Quizzes from './pages/Quizzes.jsx'
@@ -39,14 +42,20 @@ createRoot(document.getElementById('root')).render(
           <Route path="/courses/:courseId/start" element={<CourseStart />} />
           <Route path="/test/:courseId" element={<Test />} />
           <Route path="/test/:courseId/results" element={<Results />} />
-          <Route path="/admin" element={<RequireRole><Admin /></RequireRole>} />
+          <Route path="/control-panel" element={<RequireRole><ControlPanel /></RequireRole>} />
+          <Route path="/control-panel/courses" element={<RequireRole><ControlPanelCoursesPage /></RequireRole>} />
           <Route
-            path="/admin/courses/:courseId"
+            path="/control-panel/courses/:courseId"
             element={<RequireRole><AdminCourse /></RequireRole>}
           />
+          <Route path="/control-panel/reports" element={<RequireRole><ControlPanelReportsPage /></RequireRole>} />
           <Route
-            path="/admin-only"
-            element={<RequireRole allowedRoles={[ROLE.ADMIN]}><AdminOnly /></RequireRole>}
+            path="/admin-panel"
+            element={<RequireRole allowedRoles={[ROLE.ADMIN]}><AdminPanel /></RequireRole>}
+          />
+          <Route
+            path="/admin-panel/audits"
+            element={<RequireRole allowedRoles={[ROLE.ADMIN]}><AuditLogsPage /></RequireRole>}
           />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />

@@ -177,4 +177,9 @@ export const authApi = {
   accessAdmin: () => unwrap(http.get('/access/admin')),
 }
 
-export default { coursesApi, questionsApi, bundlesApi, authApi }
+export const auditApi = {
+  getLogs: (params) => unwrap(http.get('/audit-logs', { params })),
+  createLog: (payload) => unwrap(http.post('/logs/audit', payload)),
+}
+
+export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi }

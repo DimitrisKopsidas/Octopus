@@ -38,7 +38,7 @@ function Layout() {
             <NavLink to="/" end className={navLinkClass}>{t.nav.home}</NavLink>
             <NavLink to="/courses" className={navLinkClass}>{t.nav.courses}</NavLink>
             {showAdmin && (
-              <NavLink to="/admin" className={navLinkClass}>{t.nav.admin}</NavLink>
+              <NavLink to="/control-panel" className={navLinkClass}>{t.nav.admin}</NavLink>
             )}
             <NavLink to="/info" className={navLinkClass}>{t.nav.info}</NavLink>
             {user ? (

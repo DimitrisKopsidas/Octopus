@@ -40,7 +40,6 @@
   },
   "rbacTest": {
     "title": "Έλεγχος Πρόσβασης (RBAC Live Test)",
-    "description": "Δοκίμασε να καλέσεις τα endpoints του Backend για να επιβεβαιώσεις αν το JWT Access Token σου επιτρέπει πρόσβαση ανάλογα με το ρόλο σου.",
     "buttons": {
       "student": "Test Student Access",
       "helper": "Test Helper Access",
