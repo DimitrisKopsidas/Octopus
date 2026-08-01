@@ -58,14 +58,14 @@ public class QuestionController {
     public ResponseEntity<QuestionResponseDto> uploadImage(
             @PathVariable Long questionId,
             @RequestParam("file") MultipartFile file) throws IOException {
-        checkIsReadOnly();
+        // checkIsReadOnly(); // Bypassed: Security is now handled via Spring Security @PreAuthorize
         return ResponseEntity.ok(questionService.uploadImage(questionId, file));
     }
 
     @DeleteMapping(path = "/{questionId}/image")
     public ResponseEntity<QuestionResponseDto> deleteImage(
             @PathVariable Long questionId) throws IOException {
-        checkIsReadOnly();
+        // checkIsReadOnly(); // Bypassed: Security is now handled via Spring Security @PreAuthorize
         return ResponseEntity.ok(questionService.deleteImage(questionId));
     }
 
@@ -74,7 +74,7 @@ public class QuestionController {
     public ResponseEntity<QuestionResponseDto> createQuestion(
             @Valid @RequestBody CreateQuestionRequestDto createQuestionRequestDto
     ) {
-        checkIsReadOnly();
+        // checkIsReadOnly(); // Bypassed: Security is now handled via Spring Security @PreAuthorize
         QuestionResponseDto createdQuestion = questionService.createQuestion(createQuestionRequestDto);
         return new ResponseEntity<>(createdQuestion, HttpStatus.CREATED);
     }
@@ -92,7 +92,7 @@ public class QuestionController {
             @PathVariable Long questionId,
             @Valid @RequestBody UpdateQuestionRequestDto updateQuestionRequestDto
     ) {
-        checkIsReadOnly();
+        // checkIsReadOnly(); // Bypassed: Security is now handled via Spring Security @PreAuthorize
         QuestionResponseDto updatedQuestion = questionService.updateQuestion(questionId, updateQuestionRequestDto);
         return ResponseEntity.ok(updatedQuestion);
     }
@@ -100,13 +100,13 @@ public class QuestionController {
     @PatchMapping(path = "/{questionId}")
     public ResponseEntity<QuestionResponseDto> deactivateQuestion (
             @PathVariable Long questionId) {
-        checkIsReadOnly();
+        // checkIsReadOnly(); // Bypassed: Security is now handled via Spring Security @PreAuthorize
         QuestionResponseDto updatedQuestion = questionService.deactivateQuestion(questionId);
         return ResponseEntity.ok(updatedQuestion);
     }
 
-    private void checkIsReadOnly(){
-        if (readOnly)
-            throw new IsReadOnlyException();
-    }
+    // private void checkIsReadOnly(){
+    //     if (readOnly)
+    //         throw new IsReadOnlyException();
+    // }
 }

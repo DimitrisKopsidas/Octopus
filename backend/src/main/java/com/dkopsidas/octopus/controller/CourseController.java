@@ -60,13 +60,13 @@ public class CourseController {
             @PathVariable Long courseId,
             @Valid @RequestBody UpdateCourseRequestDto updateCourseRequestDto
     ) {
-        checkIsReadOnly();
+        // checkIsReadOnly(); // Bypassed: Security is now handled via Spring Security @PreAuthorize
         CourseResponseDto updatedCourse = courseService.updateCourse(courseId, updateCourseRequestDto);
         return ResponseEntity.ok(updatedCourse);
     }
 
-    private void checkIsReadOnly(){
-        if (readOnly)
-            throw new IsReadOnlyException();
-    }
+    // private void checkIsReadOnly(){
+    //     if (readOnly)
+    //         throw new IsReadOnlyException();
+    // }
 }

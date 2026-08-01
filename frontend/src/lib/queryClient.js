@@ -49,6 +49,19 @@ export const qk = {
     all: ['audit-logs'],
     list: (params) => ['audit-logs', 'list', params],
   },
+  crash: {
+    all: ['crash-logs'],
+    list: (params) => ['crash-logs', 'list', params],
+    stats: () => ['crash-logs', 'stats'],
+  },
+  inviteCodes: {
+    all: ['invite-codes'],
+    list: (params) => ['invite-codes', 'list', params],
+  },
+  users: {
+    all: ['users'],
+    list: (params) => ['users', 'list', params],
+  },
 }
 
 // Shared error mapper so every hook surfaces the same Greek message shape the

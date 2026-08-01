@@ -21,6 +21,9 @@ import ControlPanelReportsPage from './pages/ControlPanelReportsPage.jsx'
 import AdminCourse from './pages/AdminCourse.jsx'
 import AdminPanel from './pages/AdminPanel.jsx'
 import AuditLogsPage from './pages/AuditLogsPage.jsx'
+import CrashLogsPage from './pages/CrashLogsPage.jsx'
+import InviteCodesPage from './pages/InviteCodesPage.jsx'
+import UserManagementPage from './pages/UserManagementPage.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Profile from './pages/Profile.jsx'
@@ -56,6 +59,18 @@ createRoot(document.getElementById('root')).render(
           <Route
             path="/admin-panel/audits"
             element={<RequireRole allowedRoles={[ROLE.ADMIN]}><AuditLogsPage /></RequireRole>}
+          />
+          <Route
+            path="/admin-panel/crashes"
+            element={<RequireRole allowedRoles={[ROLE.ADMIN]}><CrashLogsPage /></RequireRole>}
+          />
+          <Route
+            path="/admin-panel/invite-codes"
+            element={<RequireRole allowedRoles={[ROLE.ADMIN]}><InviteCodesPage /></RequireRole>}
+          />
+          <Route
+            path="/admin-panel/users"
+            element={<RequireRole allowedRoles={[ROLE.ADMIN]}><UserManagementPage /></RequireRole>}
           />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />

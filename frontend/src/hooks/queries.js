@@ -8,7 +8,7 @@
 // - Errors are mapped to a plain Greek string via toMessage so ErrorState and
 //   the toast store keep working unchanged.
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, setAccessToken } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, setAccessToken } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -212,6 +212,22 @@ export function useLogout() {
   })
 }
 
+export function useUpdateYear() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (year) => authApi.updateYear(year),
+    onSuccess: (updatedUser) => {
+      qc.setQueryData(qk.auth.me(), updatedUser)
+    },
+  })
+}
+
+export function useUpdatePassword() {
+  return useMutation({
+    mutationFn: (payload) => authApi.updatePassword(payload),
+  })
+}
+
 // Course settings (set size + default timer). Writes the fresh course straight
 // into the cached list so the header updates without a refetch, then invalidates
 // settingsInfo because setQuestionCount is derived from it.
@@ -245,4 +261,111 @@ export function useAuditLogs(params = {}, fallbackError = 'Σφάλμα φόρτ
     error: q.error ? toMessage(q.error, fallbackError) : null,
   }
 }
+
+/* ------------------------------------------------------------------ crash */
+
+export function useCrashLogs(params = {}, fallbackError = 'Σφάλμα φόρτωσης Crash Logs') {
+  const q = useQuery({
+    queryKey: qk.crash.list(params),
+    queryFn: () => crashApi.getLogs(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    logs: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+export function useResolveCrashLog() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, resolved }) => crashApi.markAsResolved(id, resolved),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.crash.all })
+    },
+  })
+}
+
+/* ------------------------------------------------------------------ invite-codes */
+
+export function useInviteCodes(params = {}, fallbackError = 'Σφάλμα φόρτωσης Κωδικών Πρόσκλησης') {
+  const q = useQuery({
+    queryKey: qk.inviteCodes.list(params),
+    queryFn: () => inviteCodesApi.getCodes(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    codes: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+export function useGenerateInviteCode() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload) => inviteCodesApi.generateCode(payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.inviteCodes.all })
+    },
+  })
+}
+
+export function useDeleteInviteCode() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ targetRole, id }) => inviteCodesApi.deleteCode(targetRole, id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.inviteCodes.all })
+    },
+  })
+}
+
+/* ------------------------------------------------------------------ users */
+
+export function useUsersList(params = {}, fallbackError = 'Σφάλμα φόρτωσης λίστας χρηστών') {
+  const q = useQuery({
+    queryKey: qk.users.list(params),
+    queryFn: () => usersApi.getUsers(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    users: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+export function useUpdateUserRole() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ userId, role }) => usersApi.updateRole(userId, role),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.users.all })
+    },
+  })
+}
+
+export function useToggleUserStatus() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ userId, active }) => usersApi.toggleStatus(userId, active),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.users.all })
+    },
+  })
+}
+
+
+
 

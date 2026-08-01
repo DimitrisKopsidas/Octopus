@@ -172,6 +172,8 @@ export const authApi = {
     return unwrap(http.get('/auth/me'))
   },
   logout: () => unwrap(http.post('/auth/logout')),
+  updateYear: (year) => unwrap(http.patch('/users/me/year', { year })),
+  updatePassword: (payload) => unwrap(http.patch('/users/me/password', payload)),
   accessStudent: () => unwrap(http.get('/access/student')),
   accessHelper: () => unwrap(http.get('/access/helper')),
   accessAdmin: () => unwrap(http.get('/access/admin')),
@@ -182,4 +184,23 @@ export const auditApi = {
   createLog: (payload) => unwrap(http.post('/logs/audit', payload)),
 }
 
-export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi }
+export const crashApi = {
+  getLogs: (params) => unwrap(http.get('/crash-logs', { params })),
+  getStats: () => unwrap(http.get('/crash-logs/stats')),
+  createLog: (payload) => unwrap(http.post('/logs/crash', payload)),
+  markAsResolved: (id, resolved) => unwrap(http.patch(`/crash-logs/${id}/resolve`, { resolved })),
+}
+
+export const inviteCodesApi = {
+  getCodes: (params) => unwrap(http.get('/invite-codes', { params })),
+  generateCode: (payload) => unwrap(http.post('/invite-codes', payload)),
+  deleteCode: (targetRole, id) => unwrap(http.delete(`/invite-codes/${targetRole}/${id}`)),
+}
+
+export const usersApi = {
+  getUsers: (params) => unwrap(http.get('/users', { params })),
+  updateRole: (userId, role) => unwrap(http.patch(`/users/${userId}/role`, { role })),
+  toggleStatus: (userId, active) => unwrap(http.patch(`/users/${userId}/status`, { active })),
+}
+
+export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi }
