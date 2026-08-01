@@ -1,0 +1,35 @@
+{
+  "title": "Crash Logs & System Exceptions",
+  "subtitle": "Καταγραφή σφαλμάτων διακομιστή (500 Internal Errors), εξαιρέσεων και unhandled JavaScript crashes.",
+  "refresh": "Ανανέωση",
+  "filters": {
+    "exceptionPlaceholder": "Αναζήτηση Exception Class...",
+    "resolvedAll": "Όλη η Κατάσταση",
+    "resolvedUnresolved": "⚠️ Εκκρεμή (Unresolved)",
+    "resolvedDone": "✓ Επιλυμένα (Resolved)",
+    "rangeAll": "Όλες οι Ημερομηνίες",
+    "rangeToday": "Σήμερα",
+    "rangeWeek": "Τελευταία Εβδομάδα",
+    "rangeMonth": "Τελευταίος Μήνας"
+  },
+  "table": {
+    "headers": {
+      "timestamp": "Ημερομηνία & Ώρα",
+      "exception": "Exception Class & Message",
+      "request": "URI & Method",
+      "status": "Status",
+      "resolved": "Κατάσταση",
+      "actions": "Ενέργειες"
+    },
+    "viewDetails": "Προβολή Trace",
+    "resolve": "Επίλυση",
+    "unresolve": "Εκκρεμεί",
+    "empty": "Δεν βρέθηκαν crash logs με τα επιλεγμένα φίλτρα."
+  },
+  "modal": {
+    "title": "Λεπτομέρειες Crash & Stack Trace",
+    "markResolved": "✓ Σήμανση ως Επιλυμένο",
+    "markUnresolved": "⚠️ Σήμανση ως Εκκρεμές",
+    "close": "Κλείσιμο"
+  }
+}
