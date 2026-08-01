@@ -63,18 +63,19 @@ public class AuthService {
         }
 
         User user = userRepository.findById(principal.getId())
-                .filter(User::isActive)
-                .orElseThrow(() -> {
-                    eventPublisher.publishEvent(AuditEvent.failure(
-                            principal.getId(),
-                            principal.getUsername(),
-                            AuditAction.USER_LOGIN_FAILED,
-                            "AUTH",
-                            principal.getId().toString(),
-                            "Inactive user account"
-                    ));
-                    return new InvalidCredentialsException();
-                });
+                .orElseThrow(InvalidCredentialsException::new);
+
+        if (!user.isActive()) {
+            eventPublisher.publishEvent(AuditEvent.failure(
+                    principal.getId(),
+                    principal.getUsername(),
+                    AuditAction.USER_LOGIN_FAILED,
+                    "AUTH",
+                    principal.getId().toString(),
+                    "Inactive user account"
+            ));
+            throw new InactiveAccountException("Ο λογαριασμός σας έχει απενεργοποιηθεί. Επικοινωνήστε με τον διαχειριστή.");
+        }
         IssuedAccessToken accessToken = accessTokenService.issueFor(user);
         IssuedRefreshToken refreshToken = refreshTokenService.issueFor(user);
 

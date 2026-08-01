@@ -14,6 +14,9 @@ export default function PanelNavigation({ activeTab }) {
   const isReportsActive = currentPath === '/control-panel/reports'
   const isAdminPanelActive = currentPath === '/admin-panel'
   const isAuditsActive = currentPath === '/admin-panel/audits'
+  const isCrashesActive = currentPath === '/admin-panel/crashes'
+  const isInviteCodesActive = currentPath === '/admin-panel/invite-codes'
+  const isUsersActive = currentPath === '/admin-panel/users'
 
   return (
     <div className="mb-8 border-b border-slate-200 dark:border-slate-800">
@@ -70,6 +73,34 @@ export default function PanelNavigation({ activeTab }) {
             </Link>
           )}
 
+          {/* Users & Roles Tab (Admins only) */}
+          {isAdmin && (
+            <Link
+              to="/admin-panel/users"
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                isUsersActive
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              <span>👥 Χρήστες & Ρόλοι</span>
+            </Link>
+          )}
+
+          {/* Invite Codes Tab (Admins only) */}
+          {isAdmin && (
+            <Link
+              to="/admin-panel/invite-codes"
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                isInviteCodesActive
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
+                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              <span>🔑 Invite Codes</span>
+            </Link>
+          )}
+
           {/* Audit Logs Tab (Admins only) */}
           {isAdmin && (
             <Link
@@ -81,6 +112,20 @@ export default function PanelNavigation({ activeTab }) {
               }`}
             >
               <span>📜 Audit Logs</span>
+            </Link>
+          )}
+
+          {/* Crash Logs Tab (Admins only) */}
+          {isAdmin && (
+            <Link
+              to="/admin-panel/crashes"
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                isCrashesActive
+                  ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/25'
+                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              <span>💥 Crash Logs</span>
             </Link>
           )}
         </nav>
