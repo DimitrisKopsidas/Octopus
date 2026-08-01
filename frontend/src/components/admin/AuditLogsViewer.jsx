@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuditLogs } from '../../hooks/queries'
 import Skeleton from '../ui/Skeleton'
 import ErrorState from '../ui/ErrorState'
+import t from '../../content/auditLogs.json'
 
 const ACTION_OPTIONS = [
   { value: '', label: 'Όλες οι ενέργειες' },
@@ -9,7 +10,11 @@ const ACTION_OPTIONS = [
   { value: 'USER_LOGIN_FAILED', label: 'USER_LOGIN_FAILED' },
   { value: 'USER_LOGOUT', label: 'USER_LOGOUT' },
   { value: 'USER_REGISTERED', label: 'USER_REGISTERED' },
+  { value: 'USER_REGISTER_FAILED', label: 'USER_REGISTER_FAILED' },
+  { value: 'USER_ROLE_CHANGED', label: 'USER_ROLE_CHANGED' },
   { value: 'USER_DEACTIVATED', label: 'USER_DEACTIVATED' },
+  { value: 'INVITE_CODE_GENERATED', label: 'INVITE_CODE_GENERATED' },
+  { value: 'INVITE_CODE_DELETED', label: 'INVITE_CODE_DELETED' },
   { value: 'TOKEN_REFRESHED', label: 'TOKEN_REFRESHED' },
   { value: 'COURSE_UPDATED', label: 'COURSE_UPDATED' },
   { value: 'QUESTION_CREATED', label: 'QUESTION_CREATED' },
@@ -44,6 +49,23 @@ export default function AuditLogsViewer() {
   const [selectedStatus, setSelectedStatus] = useState('')
   const [selectedDateRange, setSelectedDateRange] = useState('')
   const [selectedLog, setSelectedLog] = useState(null)
+
+  // Body scroll lock & ESC key handling for detail modal
+  useEffect(() => {
+    if (selectedLog) {
+      document.body.classList.add('overflow-hidden')
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') setSelectedLog(null)
+      }
+      window.addEventListener('keydown', handleKeyDown)
+      return () => {
+        document.body.classList.remove('overflow-hidden')
+        window.removeEventListener('keydown', handleKeyDown)
+      }
+    } else {
+      document.body.classList.remove('overflow-hidden')
+    }
+  }, [selectedLog])
 
   const queryParams = {
     page,
@@ -90,10 +112,10 @@ export default function AuditLogsViewer() {
             <span className="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-900/60 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm shadow-sm">
               📜
             </span>
-            Audit Logs System Trail
+            {t.title}
           </h2>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-            Πλήρες αρχείο ενεργειών, συνδέσεων και μεταβολών στο σύστημα ({totalElements} εγγραφές)
+            {t.subtitle} ({totalElements} εγγραφές)
           </p>
         </div>
 
@@ -105,7 +127,7 @@ export default function AuditLogsViewer() {
           <svg className={`w-3.5 h-3.5 mr-1.5 ${isFetching ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          Ανανέωση
+          {t.refresh}
         </button>
       </div>
 
@@ -115,168 +137,186 @@ export default function AuditLogsViewer() {
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
             Τύπος Ενέργειας (Action)
           </label>
-          <select
-            value={selectedAction}
-            onChange={(e) => {
-              setSelectedAction(e.target.value)
-              setPage(0)
-            }}
-            className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
-          >
-            {ACTION_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={selectedAction}
+              onChange={(e) => {
+                setSelectedAction(e.target.value)
+                setPage(0)
+              }}
+              className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+            >
+              {ACTION_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-            Κατάσταση (Status)
+            Status
           </label>
-          <select
-            value={selectedStatus}
-            onChange={(e) => {
-              setSelectedStatus(e.target.value)
-              setPage(0)
-            }}
-            className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
-          >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={selectedStatus}
+              onChange={(e) => {
+                setSelectedStatus(e.target.value)
+                setPage(0)
+              }}
+              className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+            >
+              {STATUS_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-            Χρονικό Διάστημα (Date Range)
+            Χρονικό Εύρος
           </label>
-          <select
-            value={selectedDateRange}
-            onChange={(e) => {
-              setSelectedDateRange(e.target.value)
-              setPage(0)
-            }}
-            className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
-          >
-            {DATE_RANGE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={selectedDateRange}
+              onChange={(e) => {
+                setSelectedDateRange(e.target.value)
+                setPage(0)
+              }}
+              className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+            >
+              {DATE_RANGE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
             Εγγραφές ανά σελίδα
           </label>
-          <select
-            value={pageSize}
-            onChange={(e) => {
-              setPageSize(Number(e.target.value))
-              setPage(0)
-            }}
-            className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500"
-          >
-            {SIZE_OPTIONS.map((sz) => (
-              <option key={sz} value={sz}>
-                {sz} ανά σελίδα
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value))
+                setPage(0)
+              }}
+              className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+            >
+              {SIZE_OPTIONS.map((size) => (
+                <option key={size} value={size}>
+                  {size} εγγραφές
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Error state */}
+      {error && <ErrorState message={error} onRetry={refetch} retryLabel={t.refresh} />}
 
       {/* Loading state */}
       {isPending && (
         <div className="space-y-3 py-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full rounded-xl" />
-          ))}
+          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-10 w-full rounded-xl" />
         </div>
       )}
 
-      {/* Error state */}
-      {error && !isPending && (
-        <ErrorState message={error} onRetry={() => refetch()} retryLabel="Δοκίμασε ξανά" />
-      )}
-
-      {/* Empty state */}
-      {!isPending && !error && logs.length === 0 && (
-        <div className="text-center py-10 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Δεν βρέθηκαν audit logs για τα επιλεγμένα φίλτρα.
-          </p>
-        </div>
-      )}
-
-      {/* Table */}
-      {!isPending && !error && logs.length > 0 && (
+      {/* Logs Table */}
+      {!isPending && !error && (
         <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-          <table className="w-full text-left text-xs text-slate-600 dark:text-slate-300">
-            <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
+          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+            <thead className="bg-slate-50 dark:bg-slate-800/60 uppercase text-[10px] tracking-wider text-slate-500 dark:text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="py-3 px-4">Ημερομηνία</th>
-                <th className="py-3 px-4">Ενέργεια</th>
-                <th className="py-3 px-4">Χρήστης (Actor)</th>
-                <th className="py-3 px-4">Πόρος (Resource)</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">IP Address</th>
-                <th className="py-3 px-4 text-right">Λεπτομέρειες</th>
+                <th className="px-4 py-3">{t.table.headers.timestamp}</th>
+                <th className="px-4 py-3">{t.table.headers.action}</th>
+                <th className="px-4 py-3">{t.table.headers.actor}</th>
+                <th className="px-4 py-3">{t.table.headers.status}</th>
+                <th className="px-4 py-3">{t.table.headers.ip}</th>
+                <th className="px-4 py-3 text-right">{t.table.headers.details}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-              {logs.map((log) => (
-                <tr
-                  key={log.id}
-                  className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
-                >
-                  <td className="py-3 px-4 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                    {formatTimestamp(log.timestamp)}
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold border ${getActionBadgeColor(log.action, log.status)}`}>
-                      {log.action}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
-                    {log.actorUsername || (log.actorId ? log.actorId.substring(0, 8) + '…' : '—')}
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap text-slate-500 dark:text-slate-400">
-                    {log.resourceType ? `${log.resourceType} ${log.resourceId ? `#${log.resourceId}` : ''}` : '—'}
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${log.status === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
-                      {log.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                    {log.ipAddress || '—'}
-                  </td>
-                  <td className="py-3 px-4 text-right whitespace-nowrap">
-                    <button
-                      onClick={() => setSelectedLog(log)}
-                      className="text-brand-600 dark:text-brand-400 hover:underline font-medium"
-                    >
-                      Προβολή
-                    </button>
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800/60">
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                    {t.table.empty}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                logs.map((log) => (
+                  <tr key={log.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                      {formatTimestamp(log.timestamp)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getActionBadgeColor(log.action, log.status)}`}>
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap font-semibold text-slate-900 dark:text-slate-100">
+                      @{log.actorUsername || 'system'}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600'}`}>
+                        {log.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                      {log.ipAddress || '—'}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <button
+                        onClick={() => setSelectedLog(log)}
+                        className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-[11px] transition-colors"
+                      >
+                        {t.table.viewDetails}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination Footer */}
       {!isPending && !error && totalPages > 1 && (
-        <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-xs">
-          <span className="text-slate-500 dark:text-slate-400">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 text-xs text-slate-500 dark:text-slate-400">
+          <span>
             Σελίδα {currentPage + 1} από {totalPages} (Σύνολο {totalElements} εγγραφές)
           </span>
           <div className="flex gap-2">
@@ -298,17 +338,23 @@ export default function AuditLogsViewer() {
         </div>
       )}
 
-      {/* Detail Modal */}
+      {/* Detail Modal with Backdrop Lock & Esc Dismiss */}
       {selectedLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedLog(null)
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in"
+        >
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 animate-scale-up">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                Λεπτομέρειες Audit Log
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span>📜</span>
+                <span>{t.modal.title}</span>
               </h3>
               <button
                 onClick={() => setSelectedLog(null)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg leading-none"
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg leading-none p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
                 ✕
               </button>
@@ -335,9 +381,9 @@ export default function AuditLogsViewer() {
             <div className="pt-2 text-right">
               <button
                 onClick={() => setSelectedLog(null)}
-                className="px-4 py-2 text-xs font-semibold bg-brand-500 text-white rounded-xl hover:bg-brand-600 transition-colors"
+                className="px-4 py-2 text-xs font-semibold bg-brand-600 text-white rounded-xl hover:bg-brand-700 transition-colors shadow-md shadow-brand-600/20"
               >
-                Κλείσιμο
+                {t.modal.close}
               </button>
             </div>
           </div>

@@ -111,7 +111,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/refresh",
                                 "/api/v1/auth/logout",
-                                "/api/v1/logs/audit"
+                                "/api/v1/logs/audit",
+                                "/api/v1/logs/crash"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/auth/csrf",

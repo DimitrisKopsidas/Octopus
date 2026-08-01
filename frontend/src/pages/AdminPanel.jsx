@@ -121,7 +121,7 @@ export default function AdminPanel() {
               {t.cards.system.title}
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
-              {t.cards.system.descriptionPrefix}{user?.username}) έχει πλήρη δικαιώματα ADMIN στο σύστημα.
+              {t.cards.system.descriptionPrefix}{user?.username}) έχει πλήρη δικαιώματα στο σύστημα.
             </p>
           </div>
 
