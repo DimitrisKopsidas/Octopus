@@ -8,11 +8,13 @@ import com.dkopsidas.octopus.mapper.AuditLogMapper;
 import com.dkopsidas.octopus.repository.AuditLogRepository;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
 import com.dkopsidas.octopus.service.AuditLogService;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -20,6 +22,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -98,8 +102,30 @@ public class AuditLogServiceImpl implements AuditLogService {
             }
         }
 
-        String searchStatus = (status != null && !status.isBlank()) ? status : null;
-        return auditLogRepository.searchLogs(actorId, action, searchStatus, effectiveFrom, toTimestamp, pageable)
+        final Instant filterFrom = effectiveFrom;
+        final String searchStatus = (status != null && !status.isBlank()) ? status : null;
+
+        Specification<AuditLog> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (actorId != null) {
+                predicates.add(cb.equal(root.get("actorId"), actorId));
+            }
+            if (action != null) {
+                predicates.add(cb.equal(root.get("action"), action));
+            }
+            if (searchStatus != null) {
+                predicates.add(cb.equal(cb.lower(root.get("status")), searchStatus.toLowerCase()));
+            }
+            if (filterFrom != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("timestamp"), filterFrom));
+            }
+            if (toTimestamp != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("timestamp"), toTimestamp));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return auditLogRepository.findAll(spec, pageable)
                 .map(auditLogMapper::toDto);
     }
 

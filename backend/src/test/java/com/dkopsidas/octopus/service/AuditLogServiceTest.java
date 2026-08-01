@@ -1,7 +1,6 @@
 package com.dkopsidas.octopus.service;
 
 import com.dkopsidas.octopus.domain.dto.AuditLogResponseDto;
-import com.dkopsidas.octopus.domain.dto.CreateAuditLogRequestDto;
 import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.domain.entity.AuditLog;
 import com.dkopsidas.octopus.mapper.AuditLogMapper;
@@ -18,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
 import java.util.List;
@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -103,7 +104,7 @@ class AuditLogServiceTest {
         auditLog.setId(UUID.randomUUID());
 
         Page<AuditLog> page = new PageImpl<>(List.of(auditLog));
-        when(auditLogRepository.searchLogs(eq(actorId), eq(AuditAction.USER_LOGIN_SUCCESS), eq("SUCCESS"), any(), any(), eq(pageable)))
+        when(auditLogRepository.findAll(any(Specification.class), eq(pageable)))
                 .thenReturn(page);
 
         Page<AuditLogResponseDto> result = auditLogService.getAuditLogs(
