@@ -117,7 +117,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/auth/csrf",
                                 "/api/v1/healthz",
-                                "/images/**"
+                                "/images/**",
+                                "/api/v1/courses/**",
+                                "/api/v1/questions/**",
+                                "/api/v1/bundles/**"
                         ).permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
