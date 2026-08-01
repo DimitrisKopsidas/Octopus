@@ -82,10 +82,10 @@ function UserMenu() {
               to="/profile"
               onClick={() => setOpen(false)}
               role="menuitem"
-              className="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+              className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
-              <span className="flex items-center gap-2.5">
-                <span>👤</span>
+              <span className="flex items-center gap-3">
+                <span className="w-5 text-center">👤</span>
                 <span>Το προφίλ μου</span>
               </span>
             </Link>
@@ -94,10 +94,10 @@ function UserMenu() {
               to="/favorites"
               onClick={() => setOpen(false)}
               role="menuitem"
-              className="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+              className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
-              <span className="flex items-center gap-2.5">
-                <span>❤️</span>
+              <span className="flex items-center gap-3">
+                <span className="w-5 text-center">❤️</span>
                 <span>Αγαπημένα</span>
               </span>
             </Link>
@@ -106,10 +106,10 @@ function UserMenu() {
               to="/quizzes"
               onClick={() => setOpen(false)}
               role="menuitem"
-              className="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+              className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
-              <span className="flex items-center gap-2.5">
-                <span>📝</span>
+              <span className="flex items-center gap-3">
+                <span className="w-5 text-center">📝</span>
                 <span>Τα Κουίζ μου</span>
               </span>
             </Link>
@@ -118,10 +118,10 @@ function UserMenu() {
               to="/settings"
               onClick={() => setOpen(false)}
               role="menuitem"
-              className="flex items-center justify-between px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+              className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
-              <span className="flex items-center gap-2.5">
-                <span>⚙️</span>
+              <span className="flex items-center gap-3">
+                <span className="w-5 text-center">⚙️</span>
                 <span>Ρυθμίσεις</span>
               </span>
             </Link>
@@ -131,10 +131,10 @@ function UserMenu() {
                 to="/control-panel"
                 onClick={() => setOpen(false)}
                 role="menuitem"
-                className="flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors border-t border-slate-100 dark:border-slate-800"
+                className="flex items-center justify-between px-5 py-2.5 text-sm font-semibold text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors border-t border-slate-100 dark:border-slate-800"
               >
-                <span className="flex items-center gap-2.5">
-                  <span>🛠️</span>
+                <span className="flex items-center gap-3">
+                  <span className="w-5 text-center">🛠️</span>
                   <span>Πίνακας Ελέγχου</span>
                 </span>
               </Link>
@@ -145,10 +145,10 @@ function UserMenu() {
                 to="/admin-panel"
                 onClick={() => setOpen(false)}
                 role="menuitem"
-                className="flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
+                className="flex items-center justify-between px-5 py-2.5 text-sm font-semibold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
               >
-                <span className="flex items-center gap-2.5">
-                  <span>👑</span>
+                <span className="flex items-center gap-3">
+                  <span className="w-5 text-center">👑</span>
                   <span>Πίνακας Admin</span>
                 </span>
               </Link>
