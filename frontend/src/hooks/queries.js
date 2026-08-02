@@ -179,7 +179,9 @@ export function useMe() {
   })
   return {
     user: q.data ?? null,
-    isLoading: q.isPending,
+    isLoading: Boolean(q.isPending || q.isLoading),
+    isPending: Boolean(q.isPending),
+    isFetching: Boolean(q.isFetching),
     isLoggedIn: q.data != null,
   }
 }

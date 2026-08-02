@@ -30,9 +30,46 @@ export default function Settings() {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto py-8 space-y-6">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
+      <div className="max-w-3xl mx-auto py-8 space-y-8 animate-pulse">
+        {/* Title */}
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-44 rounded-lg" />
+          <Skeleton className="h-4 w-72 rounded-md" />
+        </div>
+
+        {/* Section 1: Study Year */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+          <Skeleton className="h-6 w-40 rounded-lg pb-3 border-b border-slate-100 dark:border-slate-800" />
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-10 w-full sm:w-64 rounded-xl" />
+            <Skeleton className="h-3 w-64" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-xl" />
+        </div>
+
+        {/* Section 2: Password */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+          <Skeleton className="h-6 w-48 rounded-lg pb-3 border-b border-slate-100 dark:border-slate-800" />
+          <div className="space-y-3 max-w-md">
+            <div className="space-y-1"><Skeleton className="h-3 w-28" /><Skeleton className="h-10 w-full rounded-xl" /></div>
+            <div className="space-y-1"><Skeleton className="h-3 w-28" /><Skeleton className="h-10 w-full rounded-xl" /></div>
+            <div className="space-y-1"><Skeleton className="h-3 w-32" /><Skeleton className="h-10 w-full rounded-xl" /></div>
+          </div>
+          <Skeleton className="h-10 w-36 rounded-xl" />
+        </div>
+
+        {/* Section 3: Theme */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+          <Skeleton className="h-6 w-40 rounded-lg pb-3 border-b border-slate-100 dark:border-slate-800" />
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-48" />
+            </div>
+            <Skeleton className="h-9 w-24 rounded-xl" />
+          </div>
+        </div>
       </div>
     )
   }

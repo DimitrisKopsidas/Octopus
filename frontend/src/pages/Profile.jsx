@@ -24,9 +24,41 @@ function Profile() {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto py-8 space-y-6">
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
+      <div className="max-w-3xl mx-auto py-8 space-y-6 animate-pulse">
+        {/* Header Card Skeleton */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6">
+          <Skeleton className="w-20 h-20 rounded-full shrink-0" />
+          <div className="text-center md:text-left flex-1 space-y-2.5 w-full">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <Skeleton className="h-7 w-44 rounded-lg" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-28 rounded-md mx-auto md:mx-0" />
+          </div>
+          <Skeleton className="h-9 w-28 rounded-xl shrink-0" />
+        </div>
+
+        {/* Account Info Card Skeleton */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+          <Skeleton className="h-6 w-40 rounded-lg pb-3 border-b border-slate-100 dark:border-slate-800" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5"><Skeleton className="h-3 w-24" /><Skeleton className="h-5 w-40" /></div>
+            <div className="space-y-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-32" /></div>
+            <div className="space-y-1.5"><Skeleton className="h-3 w-16" /><Skeleton className="h-5 w-28" /></div>
+            <div className="space-y-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-36" /></div>
+            <div className="space-y-1.5"><Skeleton className="h-3 w-24" /><Skeleton className="h-5 w-28" /></div>
+          </div>
+        </div>
+
+        {/* RBAC Card Skeleton */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+          <Skeleton className="h-6 w-48 rounded-lg" />
+          <div className="flex flex-wrap gap-3">
+            <Skeleton className="h-8 w-28 rounded-lg" />
+            <Skeleton className="h-8 w-28 rounded-lg" />
+            <Skeleton className="h-8 w-28 rounded-lg" />
+          </div>
+        </div>
       </div>
     )
   }
