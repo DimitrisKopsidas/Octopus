@@ -18,7 +18,7 @@ const navLinkClass = ({ isActive }) =>
 
 function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user } = useMe()
+  const { user, isLoading } = useMe()
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
@@ -45,7 +45,11 @@ function Layout() {
 
           {/* Right: User Menu or Login + Mobile Toggle */}
           <div className="flex items-center gap-3 shrink-0">
-            {user ? (
+            {isLoading ? (
+              <div className="w-8 h-8 rounded-full bg-brand-800/80 animate-pulse border border-brand-700/50 flex items-center justify-center">
+                <div className="w-4 h-4 rounded-full bg-brand-600/50" />
+              </div>
+            ) : user ? (
               <UserMenu />
             ) : (
               <NavLink

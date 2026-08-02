@@ -18,7 +18,7 @@ const mobileNavLinkClass = ({ isActive }) =>
 // while open so the host layout stays free of that concern.
 function MobileNavDrawer({ open, onClose }) {
   const navigate = useNavigate()
-  const { user } = useMe()
+  const { user, isLoading } = useMe()
   const logoutMutation = useLogout()
   const showAdmin = canManageContent(user)
 
@@ -67,7 +67,15 @@ function MobileNavDrawer({ open, onClose }) {
         </div>
 
         <div className="border-t border-brand-800 pt-4">
-          {user ? (
+          {isLoading ? (
+            <div className="flex items-center gap-3 px-2 py-2 animate-pulse">
+              <div className="w-9 h-9 rounded-full bg-brand-800/80 shrink-0" />
+              <div className="space-y-1.5 flex-1">
+                <div className="h-3.5 w-24 bg-brand-800/80 rounded" />
+                <div className="h-2.5 w-16 bg-brand-800/60 rounded" />
+              </div>
+            </div>
+          ) : user ? (
             <div className="space-y-3">
               <div className="flex items-center gap-3 px-2">
                 <span className="w-9 h-9 rounded-full bg-brand-600 text-white text-sm font-semibold flex items-center justify-center shrink-0">
