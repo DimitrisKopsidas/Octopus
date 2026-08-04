@@ -1,7 +1,7 @@
 package com.dkopsidas.octopus.service.impl;
 
-import com.dkopsidas.octopus.domain.entity.HelperCode;
-import com.dkopsidas.octopus.repository.HelperCodeRepository;
+import com.dkopsidas.octopus.domain.entity.UserCode;
+import com.dkopsidas.octopus.repository.UserCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +13,9 @@ import java.util.UUID;
  */
 @RequiredArgsConstructor
 @Service
-public class HelperCodeService {
+public class UserCodeService {
 
-    private final HelperCodeRepository helperCodeRepository;
+    private final UserCodeRepository userCodeRepository;
 
     /**
      * @return true if the request carried a code at all. Used to tell
@@ -40,7 +40,7 @@ public class HelperCodeService {
         if (!isPresent(code)) {
             return false;
         }
-        return helperCodeRepository.claim(code.trim(), Instant.now()) == 1;
+        return userCodeRepository.claim(code.trim(), Instant.now()) == 1;
     }
 
     /**
@@ -49,8 +49,8 @@ public class HelperCodeService {
      * has to happen first so two concurrent registrations cannot both win it.
      */
     public void assignTo(String code, UUID userId) {
-        helperCodeRepository.findByCode(code.trim())
-                .ifPresent(helperCode -> helperCode.setUsedBy(userId));
+        userCodeRepository.findByCode(code.trim())
+                .ifPresent(userCode -> userCode.setUsedBy(userId));
     }
 
     /**
@@ -58,11 +58,11 @@ public class HelperCodeService {
      * existing codes — including consumed ones — are left untouched.
      */
     public void createIfAbsent(String code) {
-        if (helperCodeRepository.existsByCode(code)) {
+        if (userCodeRepository.existsByCode(code)) {
             return;
         }
-        HelperCode helperCode = new HelperCode();
-        helperCode.setCode(code);
-        helperCodeRepository.save(helperCode);
+        UserCode userCode = new UserCode();
+        userCode.setCode(code);
+        userCodeRepository.save(userCode);
     }
 }

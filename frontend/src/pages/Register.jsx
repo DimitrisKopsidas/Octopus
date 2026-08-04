@@ -25,7 +25,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [year, setYear] = useState('1')
   const [role, setRole] = useState('student')
-  const [helperCode, setHelperCode] = useState('')
+  const [userCode, setHelperCode] = useState('')
   const [adminCode, setAdminCode] = useState('')
   const [error, setError] = useState(null)
 
@@ -38,7 +38,7 @@ function Register() {
       setError(t.errors.requiredAll)
       return
     }
-    if (role === 'helper' && !helperCode.trim()) {
+    if (role === 'helper' && !userCode.trim()) {
       setError(t.errors.requiredHelperCode)
       return
     }
@@ -53,7 +53,7 @@ function Register() {
         username: username.trim(),
         password,
         year: year ? Number(year) : 1,
-        helperCode: role === 'helper' ? helperCode.trim() : undefined,
+        userCode: role === 'helper' ? userCode.trim() : undefined,
         adminCode: role === 'admin' ? adminCode.trim() : undefined,
       })
       toast.success(t.toast.created)
@@ -184,15 +184,15 @@ function Register() {
           {role === 'helper' && (
             <div className="rounded-lg bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-900 p-3.5 animate-fade-in">
               <label className="block text-sm font-medium text-brand-900 dark:text-brand-200 mb-1.5">
-                {t.helperCode.label}
+                {t.userCode.label}
               </label>
               <input
                 type="text"
-                value={helperCode}
+                value={userCode}
                 onChange={(e) =>
                   setHelperCode(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))
                 }
-                placeholder={t.placeholders.helperCode}
+                placeholder={t.placeholders.userCode}
                 autoComplete="off"
                 className="w-full px-3 py-2 rounded-md bg-white dark:bg-slate-950 border border-brand-200 dark:border-brand-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 font-mono tracking-wide focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
