@@ -20,10 +20,10 @@ import java.util.UUID;
 @ToString(exclude = "code")
 @Entity
 @Table(
-        name = "helper_codes",
-        uniqueConstraints = @UniqueConstraint(name = "uk_helper_codes_code", columnNames = "code")
+        name = "user_codes",
+        uniqueConstraints = @UniqueConstraint(name = "uk_user_codes_code", columnNames = "code")
 )
-public class HelperCode {
+public class UserCode {
 
     @Id
     @GeneratedValue
@@ -33,8 +33,8 @@ public class HelperCode {
     private String code;
 
     /** Null while the code is unused. Set atomically the moment it is claimed. */
-    @Column(name = "used_at")
-    private Instant usedAt;
+    @Column(name = "used")
+    private Instant used;
 
     /** Which account claimed it. Filled in right after the user row is created. */
     @Column(name = "used_by")
@@ -49,6 +49,6 @@ public class HelperCode {
     }
 
     public boolean isUsed() {
-        return usedAt != null;
+        return used != null;
     }
 }

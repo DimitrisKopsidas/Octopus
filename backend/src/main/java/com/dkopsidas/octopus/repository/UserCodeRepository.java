@@ -1,6 +1,6 @@
 package com.dkopsidas.octopus.repository;
 
-import com.dkopsidas.octopus.domain.entity.HelperCode;
+import com.dkopsidas.octopus.domain.entity.UserCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,9 +9,9 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.util.Optional;
 
-public interface HelperCodeRepository extends JpaRepository<HelperCode, Long> {
+public interface UserCodeRepository extends JpaRepository<UserCode, Long> {
 
-    Optional<HelperCode> findByCode(String code);
+    Optional<UserCode> findByCode(String code);
 
     boolean existsByCode(String code);
 
@@ -25,10 +25,10 @@ public interface HelperCodeRepository extends JpaRepository<HelperCode, Long> {
      */
     @Modifying(clearAutomatically = true)
     @Query("""
-            UPDATE HelperCode helperCode
-               SET helperCode.usedAt = :now
-             WHERE helperCode.code = :code
-               AND helperCode.usedAt IS NULL
+            UPDATE UserCode userCode
+               SET userCode.used = :now
+             WHERE userCode.code = :code
+               AND userCode.used IS NULL
             """)
     int claim(@Param("code") String code, @Param("now") Instant now);
 }

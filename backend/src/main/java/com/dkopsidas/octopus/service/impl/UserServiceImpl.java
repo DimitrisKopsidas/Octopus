@@ -7,7 +7,7 @@ import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.domain.entity.UserRole;
 import com.dkopsidas.octopus.exception.InvalidAdminCodeException;
 import com.dkopsidas.octopus.exception.InvalidCredentialsException;
-import com.dkopsidas.octopus.exception.InvalidHelperCodeException;
+import com.dkopsidas.octopus.exception.InvalidUserCodeException;
 import com.dkopsidas.octopus.exception.UserAlreadyExistsException;
 import com.dkopsidas.octopus.exception.UserNotFoundException;
 import com.dkopsidas.octopus.mapper.UserMapper;
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final HelperCodeService helperCodeService;
+    private final UserCodeService userCodeService;
     private final AdminCodeService adminCodeService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
         boolean wantsAdmin = adminCodeService.isPresent(adminCode);
 
         String helperCode = createRequest.helperCode();
-        boolean wantsHelper = helperCodeService.isPresent(helperCode);
+        boolean wantsHelper = userCodeService.isPresent(helperCode);
 
         if (wantsAdmin && !adminCodeService.claim(adminCode)) {
             eventPublisher.publishEvent(AuditEvent.failure(
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidAdminCodeException();
         }
 
-        if (wantsHelper && !helperCodeService.claim(helperCode)) {
+        if (wantsHelper && !userCodeService.claim(helperCode)) {
             eventPublisher.publishEvent(AuditEvent.failure(
                     null,
                     username,
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
                     null,
                     "Invalid or spent helper code"
             ));
-            throw new InvalidHelperCodeException();
+            throw new InvalidUserCodeException();
         }
 
         UserRole role = wantsAdmin ? UserRole.ADMIN : (wantsHelper ? UserRole.HELPER : UserRole.STUDENT);
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
         if (wantsAdmin) {
             adminCodeService.assignTo(adminCode, savedUser.getId());
         } else if (wantsHelper) {
-            helperCodeService.assignTo(helperCode, savedUser.getId());
+            userCodeService.assignTo(helperCode, savedUser.getId());
         }
 
         eventPublisher.publishEvent(AuditEvent.success(
