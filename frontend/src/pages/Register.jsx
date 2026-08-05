@@ -7,11 +7,14 @@ import { toast } from '../store/toastStore'
 import logo from '../assets/favicon.png'
 import t from '../content/register.json'
 
-function translateServerError(err) {
+// Helper and admin codes now live in one table, so the server no longer says
+// which kind failed. The role the user picked tells us which wording to show.
+function translateServerError(err, role) {
   const raw = extractErrorMessage(err, '')
   if (/already exists/i.test(raw)) return t.errors.usernameTaken
-  if (/helper code/i.test(raw)) return t.errors.helperCodeInvalid
-  if (/admin code/i.test(raw)) return t.errors.adminCodeInvalid
+  if (/user code/i.test(raw)) {
+    return role === 'admin' ? t.errors.adminCodeInvalid : t.errors.helperCodeInvalid
+  }
   return raw || t.errors.serverFallback
 }
 
@@ -25,7 +28,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [year, setYear] = useState('1')
   const [role, setRole] = useState('student')
-  const [userCode, setHelperCode] = useState('')
+  const [helperCode, setHelperCode] = useState('')
   const [adminCode, setAdminCode] = useState('')
   const [error, setError] = useState(null)
 
@@ -38,7 +41,7 @@ function Register() {
       setError(t.errors.requiredAll)
       return
     }
-    if (role === 'helper' && !userCode.trim()) {
+    if (role === 'helper' && !helperCode.trim()) {
       setError(t.errors.requiredHelperCode)
       return
     }
@@ -53,13 +56,19 @@ function Register() {
         username: username.trim(),
         password,
         year: year ? Number(year) : 1,
-        userCode: role === 'helper' ? userCode.trim() : undefined,
-        adminCode: role === 'admin' ? adminCode.trim() : undefined,
+        // Both boxes feed the same field: the code row on the server decides
+        // whether it grants HELPER or ADMIN.
+        userCode:
+          role === 'helper'
+            ? helperCode.trim()
+            : role === 'admin'
+              ? adminCode.trim()
+              : undefined,
       })
       toast.success(t.toast.created)
       navigate('/login', { replace: true })
     } catch (err) {
-      setError(translateServerError(err))
+      setError(translateServerError(err, role))
     }
   }
 
@@ -184,15 +193,15 @@ function Register() {
           {role === 'helper' && (
             <div className="rounded-lg bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-900 p-3.5 animate-fade-in">
               <label className="block text-sm font-medium text-brand-900 dark:text-brand-200 mb-1.5">
-                {t.userCode.label}
+                {t.helperCode.label}
               </label>
               <input
                 type="text"
-                value={userCode}
+                value={helperCode}
                 onChange={(e) =>
                   setHelperCode(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))
                 }
-                placeholder={t.placeholders.userCode}
+                placeholder={t.placeholders.helperCode}
                 autoComplete="off"
                 className="w-full px-3 py-2 rounded-md bg-white dark:bg-slate-950 border border-brand-200 dark:border-brand-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 font-mono tracking-wide focus:outline-none focus:ring-2 focus:ring-brand-500"
               />

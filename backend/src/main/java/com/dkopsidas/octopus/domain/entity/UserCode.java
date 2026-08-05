@@ -9,10 +9,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * A single-use invite code that upgrades a registration from STUDENT to HELPER.
+ * A single-use invite code that upgrades a registration above STUDENT.
  * <p>
- * Availability is derived from {@code usedAt} rather than a separate boolean
- * flag: one field cannot contradict itself. {@code usedAt == null} means the
+ * The code itself carries the role it grants, so HELPER and ADMIN invites live
+ * in one table instead of two parallel ones: the claim path is identical for
+ * both and only the granted role differs.
+ * <p>
+ * Availability is derived from {@code used} rather than a separate boolean
+ * flag: one field cannot contradict itself. {@code used == null} means the
  * code is still available, and nothing else needs to be kept in sync.
  */
 @Getter
@@ -31,6 +35,14 @@ public class UserCode {
 
     @Column(name = "code", nullable = false, length = 100)
     private String code;
+
+    /**
+     * The role a successful claim grants. STUDENT is never stored here — a
+     * student registration carries no code at all.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private UserRole role;
 
     /** Null while the code is unused. Set atomically the moment it is claimed. */
     @Column(name = "used")

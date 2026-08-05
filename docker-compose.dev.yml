@@ -22,7 +22,6 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      USER_CODES: ${USER_CODES}
       AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
       AUTH_JWT_ISSUER: ${AUTH_JWT_ISSUER:-octopus-api}
       AUTH_JWT_AUDIENCE: ${AUTH_JWT_AUDIENCE:-octopus-browser}

@@ -194,7 +194,7 @@ export const crashApi = {
 export const inviteCodesApi = {
   getCodes: (params) => unwrap(http.get('/invite-codes', { params })),
   generateCode: (payload) => unwrap(http.post('/invite-codes', payload)),
-  deleteCode: (targetRole, id) => unwrap(http.delete(`/invite-codes/${targetRole}/${id}`)),
+  deleteCode: (id) => unwrap(http.delete(`/invite-codes/${id}`)),
 }
 
 export const usersApi = {
