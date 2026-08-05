@@ -5,7 +5,6 @@ import com.dkopsidas.octopus.domain.dto.UserResponseDto;
 import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.domain.entity.UserRole;
-import com.dkopsidas.octopus.exception.InvalidAdminCodeException;
 import com.dkopsidas.octopus.exception.InvalidCredentialsException;
 import com.dkopsidas.octopus.exception.InvalidUserCodeException;
 import com.dkopsidas.octopus.exception.UserAlreadyExistsException;
@@ -36,7 +35,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserCodeService userCodeService;
-    private final AdminCodeService adminCodeService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -87,47 +85,33 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException(username);
         }
 
-        String adminCode = createRequest.adminCode();
-        boolean wantsAdmin = adminCodeService.isPresent(adminCode);
+        String userCode = createRequest.userCode();
+        boolean usesCode = userCodeService.isPresent(userCode);
 
-        String helperCode = createRequest.helperCode();
-        boolean wantsHelper = userCodeService.isPresent(helperCode);
-
-        if (wantsAdmin && !adminCodeService.claim(adminCode)) {
-            eventPublisher.publishEvent(AuditEvent.failure(
-                    null,
-                    username,
-                    AuditAction.USER_REGISTER_FAILED,
-                    "USER",
-                    null,
-                    "Invalid or spent admin code"
-            ));
-            throw new InvalidAdminCodeException();
+        // The code row carries the role it grants, so HELPER and ADMIN
+        // registrations follow the exact same path from here on.
+        UserRole role = UserRole.STUDENT;
+        if (usesCode) {
+            role = userCodeService.claim(userCode).orElseGet(() -> {
+                eventPublisher.publishEvent(AuditEvent.failure(
+                        null,
+                        username,
+                        AuditAction.USER_REGISTER_FAILED,
+                        "USER",
+                        null,
+                        "Invalid or spent user code"
+                ));
+                throw new InvalidUserCodeException();
+            });
         }
-
-        if (wantsHelper && !userCodeService.claim(helperCode)) {
-            eventPublisher.publishEvent(AuditEvent.failure(
-                    null,
-                    username,
-                    AuditAction.USER_REGISTER_FAILED,
-                    "USER",
-                    null,
-                    "Invalid or spent helper code"
-            ));
-            throw new InvalidUserCodeException();
-        }
-
-        UserRole role = wantsAdmin ? UserRole.ADMIN : (wantsHelper ? UserRole.HELPER : UserRole.STUDENT);
 
         String passwordHash = passwordEncoder.encode(createRequest.password());
 
         User user = userMapper.toEntity(createRequest, passwordHash, role);
         User savedUser = userRepository.save(user);
 
-        if (wantsAdmin) {
-            adminCodeService.assignTo(adminCode, savedUser.getId());
-        } else if (wantsHelper) {
-            userCodeService.assignTo(helperCode, savedUser.getId());
+        if (usesCode) {
+            userCodeService.assignTo(userCode, savedUser.getId());
         }
 
         eventPublisher.publishEvent(AuditEvent.success(

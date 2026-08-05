@@ -10,21 +10,28 @@
     "displayName": "π.χ. Γιώργος Παπαδόπουλος",
     "username": "π.χ. giorgos",
     "password": "••••••••",
-    "helperCode": "π.χ. HLP2026X"
+    "helperCode": "π.χ. HLP2026X",
+    "adminCode": "π.χ. ADM2026X"
   },
   "role": {
     "label": "Ρόλος",
     "student": { "emoji": "🎓", "label": "Φοιτητής", "description": "Λύνει τεστ" },
-    "helper": { "emoji": "🛠", "label": "Helper", "description": "Διαχειρίζεται ερωτήσεις" }
+    "helper": { "emoji": "🛠", "label": "Helper", "description": "Διαχειρίζεται ερωτήσεις" },
+    "admin": { "emoji": "👑", "label": "Admin", "description": "Πλήρης διαχείριση" }
   },
   "helperCode": {
     "label": "Κωδικός helper"
   },
+  "adminCode": {
+    "label": "Κωδικός admin"
+  },
   "errors": {
     "requiredAll": "Συμπλήρωσε όλα τα πεδία.",
     "requiredHelperCode": "Συμπλήρωσε τον κωδικό helper.",
+    "requiredAdminCode": "Συμπλήρωσε τον κωδικό admin.",
     "usernameTaken": "Το username χρησιμοποιείται ήδη. Διάλεξε άλλο.",
     "helperCodeInvalid": "Ο κωδικός helper δεν είναι έγκυρος ή έχει ήδη χρησιμοποιηθεί.",
+    "adminCodeInvalid": "Ο κωδικός admin δεν είναι έγκυρος ή έχει ήδη χρησιμοποιηθεί.",
     "serverFallback": "Κάτι πήγε στραβά. Δοκίμασε ξανά."
   },
   "toast": {

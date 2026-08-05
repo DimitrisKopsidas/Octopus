@@ -19,7 +19,7 @@ public record CreateUserRequestDto(
         Integer year,
 
         @Size(max = 50, message = ERROR_MESSAGE_USER_CODE_SIZE)
-        String helperCode
+        String userCode
 ) {
     private static final String ERROR_MESSAGE_USERNAME_REQUIRED = "Username is required";
     private static final String ERROR_MESSAGE_USERNAME_SIZE = "Username must be 50 characters or less";

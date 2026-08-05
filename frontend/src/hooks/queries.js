@@ -323,7 +323,7 @@ export function useGenerateInviteCode() {
 export function useDeleteInviteCode() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ targetRole, id }) => inviteCodesApi.deleteCode(targetRole, id),
+    mutationFn: (id) => inviteCodesApi.deleteCode(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: qk.inviteCodes.all })
     },

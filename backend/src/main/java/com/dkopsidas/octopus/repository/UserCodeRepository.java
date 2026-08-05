@@ -2,6 +2,7 @@ package com.dkopsidas.octopus.repository;
 
 import com.dkopsidas.octopus.domain.entity.UserCode;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,7 +10,8 @@ import org.springframework.data.repository.query.Param;
 import java.time.Instant;
 import java.util.Optional;
 
-public interface UserCodeRepository extends JpaRepository<UserCode, Long> {
+public interface UserCodeRepository extends JpaRepository<UserCode, Long>,
+        JpaSpecificationExecutor<UserCode> {
 
     Optional<UserCode> findByCode(String code);
 

@@ -1,0 +1,418 @@
+import { useEffect, useState } from 'react'
+import { useInviteCodes, useGenerateInviteCode, useDeleteInviteCode } from '../../hooks/queries'
+import { toast } from '../../store/toastStore'
+import t from '../../content/inviteCodes.json'
+
+function formatDateTime(isoString) {
+  if (!isoString) return '-'
+  const d = new Date(isoString)
+  return d.toLocaleString('el-GR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export default function InviteCodesViewer() {
+  const [roleFilter, setRoleFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [query, setQuery] = useState('')
+  const [page, setPage] = useState(0)
+
+  const [showGenerateModal, setShowGenerateModal] = useState(false)
+  const [modalRole, setModalRole] = useState('HELPER')
+  const [modalCustomCode, setModalCustomCode] = useState('')
+
+  const params = {
+    page,
+    size: 15,
+    ...(roleFilter ? { targetRole: roleFilter } : {}),
+    ...(statusFilter !== '' ? { used: statusFilter === 'used' } : {}),
+    ...(query.trim() ? { query: query.trim() } : {}),
+  }
+
+  const { codes, totalPages, totalElements, isPending, isFetching, error, refetch } = useInviteCodes(params)
+  const generateMutation = useGenerateInviteCode()
+  const deleteMutation = useDeleteInviteCode()
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showGenerateModal) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [showGenerateModal])
+
+  // Listen to ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && showGenerateModal) {
+        setShowGenerateModal(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showGenerateModal])
+
+  function handleCopy(code) {
+    navigator.clipboard.writeText(code)
+    toast.success(t.toast.copied)
+  }
+
+  async function handleGenerate(e) {
+    e.preventDefault()
+    try {
+      const created = await generateMutation.mutateAsync({
+        targetRole: modalRole,
+        customCode: modalCustomCode.trim() || undefined,
+      })
+      toast.success(t.toast.generated)
+      setShowGenerateModal(false)
+      setModalCustomCode('')
+      handleCopy(created.code)
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Σφάλμα δημιουργίας κωδικού')
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτόν τον κωδικό;')) return
+    try {
+      await deleteMutation.mutateAsync(id)
+      toast.success(t.toast.deleted)
+    } catch (err) {
+      toast.error('Σφάλμα διαγραφής κωδικού')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header Title & Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2.5">
+            <span>🔑</span> {t.title}
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {t.subtitle}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowGenerateModal(true)}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm shadow-md shadow-brand-600/20 transition-all cursor-pointer self-start sm:self-auto"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          {t.actions.generate}
+        </button>
+      </div>
+
+      {/* Controls Bar */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <div className="flex flex-wrap items-center gap-3 flex-1">
+          {/* Role Filter */}
+          <div className="relative">
+            <select
+              value={roleFilter}
+              onChange={(e) => {
+                setRoleFilter(e.target.value)
+                setPage(0)
+              }}
+              className="appearance-none pl-3.5 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+            >
+              <option value="">{t.actions.filterRole}</option>
+              <option value="HELPER">🛠 HELPER</option>
+              <option value="ADMIN">👑 ADMIN</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value)
+                setPage(0)
+              }}
+              className="appearance-none pl-3.5 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+            >
+              <option value="">{t.actions.filterStatus}</option>
+              <option value="available">🟢 {t.actions.available}</option>
+              <option value="used">🔴 {t.actions.used}</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Search Query */}
+          <div className="relative flex-1 min-w-[200px]">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                setPage(0)
+              }}
+              placeholder={t.actions.search}
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-end md:self-auto">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            Σύνολο: {totalElements}
+          </span>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Aνανέωση"
+          >
+            <svg className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        {isPending ? (
+          <div className="p-8 text-center text-slate-500 dark:text-slate-400">
+            <svg className="w-8 h-8 animate-spin mx-auto mb-3 text-brand-600" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Φόρτωση κωδικών...
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center text-rose-600 dark:text-rose-400">{error}</div>
+        ) : codes.length === 0 ? (
+          <div className="p-12 text-center text-slate-500 dark:text-slate-400">
+            <div className="text-4xl mb-2">🔑</div>
+            <p className="font-medium text-base text-slate-700 dark:text-slate-300">{t.table.empty}</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  <th className="px-5 py-3.5">{t.table.code}</th>
+                  <th className="px-5 py-3.5">{t.table.role}</th>
+                  <th className="px-5 py-3.5">{t.table.status}</th>
+                  <th className="px-5 py-3.5">{t.table.usedBy}</th>
+                  <th className="px-5 py-3.5">{t.table.usedAt}</th>
+                  <th className="px-5 py-3.5">{t.table.created}</th>
+                  <th className="px-5 py-3.5 text-right">{t.table.actions}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                {codes.map((item) => {
+                  const isUsed = item.usedAt !== null
+                  return (
+                    <tr key={`${item.targetRole}-${item.id}`} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td className="px-5 py-4 font-mono font-bold text-slate-900 dark:text-slate-100 tracking-wide">
+                        {item.code}
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${
+                          item.targetRole === 'ADMIN'
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900'
+                            : 'bg-brand-100 text-brand-800 dark:bg-brand-950/60 dark:text-brand-300 border border-brand-200 dark:border-brand-900'
+                        }`}>
+                          {item.targetRole === 'ADMIN' ? '👑 ADMIN' : '🛠 HELPER'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          isUsed
+                            ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
+                            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${isUsed ? 'bg-rose-500' : 'bg-emerald-500'}`} />
+                          {isUsed ? 'Εξαργυρώθηκε' : 'Διαθέσιμος'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-slate-700 dark:text-slate-300">
+                        {item.usedByUsername ? (
+                          <span className="font-semibold text-brand-600 dark:text-brand-400">@{item.usedByUsername}</span>
+                        ) : (
+                          <span className="text-slate-400 dark:text-slate-500">-</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">
+                        {formatDateTime(item.usedAt)}
+                      </td>
+                      <td className="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">
+                        {formatDateTime(item.created)}
+                      </td>
+                      <td className="px-5 py-4 text-right space-x-1 whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(item.code)}
+                          className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                          title="Αντιγραφή κωδικού"
+                        >
+                          📋 Αντιγραφή
+                        </button>
+                        {!isUsed && (
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(item.id)}
+                            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 transition-colors"
+                            title="Διαγραφή κωδικού"
+                          >
+                            🗑 Διαγραφή
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-5 py-3.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Σελίδα {page + 1} από {totalPages}
+            </span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={page === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+              >
+                Προηγούμενη
+              </button>
+              <button
+                type="button"
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+              >
+                Επόμενη
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Generate Code Modal */}
+      {showGenerateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowGenerateModal(false)}
+          />
+          <div className="relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl max-w-md w-full z-10 space-y-4 animate-scale-up">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span>🔑</span> {t.modal.title}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowGenerateModal(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleGenerate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-2">
+                  {t.modal.roleLabel}
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setModalRole('HELPER')}
+                    className={`py-2.5 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
+                      modalRole === 'HELPER'
+                        ? 'border-brand-500 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    🛠 HELPER
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalRole('ADMIN')}
+                    className={`py-2.5 px-3 rounded-xl border-2 font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
+                      modalRole === 'ADMIN'
+                        ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    👑 ADMIN
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                  {t.modal.customCodeLabel}
+                </label>
+                <input
+                  type="text"
+                  value={modalCustomCode}
+                  onChange={(e) => setModalCustomCode(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
+                  placeholder={modalRole === 'ADMIN' ? 'π.χ. ADM-CUSTOM1' : 'π.χ. HLP-CUSTOM1'}
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 text-sm font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all uppercase"
+                />
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+                  {t.modal.customCodeHint}
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowGenerateModal(false)}
+                  className="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                >
+                  {t.modal.cancel}
+                </button>
+                <button
+                  type="submit"
+                  disabled={generateMutation.isPending}
+                  className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-600/20 transition-all disabled:opacity-50"
+                >
+                  {generateMutation.isPending ? t.modal.submitting : t.modal.submit}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
