@@ -1,8 +1,10 @@
 // Sliding mobile nav drawer + backdrop (owns body scroll-lock). Used by Layout.
 import { useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import ThemeToggle from './ThemeToggle'
+import { useMe, useLogout } from '../../hooks/queries'
+import { canManageContent, userInitial } from '../../lib/roles'
 import t from '../../content/layout.json'
 
 const mobileNavLinkClass = ({ isActive }) =>
@@ -15,6 +17,11 @@ const mobileNavLinkClass = ({ isActive }) =>
 // Sliding mobile navigation drawer + backdrop. Owns the body scroll-lock
 // while open so the host layout stays free of that concern.
 function MobileNavDrawer({ open, onClose }) {
+  const navigate = useNavigate()
+  const { user, isLoading } = useMe()
+  const logoutMutation = useLogout()
+  const showAdmin = canManageContent(user)
+
   useEffect(() => {
     if (open) {
       document.body.classList.add('overflow-hidden')
@@ -55,22 +62,24 @@ function MobileNavDrawer({ open, onClose }) {
           <div className="space-y-2">
             <NavLink to="/" end onClick={onClose} className={mobileNavLinkClass}>{t.nav.home}</NavLink>
             <NavLink to="/courses" onClick={onClose} className={mobileNavLinkClass}>{t.nav.courses}</NavLink>
-            {/* <NavLink to="/admin" onClick={onClose} className={mobileNavLinkClass}>{t.nav.admin}</NavLink> */}
             <NavLink to="/info" onClick={onClose} className={mobileNavLinkClass}>{t.nav.info}</NavLink>
-          </div>
-
-          <div className="flex items-center justify-between px-4 py-2 text-brand-100 text-sm font-semibold rounded-lg hover:bg-brand-800 transition-colors">
-            <span>{t.mobile.themeLabel}</span>
-            <ThemeToggle />
           </div>
         </div>
 
-        {/* <div className="border-t border-brand-800 pt-4">
-          {user ? (
+        <div className="border-t border-brand-800 pt-4">
+          {isLoading ? (
+            <div className="flex items-center gap-3 px-2 py-2 animate-pulse">
+              <div className="w-9 h-9 rounded-full bg-brand-800/80 shrink-0" />
+              <div className="space-y-1.5 flex-1">
+                <div className="h-3.5 w-24 bg-brand-800/80 rounded" />
+                <div className="h-2.5 w-16 bg-brand-800/60 rounded" />
+              </div>
+            </div>
+          ) : user ? (
             <div className="space-y-3">
               <div className="flex items-center gap-3 px-2">
                 <span className="w-9 h-9 rounded-full bg-brand-600 text-white text-sm font-semibold flex items-center justify-center shrink-0">
-                  {user.displayName.trim().charAt(0).toUpperCase()}
+                  {userInitial(user)}
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-white leading-tight truncate">{user.displayName}</p>
@@ -79,11 +88,13 @@ function MobileNavDrawer({ open, onClose }) {
               </div>
               <button
                 type="button"
-                onClick={() => {
+                disabled={logoutMutation.isPending}
+                onClick={async () => {
                   onClose()
-                  logout()
+                  await logoutMutation.mutateAsync().catch(() => {})
+                  navigate('/')
                 }}
-                className="w-full mt-2 py-2 rounded-lg text-sm font-semibold text-rose-300 hover:text-rose-200 bg-rose-950/20 hover:bg-rose-950/40 text-center transition-colors cursor-pointer"
+                className="w-full mt-2 py-2 rounded-lg text-sm font-semibold text-rose-300 hover:text-rose-200 bg-rose-950/20 hover:bg-rose-950/40 disabled:opacity-50 text-center transition-colors cursor-pointer"
               >
                 {t.mobile.logout}
               </button>
@@ -99,7 +110,7 @@ function MobileNavDrawer({ open, onClose }) {
               </NavLink>
             </div>
           )}
-        </div> */}
+        </div>
       </div>
     </>
   )

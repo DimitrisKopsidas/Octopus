@@ -47,6 +47,6 @@ build/
 
 # Images folder for dev testing
 images/
-
+docs/
 # Claude Code local tooling 
 .claude/

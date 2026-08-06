@@ -6,12 +6,10 @@ import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateCourseRequestDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.entity.Course;
-import com.dkopsidas.octopus.exception.IsReadOnlyException;
 import com.dkopsidas.octopus.mapper.CourseMapper;
 import com.dkopsidas.octopus.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/v1/courses")
 public class CourseController {
-
-    @Value("${app.readonly:true}")
-    private boolean readOnly;
 
     private final CourseService courseService;
 
@@ -60,13 +55,7 @@ public class CourseController {
             @PathVariable Long courseId,
             @Valid @RequestBody UpdateCourseRequestDto updateCourseRequestDto
     ) {
-        checkIsReadOnly();
         CourseResponseDto updatedCourse = courseService.updateCourse(courseId, updateCourseRequestDto);
         return ResponseEntity.ok(updatedCourse);
-    }
-
-    private void checkIsReadOnly(){
-        if (readOnly)
-            throw new IsReadOnlyException();
     }
 }

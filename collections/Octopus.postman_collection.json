@@ -1,0 +1,636 @@
+{
+  "info": {
+    "_postman_id": "79adfc06-8d50-41b2-980f-a8f028632c22",
+    "name": "Octopus",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42959064",
+    "_collection_link": "https://go.postman.co/collection/42959064-79adfc06-8d50-41b2-980f-a8f028632c22?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Questions",
+      "item": [
+        {
+          "name": "ListQuestionsByCourse",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/questions/1103",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                "1103"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateQuestion",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"courseId\": 1103,\r\n  \"title\": \"What does JVM stand for?\",\r\n  \"answers\": [\r\n    { \"title\": \"Java Virtual Machine\"},\r\n    { \"title\": \"Java Variable Method\"},\r\n    { \"title\": \"Joint Vector Memory\"},\r\n    { \"title\": \"Java Vendor Module\"}\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/questions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "questions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UpdateQuestion",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"What is googoo gaga2?\",\r\n  \"answers\": [\r\n    { \"title\": \"yee\", \"isCorrect\": true },\r\n    { \"title\": \"ahh\"},\r\n    { \"title\": \"pee\"},\r\n    { \"title\": \"poo\", \"isCorrect\": false }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/questions/302",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                "302"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DeleteQuestion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/questions/302",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                "302"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "CreateUser",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"displayName\": \"George Tsantekidis\",\r\n    \"password\": \"12345678\",\r\n    \"year\": \"2022\"\r\n    // \"helperCode\": \"HLP-SOMETHING\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetUser",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/3d53529c-aee7-4957-a2e2-b899d6601bf0",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "3d53529c-aee7-4957-a2e2-b899d6601bf0"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DeleteUser",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/ee196a0f-84e3-42a0-b1a8-af5e7176ddc3",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "ee196a0f-84e3-42a0-b1a8-af5e7176ddc3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "ListCourses",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"ntina\",\r\n    \"password\": \"liogka\",\r\n    \"year\": \"2017\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/courses",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateCourse",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Maths\",\r\n    \"semester\": \"1\",\r\n    \"questions\": [],\r\n    \"questionSetSize\": 200,\r\n    \"defaultTimerMinutes\": 200\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/courses",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();\r",
+                  "pm.environment.set(\"ACCESS_TOKEN\", body.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const body = pm.response.json();\r",
+                  "pm.environment.set(\"ACCESS_TOKEN\", body.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/logout",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/refresh",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CSRF",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/csrf",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "csrf"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RoleBasedAccessDemo",
+      "item": [
+        {
+          "name": "healthzPublic",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"displayName\": \"George\",\r\n    \"password\": \"12345678\",\r\n    \"year\": \"2022\",\r\n    \"helperCode\": \"HLP-SOMETHING\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/healthz",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "healthz"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "StudentAccess",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"displayName\": \"George\",\r\n    \"password\": \"12345678\",\r\n    \"year\": \"2022\",\r\n    \"helperCode\": \"HLP-SOMETHING\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/access/student",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "access",
+                "student"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "HelperAccess",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"displayName\": \"George\",\r\n    \"password\": \"12345678\",\r\n    \"year\": \"2022\",\r\n    \"helperCode\": \"HLP-SOMETHING\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/access/helper",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "access",
+                "helper"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AdminAccess",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"displayName\": \"George\",\r\n    \"password\": \"12345678\",\r\n    \"year\": \"2022\",\r\n    \"helperCode\": \"HLP-SOMETHING\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/access/admin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "access",
+                "admin"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

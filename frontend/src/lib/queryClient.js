@@ -40,6 +40,28 @@ export const qk = {
   bundles: {
     count: () => ['bundles', 'count'],
   },
+  auth: {
+    // The logged-in user. Login and logout invalidate this key; everything that
+    // needs to know "who am I" reads it instead of keeping its own copy.
+    me: () => ['auth', 'me'],
+  },
+  audit: {
+    all: ['audit-logs'],
+    list: (params) => ['audit-logs', 'list', params],
+  },
+  crash: {
+    all: ['crash-logs'],
+    list: (params) => ['crash-logs', 'list', params],
+    stats: () => ['crash-logs', 'stats'],
+  },
+  inviteCodes: {
+    all: ['invite-codes'],
+    list: (params) => ['invite-codes', 'list', params],
+  },
+  users: {
+    all: ['users'],
+    list: (params) => ['users', 'list', params],
+  },
 }
 
 // Shared error mapper so every hook surfaces the same Greek message shape the

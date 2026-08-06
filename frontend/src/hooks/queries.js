@@ -8,7 +8,7 @@
 // - Errors are mapped to a plain Greek string via toMessage so ErrorState and
 //   the toast store keep working unchanged.
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, setAccessToken } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -150,6 +150,86 @@ export function useDeleteQuestion(courseId) {
   })
 }
 
+/* -------------------------------------------------------------------- auth */
+
+// Registration. Hits POST /users, which already exists — no dependency on the
+// session work. The server decides the role from the helper code, so the payload
+// deliberately has no `role` field.
+//
+// Nothing is invalidated on success: registering does not log you in, so there is
+// no cached user to refresh. That changes when useLogin lands.
+export function useRegister() {
+  return useMutation({
+    mutationFn: authApi.register,
+  })
+}
+
+// The logged-in user, or null. This is the single source of truth for "who am I" —
+// no store keeps a second copy.
+//
+// A 401 here is the normal state for most visitors, not an error: everything in
+// the app works logged out. So it must never retry, never block rendering, and
+// never be treated as a failure worth showing.
+export function useMe() {
+  const q = useQuery({
+    queryKey: qk.auth.me(),
+    queryFn: authApi.me,
+    retry: false,
+    staleTime: Infinity, // only login and logout change it
+  })
+  return {
+    user: q.data ?? null,
+    isLoading: Boolean(q.isPending || q.isLoading),
+    isPending: Boolean(q.isPending),
+    isFetching: Boolean(q.isFetching),
+    isLoggedIn: q.data != null,
+  }
+}
+
+// On success the server has set the session cookie; invalidating `me` makes every
+// consumer re-read it and the whole UI flips to the logged-in state at once.
+export function useLogin() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: authApi.login,
+    onSuccess: (res) => {
+      // res is AuthResponseDto { accessToken, tokenType, expiresIn, user }
+      setAccessToken(res.accessToken)
+      qc.setQueryData(qk.auth.me(), res.user)
+    },
+  })
+}
+
+export function useLogout() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: authApi.logout,
+    // Runs on success and on failure alike: if logout errored we still want the
+    // client to forget the user rather than show a session that may be gone.
+    onSettled: () => {
+      setAccessToken(null)
+      qc.setQueryData(qk.auth.me(), null)
+      qc.invalidateQueries({ queryKey: qk.auth.me() })
+    },
+  })
+}
+
+export function useUpdateYear() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (year) => authApi.updateYear(year),
+    onSuccess: (updatedUser) => {
+      qc.setQueryData(qk.auth.me(), updatedUser)
+    },
+  })
+}
+
+export function useUpdatePassword() {
+  return useMutation({
+    mutationFn: (payload) => authApi.updatePassword(payload),
+  })
+}
+
 // Course settings (set size + default timer). Writes the fresh course straight
 // into the cached list so the header updates without a refetch, then invalidates
 // settingsInfo because setQuestionCount is derived from it.
@@ -165,3 +245,129 @@ export function useUpdateCourseSettings(courseId) {
     },
   })
 }
+
+/* ------------------------------------------------------------------ audit */
+
+export function useAuditLogs(params = {}, fallbackError = 'Σφάλμα φόρτωσης Audit Logs') {
+  const q = useQuery({
+    queryKey: qk.audit.list(params),
+    queryFn: () => auditApi.getLogs(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    logs: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+/* ------------------------------------------------------------------ crash */
+
+export function useCrashLogs(params = {}, fallbackError = 'Σφάλμα φόρτωσης Crash Logs') {
+  const q = useQuery({
+    queryKey: qk.crash.list(params),
+    queryFn: () => crashApi.getLogs(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    logs: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+export function useResolveCrashLog() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, resolved }) => crashApi.markAsResolved(id, resolved),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.crash.all })
+    },
+  })
+}
+
+/* ------------------------------------------------------------------ invite-codes */
+
+export function useInviteCodes(params = {}, fallbackError = 'Σφάλμα φόρτωσης Κωδικών Πρόσκλησης') {
+  const q = useQuery({
+    queryKey: qk.inviteCodes.list(params),
+    queryFn: () => inviteCodesApi.getCodes(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    codes: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+export function useGenerateInviteCode() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload) => inviteCodesApi.generateCode(payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.inviteCodes.all })
+    },
+  })
+}
+
+export function useDeleteInviteCode() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id) => inviteCodesApi.deleteCode(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.inviteCodes.all })
+    },
+  })
+}
+
+/* ------------------------------------------------------------------ users */
+
+export function useUsersList(params = {}, fallbackError = 'Σφάλμα φόρτωσης λίστας χρηστών') {
+  const q = useQuery({
+    queryKey: qk.users.list(params),
+    queryFn: () => usersApi.getUsers(params),
+    retry: 1,
+  })
+  return {
+    ...q,
+    users: q.data?.content ?? [],
+    page: q.data?.number ?? 0,
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+export function useUpdateUserRole() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ userId, role }) => usersApi.updateRole(userId, role),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.users.all })
+    },
+  })
+}
+
+export function useToggleUserStatus() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ userId, active }) => usersApi.toggleStatus(userId, active),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: qk.users.all })
+    },
+  })
+}
+
+
+
+

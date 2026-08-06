@@ -6,7 +6,7 @@ import t from '../../content/admin.json'
 function AdminCourseCard({ course, hasContent }) {
   return (
     <Link
-      to={`/admin/courses/${course.id}`}
+      to={`/control-panel/courses/${course.id}`}
       className="group flex flex-col h-full bg-white dark:bg-slate-900 rounded-lg p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-600 transition-all"
     >
       <div className="flex items-start justify-between gap-3">

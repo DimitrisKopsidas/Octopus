@@ -4,11 +4,9 @@ import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
-import com.dkopsidas.octopus.exception.IsReadOnlyException;
 import com.dkopsidas.octopus.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/api/v1/questions")
 public class QuestionController {
-
-    @Value("${app.readonly:true}")
-    private boolean readOnly;
 
     private final QuestionService questionService;
 
@@ -58,14 +53,12 @@ public class QuestionController {
     public ResponseEntity<QuestionResponseDto> uploadImage(
             @PathVariable Long questionId,
             @RequestParam("file") MultipartFile file) throws IOException {
-        checkIsReadOnly();
         return ResponseEntity.ok(questionService.uploadImage(questionId, file));
     }
 
     @DeleteMapping(path = "/{questionId}/image")
     public ResponseEntity<QuestionResponseDto> deleteImage(
             @PathVariable Long questionId) throws IOException {
-        checkIsReadOnly();
         return ResponseEntity.ok(questionService.deleteImage(questionId));
     }
 
@@ -74,7 +67,6 @@ public class QuestionController {
     public ResponseEntity<QuestionResponseDto> createQuestion(
             @Valid @RequestBody CreateQuestionRequestDto createQuestionRequestDto
     ) {
-        checkIsReadOnly();
         QuestionResponseDto createdQuestion = questionService.createQuestion(createQuestionRequestDto);
         return new ResponseEntity<>(createdQuestion, HttpStatus.CREATED);
     }
@@ -92,7 +84,6 @@ public class QuestionController {
             @PathVariable Long questionId,
             @Valid @RequestBody UpdateQuestionRequestDto updateQuestionRequestDto
     ) {
-        checkIsReadOnly();
         QuestionResponseDto updatedQuestion = questionService.updateQuestion(questionId, updateQuestionRequestDto);
         return ResponseEntity.ok(updatedQuestion);
     }
@@ -100,13 +91,7 @@ public class QuestionController {
     @PatchMapping(path = "/{questionId}")
     public ResponseEntity<QuestionResponseDto> deactivateQuestion (
             @PathVariable Long questionId) {
-        checkIsReadOnly();
         QuestionResponseDto updatedQuestion = questionService.deactivateQuestion(questionId);
         return ResponseEntity.ok(updatedQuestion);
-    }
-
-    private void checkIsReadOnly(){
-        if (readOnly)
-            throw new IsReadOnlyException();
     }
 }

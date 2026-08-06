@@ -2,12 +2,14 @@ name: octopus
 
 services:
   db:
-    image: postgres
+    image: postgres:16
     ports:
       - "5432:5432"
     restart: always
     environment:
-      POSTGRES_PASSWORD: dimitris
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
 
   backend:
     build: ./backend
@@ -20,6 +22,13 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      AUTH_JWT_ISSUER: ${AUTH_JWT_ISSUER:-octopus-api}
+      AUTH_JWT_AUDIENCE: ${AUTH_JWT_AUDIENCE:-octopus-browser}
+      AUTH_ACCESS_TOKEN_TTL: ${AUTH_ACCESS_TOKEN_TTL:-15m}
+      AUTH_REFRESH_TOKEN_TTL: ${AUTH_REFRESH_TOKEN_TTL:-14d}
+      AUTH_REFRESH_COOKIE_SECURE: ${AUTH_REFRESH_COOKIE_SECURE:-false}
+      AUTH_REFRESH_COOKIE_SAME_SITE: ${AUTH_REFRESH_COOKIE_SAME_SITE:-Lax}
     volumes:
       - ./images:/var/www/octopus/images
 

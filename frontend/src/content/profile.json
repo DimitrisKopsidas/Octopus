@@ -1,0 +1,51 @@
+{
+  "loggedOut": {
+    "title": "Το προφίλ σου σε περιμένει!",
+    "subtitle": "Χρειάζεσαι λογαριασμό για να δεις στατιστικά, streak και ιστορικό quiz. Είναι δωρεάν και παίρνει λιγότερο από ένα λεπτό.",
+    "buttons": {
+      "login": "Σύνδεση / Εγγραφή",
+      "home": "Συνέχισε ως επισκέπτης"
+    },
+    "features": [
+      {
+        "id": "streaks",
+        "title": "Σερί Μελέτης (Streaks)",
+        "description": "Παρακολούθησε τη καθημερινή σου συνέπεια και χτίσε σταθερές συνήθειες διαβάσματος."
+      },
+      {
+        "id": "progress",
+        "title": "Πρόοδος ανά Μάθημα",
+        "description": "Αναλυτικά στατιστικά και ποσοστά επιτυχίας για κάθε μάθημα του εξαμήνου σου."
+      },
+      {
+        "id": "achievements",
+        "title": "Επιτεύγματα & Badges",
+        "description": "Ξεκλείδωσε παράσημα και ανταμοιβές καθώς ολοκληρώνεις quiz και τεστ."
+      }
+    ]
+  },
+  "accountInfo": {
+    "title": "Στοιχεία Λογαριασμού",
+    "labels": {
+      "displayName": "Όνομα",
+      "username": "Username",
+      "year": "Έτος Σπουδών",
+      "role": "Ρόλος",
+      "favorites": "Αγαπημένα Μαθήματα"
+    },
+    "notSet": "Δεν ορίστηκε",
+    "coursesCount": "μαθήματα",
+    "logoutButton": "Αποσύνδεση",
+    "logoutPending": "Αποσύνδεση…"
+  },
+  "rbacTest": {
+    "title": "Έλεγχος Πρόσβασης (RBAC Live Test)",
+    "buttons": {
+      "student": "Test Student Access",
+      "helper": "Test Helper Access",
+      "admin": "Test Admin Access"
+    },
+    "statusSuccess": "✅ 200 OK — Πρόσβαση Επιτράπηκε",
+    "statusError": "❌ Πρόσβαση Απορρίφθηκε"
+  }
+}
