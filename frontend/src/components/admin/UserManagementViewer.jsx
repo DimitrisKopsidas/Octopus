@@ -3,6 +3,12 @@ import { useUsersList, useUpdateUserRole, useToggleUserStatus, useMe } from '../
 import { toast } from '../../store/toastStore'
 import t from '../../content/usersManagement.json'
 
+// The browser draws the open <option> list itself and lets it inherit the
+// closed select's colours — which is how the role pill's amber turned the whole
+// menu muddy. Pinning each option to a plain surface stops that. The highlight
+// on the hovered row belongs to the OS and cannot be restyled.
+const OPTION_CLASS = 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium'
+
 export default function UserManagementViewer() {
   const { user: me } = useMe()
   const [roleFilter, setRoleFilter] = useState('')
@@ -81,10 +87,10 @@ export default function UserManagementViewer() {
               }}
               className="appearance-none pl-3.5 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
-              <option value="">{t.actions.filterRole}</option>
-              <option value="STUDENT">🎓 STUDENT</option>
-              <option value="HELPER">🛠 HELPER</option>
-              <option value="ADMIN">👑 ADMIN</option>
+              <option value="" className={OPTION_CLASS}>{t.actions.filterRole}</option>
+              <option value="STUDENT" className={OPTION_CLASS}>🎓 STUDENT</option>
+              <option value="HELPER" className={OPTION_CLASS}>🛠 HELPER</option>
+              <option value="ADMIN" className={OPTION_CLASS}>👑 ADMIN</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -103,9 +109,9 @@ export default function UserManagementViewer() {
               }}
               className="appearance-none pl-3.5 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
-              <option value="">{t.actions.filterStatus}</option>
-              <option value="active">🟢 {t.actions.active}</option>
-              <option value="inactive">🔴 {t.actions.inactive}</option>
+              <option value="" className={OPTION_CLASS}>{t.actions.filterStatus}</option>
+              <option value="active" className={OPTION_CLASS}>🟢 {t.actions.active}</option>
+              <option value="inactive" className={OPTION_CLASS}>🔴 {t.actions.inactive}</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,7 +206,7 @@ export default function UserManagementViewer() {
                             value={u.role}
                             onChange={(e) => handleRoleChange(u.id, u.username, e.target.value)}
                             disabled={updateRoleMutation.isPending}
-                            className={`appearance-none pl-3 pr-8 py-1 rounded-lg text-xs font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all ${
+                            className={`appearance-none w-full min-w-[8.5rem] pl-3 pr-8 py-1.5 rounded-lg text-xs font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
                               u.role === 'ADMIN'
                                 ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-900'
                                 : u.role === 'HELPER'
@@ -208,11 +214,11 @@ export default function UserManagementViewer() {
                                 : 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
                             }`}
                           >
-                            <option value="STUDENT">🎓 STUDENT</option>
-                            <option value="HELPER">🛠 HELPER</option>
-                            <option value="ADMIN">👑 ADMIN</option>
+                            <option value="STUDENT" className={OPTION_CLASS}>🎓 STUDENT</option>
+                            <option value="HELPER" className={OPTION_CLASS}>🛠 HELPER</option>
+                            <option value="ADMIN" className={OPTION_CLASS}>👑 ADMIN</option>
                           </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-slate-400">
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-500 dark:text-slate-400">
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>

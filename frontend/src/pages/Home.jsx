@@ -11,8 +11,11 @@ function Home() {
 
   return (
     <div>
-      {/* HERO — asymmetric: copy left, brand visual right */}
-      <section className="pt-10 sm:pt-14 lg:pt-20 pb-16">
+      {/* HERO — asymmetric: copy left, brand visual right.
+          overflow-hidden because the glow below sits on -inset-6, so on narrow
+          screens it reaches past the viewport and pushes out a horizontal
+          scrollbar. Clipping a blurred, low-opacity decoration is invisible. */}
+      <section className="pt-10 sm:pt-14 lg:pt-20 pb-16 overflow-hidden">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-6 items-center">
           <div className="lg:col-span-7 text-center lg:text-left animate-fade-up">
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-200 leading-[1.1]">

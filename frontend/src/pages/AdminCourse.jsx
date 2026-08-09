@@ -58,7 +58,7 @@ function AdminCourse() {
   return (
     <div>
       <div className="mb-6">
-        <BackButton to="/admin" label={t.backLabel} />
+        <BackButton to="/control-panel/courses" label={t.backLabel} />
       </div>
 
       <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">

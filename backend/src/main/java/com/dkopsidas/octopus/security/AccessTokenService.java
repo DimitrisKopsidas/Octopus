@@ -39,6 +39,7 @@ public class AccessTokenService {
                 .expiresAt(expiresAt)
                 .id(UUID.randomUUID().toString())
                 .claim("token_type", TOKEN_TYPE)
+                .claim("username", user.getUsername())
                 .claim("authorities", authorities)
                 .build();
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256)
