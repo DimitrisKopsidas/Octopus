@@ -61,6 +61,7 @@ export const qk = {
   users: {
     all: ['users'],
     list: (params) => ['users', 'list', params],
+    count: () => ['users', 'count'],
   },
 }
 
