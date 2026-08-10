@@ -19,7 +19,7 @@ import static java.time.LocalTime.now;
 @Component
 public class QuestionMapperImpl implements QuestionMapper {
     @Override
-    public Question toEntity(CreateQuestionRequestDto dto, Course courseById) {
+    public Question toEntity(CreateQuestionRequestDto dto, Course courseById, User userById) {
         Question question = new Question(
                 null,
                 dto.title(),
@@ -27,6 +27,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 true,
                 new ArrayList<>(),
                 courseById,
+                userById
                 Instant.now(),
                 Instant.now()
         );
@@ -51,6 +52,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 dto.imageUrl(),
                 dto.isActive(),
                 new ArrayList<>(),
+                null,
                 null,
                 null,
                 Instant.now()

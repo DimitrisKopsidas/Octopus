@@ -15,9 +15,12 @@ public record CreateQuestionRequestDto(
         @Size(min = 2, max = 10, message = ERROR_MESSAGE_ANSWER_COUNT)
         List<AnswerRequestDto> answers,
         @NotNull(message = ERROR_MESSAGE_COURSE_ATTACHED)
-        Long courseId
+        Long courseId,
+        @NotNull(message = ERROR_MESSAGE_USER_ATTACHED)
+        Long userId
 ) {
     private static final String ERROR_MESSAGE_TITLE_LENGTH = "Title must be between 1 and 510 characters";
     private static final String ERROR_MESSAGE_ANSWER_COUNT = "Answer count cannot be less than 2 and more than 10";
     private static final String ERROR_MESSAGE_COURSE_ATTACHED = "A question must have a course attached";
+    private static final String ERROR_MESSAGE_USER_ATTACHED = "A question must have a user attached";
 }

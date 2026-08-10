@@ -9,11 +9,14 @@ import com.dkopsidas.octopus.domain.entity.Course;
 import com.dkopsidas.octopus.domain.entity.Question;
 import com.dkopsidas.octopus.exception.CorrectAnswerCountException;
 import com.dkopsidas.octopus.exception.CourseNotFoundException;
+import com.dkopsidas.octopus.exception.UserNotFoundException;
 import com.dkopsidas.octopus.exception.QuestionNotFoundException;
 import com.dkopsidas.octopus.exception.SimpleException;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
+import com.dkopsidas.octopus.mapper.UserMapper;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.QuestionRepository;
+import com.dkopsidas.octopus.repository.UserRepository;
 import com.dkopsidas.octopus.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import com.dkopsidas.octopus.domain.entity.AuditAction;
@@ -33,6 +36,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionRepository questionRepository;
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
     private final QuestionMapper questionMapper;
     private final ImageService imageService;
     private final ApplicationEventPublisher eventPublisher;
@@ -42,7 +46,10 @@ public class QuestionServiceImpl implements QuestionService {
         Course courseFromDto = courseRepository.findById(createRequest.courseId()).
                 orElseThrow(() -> new CourseNotFoundException(createRequest.courseId()));
 
-        Question question = questionMapper.toEntity(createRequest, courseFromDto);
+        User userFromDto = userRepository.findById(createRequest.userId()).
+                orElseThrow(() -> new UserNotFoundException(createRequest.userId()));
+
+        Question question = questionMapper.toEntity(createRequest, courseFromDto, userFromDto);
 
         checkCorrectAnswerCount(question);
 
