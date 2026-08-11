@@ -225,6 +225,9 @@ public class SecurityConfig {
         AuthProperties.Cookie cookie = authProperties.refreshToken().cookie();
         CookieCsrfTokenRepository repository =
                 CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieMaxAge(Math.toIntExact(
+                authProperties.refreshToken().ttl().toSeconds()
+        ));
         repository.setCookieCustomizer(builder -> {
             builder.path("/")
                     .secure(cookie.secure())
