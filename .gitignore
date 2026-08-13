@@ -38,10 +38,6 @@ build/
 .env.development
 .env.*.local
 
-# Spring Boot dev/local properties
-**/application-dev.properties
-**/application-docker.properties
-
 # Spring Boot prod properties (contains domain info)
 **/application-prod.properties
 
