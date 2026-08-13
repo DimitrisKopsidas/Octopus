@@ -40,10 +40,25 @@ Helper team from IEE IHU Discord for ideas and further content creation
    Copy-Item .env.example .env
    ```
 2. Review the values in [.env](.env) if needed.
-3. Start the app with Docker Compose:
-   ```powershell
-   docker compose up --build
-   ```
-4. Open the app in your browser:
-   - Frontend: http://localhost:80
-   - Backend API: http://localhost:8080
+
+### Running the Application
+
+#### Production (Main Branch)
+To update to the main branch and run the production build:
+```powershell
+./scripts/run-update-main.sh
+```
+This will:
+- Checkout the main branch
+- Pull latest changes
+- Build and start containers
+
+#### Development (with pgAdmin4)
+To run the development instance with pgAdmin4 for database management:
+```powershell
+./scripts/run-dev.sh
+```
+This uses [docker-compose.dev.yml](docker-compose.dev.yml) and provides:
+- Frontend: http://localhost:80
+- Backend API: http://localhost:8080
+- pgAdmin4: http://localhost:5050 (admin@octopus.dev / admin)
