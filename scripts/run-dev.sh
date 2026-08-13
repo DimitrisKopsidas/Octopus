@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # Exit if any command fails
+set -e
 
 cd "$(dirname "$0")/.."
 
