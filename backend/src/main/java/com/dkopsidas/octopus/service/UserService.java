@@ -25,4 +25,6 @@ public interface UserService {
     UserResponseDto updateUserRole(UUID userId, UserRole role, UUID actorId, String actorUsername);
 
     UserResponseDto toggleUserStatus(UUID userId, Boolean active, UUID actorId, String actorUsername);
+
+    Long countActiveUsers();
 }

@@ -218,4 +218,8 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.toDto(saved);
     }
+
+    public Long countActiveUsers(){
+        return userRepository.countByActiveTrue();
+    }
 }
