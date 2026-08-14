@@ -20,6 +20,7 @@ import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -27,8 +28,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Transactional at class level on purpose. spring.jpa.open-in-view is disabled,
+ * so without a transaction the persistence context closes the moment a
+ * repository call returns — and QuestionMapper then reads question.getAnswers()
+ * and question.getCourse(), both lazy, which threw LazyInitializationException
+ * on every read endpoint here.
+ */
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionRepository questionRepository;
