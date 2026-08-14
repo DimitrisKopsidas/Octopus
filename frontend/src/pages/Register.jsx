@@ -191,7 +191,7 @@ function Register() {
           </div>
 
           {role === 'helper' && (
-            <div className="rounded-lg bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-900 p-3.5 animate-fade-in">
+            <div className="rounded-lg bg-brand-50 dark:bg-brand-950/30 border border-brand-200 dark:border-brand-900 p-3.5 animate-fadeIn">
               <label className="block text-sm font-medium text-brand-900 dark:text-brand-200 mb-1.5">
                 {t.helperCode.label}
               </label>
@@ -209,7 +209,7 @@ function Register() {
           )}
 
           {role === 'admin' && (
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 p-3.5 animate-fade-in">
+            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 p-3.5 animate-fadeIn">
               <label className="block text-sm font-medium text-amber-900 dark:text-amber-200 mb-1.5">
                 {t.adminCode.label}
               </label>

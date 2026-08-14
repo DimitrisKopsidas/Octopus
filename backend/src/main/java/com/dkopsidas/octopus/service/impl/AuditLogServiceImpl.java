@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -38,8 +41,8 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Transactional
     public AuditLogResponseDto logEvent(AuditEvent event) {
         AuditLog auditLog = new AuditLog();
-        auditLog.setActorId(event.actorId());
-        auditLog.setActorUsername(event.actorUsername());
+        auditLog.setActorId(event.actorId() != null ? event.actorId() : currentActorId());
+        auditLog.setActorUsername(event.actorUsername() != null ? event.actorUsername() : currentActorUsername());
         auditLog.setAction(event.action());
         auditLog.setResourceType(event.resourceType());
         auditLog.setResourceId(event.resourceId());
@@ -127,6 +130,27 @@ public class AuditLogServiceImpl implements AuditLogService {
 
         return auditLogRepository.findAll(spec, pageable)
                 .map(auditLogMapper::toDto);
+    }
+
+    private UUID currentActorId() {
+        Jwt jwt = currentJwt();
+        if (jwt == null || jwt.getSubject() == null) return null;
+        try {
+            return UUID.fromString(jwt.getSubject());
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    private String currentActorUsername() {
+        Jwt jwt = currentJwt();
+        return jwt != null ? jwt.getClaimAsString("username") : null;
+    }
+
+    private Jwt currentJwt() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) return null;
+        return authentication.getPrincipal() instanceof Jwt jwt ? jwt : null;
     }
 
     private String extractClientIp() {

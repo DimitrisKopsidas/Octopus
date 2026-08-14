@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuditLogs } from '../../hooks/queries'
 import Skeleton from '../ui/Skeleton'
 import ErrorState from '../ui/ErrorState'
 import t from '../../content/auditLogs.json'
+
+// The browser draws the open <option> list itself and lets it inherit the
+// closed select's colours. Pinning each option to a plain surface stops that.
+const OPTION_CLASS = 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium'
 
 const ACTION_OPTIONS = [
   { value: '', label: 'Όλες οι ενέργειες' },
@@ -147,7 +152,7 @@ export default function AuditLogsViewer() {
               className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
               {ACTION_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} className={OPTION_CLASS}>
                   {opt.label}
                 </option>
               ))}
@@ -174,7 +179,7 @@ export default function AuditLogsViewer() {
               className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
               {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} className={OPTION_CLASS}>
                   {opt.label}
                 </option>
               ))}
@@ -201,7 +206,7 @@ export default function AuditLogsViewer() {
               className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
               {DATE_RANGE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} className={OPTION_CLASS}>
                   {opt.label}
                 </option>
               ))}
@@ -228,7 +233,7 @@ export default function AuditLogsViewer() {
               className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
               {SIZE_OPTIONS.map((size) => (
-                <option key={size} value={size}>
+                <option key={size} value={size} className={OPTION_CLASS}>
                   {size} εγγραφές
                 </option>
               ))}
@@ -338,15 +343,18 @@ export default function AuditLogsViewer() {
         </div>
       )}
 
-      {/* Detail Modal with Backdrop Lock & Esc Dismiss */}
-      {selectedLog && (
+      {/* Detail Modal with Backdrop Lock & Esc Dismiss.
+          Rendered into document.body: inside the page tree any ancestor with a
+          transform or filter would make `fixed` resolve against that ancestor
+          instead of the viewport, and the modal drifted with the scroll. */}
+      {selectedLog && createPortal(
         <div
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedLog(null)
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn"
         >
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 animate-scale-up">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 space-y-4 animate-reveal">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span>📜</span>
@@ -387,7 +395,8 @@ export default function AuditLogsViewer() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
