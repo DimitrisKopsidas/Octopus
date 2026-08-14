@@ -69,19 +69,12 @@ export function useCourseQuestions(courseId, fallbackError = 'Σφάλμα φό�
   return { ...q, questions: q.data ?? [], error: q.error ? toMessage(q.error, fallbackError) : null }
 }
 
-/* -------------------------------------------------------------- home stats */
 
-// Landing-page counters. Both are decorative, so errors are swallowed and the
-// UI falls back to null (hides the stats band).
-// MOCK — GET /api/v1/users/count does not exist yet, so the real query below is
-// left in place but its result is overridden. Once the endpoint ships (repo
-// countByActiveTrue -> service -> controller -> permitAll in SecurityConfig),
-// delete this constant and the `??` that uses it. Nothing else changes.
+
+//   const users = useQuery({ queryKey: qk.users.count(), queryFn: usersApi.count, retry: false })
+
 const MOCK_ACTIVE_USERS = 428
 
-// Each counter is independent and never retries: the landing page renders fine
-// with any of them missing, so a slow or absent endpoint costs a number, not
-// the page.
 export function useHomeStats() {
   const tests = useQuery({
     queryKey: qk.bundles.count(),
@@ -93,19 +86,14 @@ export function useHomeStats() {
     queryFn: coursesApi.countWithContent,
     retry: false,
   })
-  const users = useQuery({
-    queryKey: qk.users.count(),
-    queryFn: usersApi.count,
-    retry: false,
-  })
   return {
     tests: tests.data ?? null,
     courses: courses.data ?? null,
-    users: users.data ?? MOCK_ACTIVE_USERS,
+    users: MOCK_ACTIVE_USERS,
   }
 }
 
-/* ------------------------------------------------------------------ writes */
+/*  writes */
 
 // Central invalidation helper. Every question write touches three things:
 //   1. the admin question list for that course
