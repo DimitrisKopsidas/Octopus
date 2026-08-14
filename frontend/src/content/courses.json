@@ -12,7 +12,9 @@
   "emptyDisabledTooltip": "Δεν υπάρχει content ακόμα για αυτό το μάθημα",
   "courseCard": {
     "semesterPrefix": "Εξάμηνο",
-    "codePrefix": "Κωδικός:"
+    "codePrefix": "Κωδικός:",
+    "questions": "ερωτήσεις",
+    "noContent": "Χωρίς υλικό"
   },
   "filterModal": {
     "title": "Φίλτρα",
