@@ -1,6 +1,7 @@
 // App shell: sticky header nav + Outlet + Footer + mobile drawer + toasts. Wraps every route.
 import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { Outlet, NavLink } from 'react-router-dom'
+import { Menu, X } from 'lucide-react'
 import logo from '../../assets/logo.png'
 import MobileNavDrawer from './MobileNavDrawer'
 import UserMenu from './UserMenu'
@@ -66,7 +67,7 @@ function Layout() {
               aria-label={t.mobile.menuLabel}
               className="md:hidden flex items-center justify-center p-2 rounded-lg text-brand-100 hover:bg-brand-800 hover:text-white transition-colors cursor-pointer"
             >
-              <span className="text-xl leading-none">{mobileMenuOpen ? '✕' : '☰'}</span>
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </nav>

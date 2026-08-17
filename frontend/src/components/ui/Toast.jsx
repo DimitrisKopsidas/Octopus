@@ -1,5 +1,6 @@
 // Toast container + toast items. Mounted once in Layout.
 import { useEffect } from 'react'
+import { Check, AlertCircle, AlertTriangle, Info, X } from 'lucide-react'
 import { useToastStore } from '../../store/toastStore'
 
 const VARIANT = {
@@ -10,11 +11,7 @@ const VARIANT = {
     text: 'text-slate-900 dark:text-slate-100',
     badgeBg: 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400',
     barBg: 'bg-emerald-500',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-      </svg>
-    ),
+    icon: <Check className="w-5 h-5" strokeWidth={2.5} />,
   },
   error: {
     bg: 'bg-white/95 dark:bg-slate-900/95',
@@ -23,11 +20,7 @@ const VARIANT = {
     text: 'text-slate-900 dark:text-slate-100',
     badgeBg: 'bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400',
     barBg: 'bg-rose-500',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    ),
+    icon: <AlertCircle className="w-5 h-5" strokeWidth={2.5} />,
   },
   warning: {
     bg: 'bg-white/95 dark:bg-slate-900/95',
@@ -36,11 +29,7 @@ const VARIANT = {
     text: 'text-slate-900 dark:text-slate-100',
     badgeBg: 'bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400',
     barBg: 'bg-amber-500',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-    ),
+    icon: <AlertTriangle className="w-5 h-5" strokeWidth={2.5} />,
   },
   info: {
     bg: 'bg-white/95 dark:bg-slate-900/95',
@@ -49,11 +38,7 @@ const VARIANT = {
     text: 'text-slate-900 dark:text-slate-100',
     badgeBg: 'bg-brand-100 dark:bg-brand-950/80 text-brand-600 dark:text-brand-400',
     barBg: 'bg-brand-500',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
+    icon: <Info className="w-5 h-5" strokeWidth={2.5} />,
   },
 }
 
@@ -115,9 +100,7 @@ function ToastItem({ toast, onClose }) {
         aria-label="Κλείσιμο"
         className="shrink-0 w-7 h-7 inline-flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <X className="w-4 h-4" />
       </button>
     </div>
   )
