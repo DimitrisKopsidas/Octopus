@@ -28,9 +28,22 @@ export function getAccessToken() {
   return memoryAccessToken
 }
 
+function setAuthorizationHeader(config, token) {
+  if (!config || !config.headers) return
+  if (typeof config.headers.set === 'function') {
+    config.headers.set('Authorization', `Bearer ${token}`)
+  } else {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+}
+
 http.interceptors.request.use((config) => {
-  if (memoryAccessToken) {
-    config.headers.Authorization = `Bearer ${memoryAccessToken}`
+  if (
+    memoryAccessToken &&
+    !config.url?.includes('/auth/login') &&
+    !config.url?.includes('/auth/refresh')
+  ) {
+    setAuthorizationHeader(config, memoryAccessToken)
   }
   return config
 })
@@ -74,7 +87,7 @@ http.interceptors.response.use(
           failedQueue.push({ resolve, reject })
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
+            setAuthorizationHeader(originalRequest, token)
             return http(originalRequest)
           })
           .catch((err) => Promise.reject(err))
@@ -87,7 +100,7 @@ http.interceptors.response.use(
         const refreshData = await authApi.refresh()
         setAccessToken(refreshData.accessToken)
         processQueue(null, refreshData.accessToken)
-        originalRequest.headers.Authorization = `Bearer ${refreshData.accessToken}`
+        setAuthorizationHeader(originalRequest, refreshData.accessToken)
         return http(originalRequest)
       } catch (refreshErr) {
         processQueue(refreshErr, null)
@@ -147,7 +160,7 @@ export const questionsApi = {
     return unwrap(http.post(`/questions/${id}/image`, fd, { timeout: UPLOAD_TIMEOUT }))
   },
   deleteImage: (id) => unwrap(http.delete(`/questions/${id}/image`)),
-  remove: (id) => http.patch(`/questions/${id}`),
+  remove: (id) => unwrap(http.patch(`/questions/${id}`)),
 }
 
 export const bundlesApi = {
@@ -199,7 +212,8 @@ export const inviteCodesApi = {
 
 export const usersApi = {
   getUsers: (params) => unwrap(http.get('/users', { params })),
-  count: () => unwrap(http.get('/users/count')),
+  countActive: () => unwrap(http.get('/users/count/active')),
+  count: () => unwrap(http.get('/users/count/active')),
   updateRole: (userId, role) => unwrap(http.patch(`/users/${userId}/role`, { role })),
   toggleStatus: (userId, active) => unwrap(http.patch(`/users/${userId}/status`, { active })),
 }
