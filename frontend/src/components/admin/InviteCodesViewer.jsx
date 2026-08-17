@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useInviteCodes, useGenerateInviteCode, useDeleteInviteCode } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
 import t from '../../content/inviteCodes.json'
+
+// The browser draws the open <option> list itself and lets it inherit the
+// closed select's colours. Pinning each option to a plain surface stops that.
+const OPTION_CLASS = 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium'
 
 function formatDateTime(isoString) {
   if (!isoString) return '-'
@@ -128,9 +133,9 @@ export default function InviteCodesViewer() {
               }}
               className="appearance-none pl-3.5 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
-              <option value="">{t.actions.filterRole}</option>
-              <option value="HELPER">🛠 HELPER</option>
-              <option value="ADMIN">👑 ADMIN</option>
+              <option value="" className={OPTION_CLASS}>{t.actions.filterRole}</option>
+              <option value="HELPER" className={OPTION_CLASS}>🛠 HELPER</option>
+              <option value="ADMIN" className={OPTION_CLASS}>👑 ADMIN</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -149,9 +154,9 @@ export default function InviteCodesViewer() {
               }}
               className="appearance-none pl-3.5 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
             >
-              <option value="">{t.actions.filterStatus}</option>
-              <option value="available">🟢 {t.actions.available}</option>
-              <option value="used">🔴 {t.actions.used}</option>
+              <option value="" className={OPTION_CLASS}>{t.actions.filterStatus}</option>
+              <option value="available" className={OPTION_CLASS}>🟢 {t.actions.available}</option>
+              <option value="used" className={OPTION_CLASS}>🔴 {t.actions.used}</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -325,14 +330,15 @@ export default function InviteCodesViewer() {
         )}
       </div>
 
-      {/* Generate Code Modal */}
-      {showGenerateModal && (
+      {/* Generate Code Modal. Rendered into document.body so `fixed` resolves
+          against the viewport rather than any transformed ancestor. */}
+      {showGenerateModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity"
             onClick={() => setShowGenerateModal(false)}
           />
-          <div className="relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl max-w-md w-full z-10 space-y-4 animate-scale-up">
+          <div className="relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xl max-w-md w-full max-h-[85vh] overflow-y-auto z-10 space-y-4 animate-reveal">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span>🔑</span> {t.modal.title}
@@ -411,7 +417,8 @@ export default function InviteCodesViewer() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

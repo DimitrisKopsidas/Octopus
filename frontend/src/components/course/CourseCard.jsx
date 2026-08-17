@@ -27,7 +27,7 @@ function formatLastUpdated(dateVal) {
 
 function CourseCard({ course, hasContent, disabled, progress = 0 }) {
   const { user } = useMe()
-  const questionCount = course.questionCount ?? (hasContent ? 10 : 0)
+  const questionCount = course.questionCount ?? 0
   const lastUpdatedText = formatLastUpdated(course.lastUpdated)
 
   const inner = (
@@ -37,6 +37,11 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
         <span className="text-xs font-semibold tracking-wide  text-slate-500 dark:text-slate-400">
           {course.semester}ο Εξάμηνο
         </span>
+        {disabled && (
+          <span className="shrink-0 rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {t.courseCard.noContent}
+          </span>
+        )}
         {!disabled && (
           <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 group-hover:border-brand-500/40 transition-all shrink-0">
             <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -78,11 +83,21 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
 
       {/* Footer Info Row */}
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-        <div className="flex items-center gap-1.5 font-medium">
-          <svg className="w-4 h-4 text-brand-600 dark:text-brand-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        {/* The question count is the one number that decides whether a course is
+            worth opening, so it carries the brand colour rather than blending
+            into the metadata row. */}
+        <div
+          className={`flex items-center gap-1.5 rounded-lg px-2 py-1 font-bold ${
+            disabled
+              ? 'text-slate-400 dark:text-slate-500'
+              : 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
+          }`}
+        >
+          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
-          <span>{questionCount} ερωτήσεις</span>
+          <span className="tabular-nums">{questionCount}</span>
+          <span className="font-medium">{t.courseCard.questions}</span>
         </div>
         <div className="flex items-center gap-1.5 font-medium">
           <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,7 +114,7 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
       <div
         title={t.emptyDisabledTooltip}
         aria-disabled="true"
-        className="relative overflow-hidden bg-white/60 dark:bg-slate-900/60 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm opacity-60 cursor-not-allowed select-none"
+        className="relative overflow-hidden bg-slate-50/60 dark:bg-slate-900/40 rounded-2xl p-6 border border-dashed border-slate-300 dark:border-slate-700 opacity-70 cursor-not-allowed select-none"
       >
         {inner}
       </div>
@@ -109,8 +124,14 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
   return (
     <Link
       to={`/courses/${course.id}/start`}
-      className="group relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-lg hover:shadow-2xl hover:border-brand-500/50 hover:-translate-y-1 transition-all duration-300"
+      className="group relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 pt-7 border border-slate-200/80 dark:border-slate-800 shadow-lg hover:shadow-2xl hover:border-brand-500/50 hover:-translate-y-1 transition-all duration-300"
     >
+      {/* Accent bar along the top edge: the fastest way to tell a playable
+          course from an empty one while scanning the grid. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 to-teal-400"
+      />
       {/* Ambient gradient top-right glow */}
       <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-brand-500/10 dark:bg-brand-500/15 blur-2xl pointer-events-none group-hover:bg-brand-500/25 transition-all" />
       {inner}

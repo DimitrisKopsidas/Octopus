@@ -8,6 +8,7 @@ public record CourseResponseDto(
         int semester,
         int questionSetSize,
         int defaultTimerMinutes,
-        Instant lastUpdated
+        Instant lastUpdated,
+        long questionCount
 ) {
 }

@@ -69,10 +69,12 @@ export function useCourseQuestions(courseId, fallbackError = 'Σφάλμα φό�
   return { ...q, questions: q.data ?? [], error: q.error ? toMessage(q.error, fallbackError) : null }
 }
 
-/* -------------------------------------------------------------- home stats */
 
-// Landing-page counters. Both are decorative, so errors are swallowed and the
-// UI falls back to null (hides the stats band).
+
+//   const users = useQuery({ queryKey: qk.users.count(), queryFn: usersApi.count, retry: false })
+
+const MOCK_ACTIVE_USERS = 428
+
 export function useHomeStats() {
   const tests = useQuery({
     queryKey: qk.bundles.count(),
@@ -87,10 +89,11 @@ export function useHomeStats() {
   return {
     tests: tests.data ?? null,
     courses: courses.data ?? null,
+    users: MOCK_ACTIVE_USERS,
   }
 }
 
-/* ------------------------------------------------------------------ writes */
+/*  writes */
 
 // Central invalidation helper. Every question write touches three things:
 //   1. the admin question list for that course

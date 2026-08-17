@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useCrashLogs, useResolveCrashLog } from '../../hooks/queries'
 import Skeleton from '../ui/Skeleton'
 import ErrorState from '../ui/ErrorState'
 import t from '../../content/crashLogs.json'
+
+// The browser draws the open <option> list itself and lets it inherit the
+// closed select's colours. Pinning each option to a plain surface stops that.
+const OPTION_CLASS = 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium'
 
 const DATE_RANGE_OPTIONS = [
   { value: '', label: 'Όλες οι ημερομηνίες' },
@@ -138,7 +143,7 @@ export default function CrashLogsViewer() {
               className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
             >
               {RESOLVED_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} className={OPTION_CLASS}>
                   {opt.label}
                 </option>
               ))}
@@ -165,7 +170,7 @@ export default function CrashLogsViewer() {
               className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
             >
               {DATE_RANGE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} className={OPTION_CLASS}>
                   {opt.label}
                 </option>
               ))}
@@ -192,7 +197,7 @@ export default function CrashLogsViewer() {
               className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
             >
               {SIZE_OPTIONS.map((size) => (
-                <option key={size} value={size}>
+                <option key={size} value={size} className={OPTION_CLASS}>
                   {size} εγγραφές
                 </option>
               ))}
@@ -316,15 +321,18 @@ export default function CrashLogsViewer() {
         </div>
       )}
 
-      {/* Detail Modal with Stack Trace Code View & Resolve Toggle */}
-      {selectedLog && (
+      {/* Detail Modal with Stack Trace Code View & Resolve Toggle.
+          Rendered into document.body: inside the page tree any ancestor with a
+          transform or filter would make `fixed` resolve against that ancestor
+          instead of the viewport, and the modal drifted with the scroll. */}
+      {selectedLog && createPortal(
         <div
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedLog(null)
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn"
         >
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] flex flex-col animate-scale-up">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 space-y-4 max-h-[85vh] flex flex-col animate-reveal">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 shrink-0">
               <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <span>💥</span>
@@ -338,16 +346,22 @@ export default function CrashLogsViewer() {
               </button>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300 overflow-y-auto pr-1">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-                <div>
-                  <div className="font-bold text-rose-600 dark:text-rose-400 text-sm">{selectedLog.exceptionClass}</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{selectedLog.message}</div>
+            {/* overflow-x-hidden explicitly: setting overflow-y alone makes the
+                browser compute overflow-x as auto, so any wide child produced a
+                horizontal scrollbar across the whole modal body. */}
+            <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300 overflow-y-auto overflow-x-hidden pr-1 min-w-0">
+              {/* min-w-0 lets the flex child shrink below the width of the
+                  exception class, which is one long unbreakable token and
+                  otherwise pushes the button out of the modal. */}
+              <div className="flex items-start justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-rose-600 dark:text-rose-400 text-sm break-words">{selectedLog.exceptionClass}</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 break-words">{selectedLog.message}</div>
                 </div>
                 <button
                   onClick={(e) => handleToggleResolve(selectedLog, e)}
                   disabled={resolveMutation.isPending}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all disabled:opacity-60 ${
                     selectedLog.resolved
                       ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20'
                       : 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700'
@@ -357,13 +371,13 @@ export default function CrashLogsViewer() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                <div><strong className="text-slate-900 dark:text-slate-100">ID:</strong> {selectedLog.id}</div>
-                <div><strong className="text-slate-900 dark:text-slate-100">Ημερομηνία:</strong> {formatTimestamp(selectedLog.timestamp)}</div>
-                <div><strong className="text-slate-900 dark:text-slate-100">Request:</strong> {selectedLog.httpMethod} {selectedLog.requestUri}</div>
-                <div><strong className="text-slate-900 dark:text-slate-100">Status Code:</strong> {selectedLog.statusCode || 500}</div>
-                <div><strong className="text-slate-900 dark:text-slate-100">Actor Username:</strong> {selectedLog.actorUsername || '—'}</div>
-                <div><strong className="text-slate-900 dark:text-slate-100">IP Address:</strong> {selectedLog.ipAddress || '—'}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] min-w-0">
+                <div className="break-all"><strong className="text-slate-900 dark:text-slate-100">ID:</strong> {selectedLog.id}</div>
+                <div className="break-words"><strong className="text-slate-900 dark:text-slate-100">Ημερομηνία:</strong> {formatTimestamp(selectedLog.timestamp)}</div>
+                <div className="break-all"><strong className="text-slate-900 dark:text-slate-100">Request:</strong> {selectedLog.httpMethod} {selectedLog.requestUri}</div>
+                <div className="break-words"><strong className="text-slate-900 dark:text-slate-100">Status Code:</strong> {selectedLog.statusCode || 500}</div>
+                <div className="break-all"><strong className="text-slate-900 dark:text-slate-100">Actor Username:</strong> {selectedLog.actorUsername || '—'}</div>
+                <div className="break-all"><strong className="text-slate-900 dark:text-slate-100">IP Address:</strong> {selectedLog.ipAddress || '—'}</div>
               </div>
 
               <div>
@@ -390,7 +404,8 @@ export default function CrashLogsViewer() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

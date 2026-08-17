@@ -29,10 +29,13 @@ public class CourseMapperImpl implements CourseMapper {
             course.getSemester(),
             course.getQuestionSetSize(),
             course.getDefaultTimerMinutes(),
-            course.getUpdatedAt()
+            // "last updated" on the card means the content, not the course row.
+            course.getLastContentUpdate(),
+            course.getQuestionCount()
         );
     }
 
+    @Override
     public List<CourseResponseDto> toDto(List<Course> courseList) {
         return courseList.stream()
                 .map(this::toDto)

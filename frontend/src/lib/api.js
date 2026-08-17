@@ -199,6 +199,7 @@ export const inviteCodesApi = {
 
 export const usersApi = {
   getUsers: (params) => unwrap(http.get('/users', { params })),
+  count: () => unwrap(http.get('/users/count')),
   updateRole: (userId, role) => unwrap(http.patch(`/users/${userId}/role`, { role })),
   toggleStatus: (userId, active) => unwrap(http.patch(`/users/${userId}/status`, { active })),
 }

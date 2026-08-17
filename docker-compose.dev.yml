@@ -1,4 +1,4 @@
-name: octopus
+name: octopus-dev
 
 services:
   db:
@@ -6,10 +6,14 @@ services:
     ports:
       - "5432:5432"
     restart: always
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
 
   backend:
     build: ./backend
@@ -17,11 +21,17 @@ services:
       - "8080:8080"
     depends_on:
       - db
+    env_file:
+      - .env
+    restart: on-failure
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_PROFILES_ACTIVE: dev
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS}
+      APP_IMAGE_UPLOAD_DIR: ${APP_IMAGE_UPLOAD_DIR}
+      APP_IMAGE_BASE_URL: ${APP_IMAGE_BASE_URL}
       AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
       AUTH_JWT_ISSUER: ${AUTH_JWT_ISSUER:-octopus-api}
       AUTH_JWT_AUDIENCE: ${AUTH_JWT_AUDIENCE:-octopus-browser}
@@ -30,16 +40,32 @@ services:
       AUTH_REFRESH_COOKIE_SECURE: ${AUTH_REFRESH_COOKIE_SECURE:-false}
       AUTH_REFRESH_COOKIE_SAME_SITE: ${AUTH_REFRESH_COOKIE_SAME_SITE:-Lax}
     volumes:
-      - ./images:/var/www/octopus/images
+      - /var/www/octopus/images:/var/www/octopus/images
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
     ports:
-      - "5173:5173"
+      - "80:80"
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - /var/www/octopus/images:/var/www/octopus/images
     depends_on:
       - backend
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@octopus.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin_data_dev:/var/lib/pgadmin
+
+volumes:
+  postgres_data_dev:
+  pgadmin_data_dev:
