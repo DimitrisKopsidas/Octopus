@@ -66,7 +66,7 @@ export default function CrashLogsViewer() {
     ...(endDate ? { endDate } : {}),
   }
 
-  const { logs, totalPages, totalElements, isPending, isFetching, error, refetch } = useCrashLogs(params)
+  const { logs, page: currentPage, totalPages, totalElements, isPending, isFetching, error, refetch } = useCrashLogs(params)
 
   const formatTimestamp = (ts) => {
     if (!ts) return '-'
