@@ -120,7 +120,8 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/api/v1/courses/**",
                                 "/api/v1/questions/**",
-                                "/api/v1/bundles/**"
+                                "/api/v1/bundles/**",
+                                "/api/v1/users/count/active"
                         ).permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()

@@ -118,4 +118,10 @@ public class UserController {
         UserResponseDto deactivatedUser = userService.toggleUserStatus(userId, false, actorId, actorUsername);
         return ResponseEntity.ok(deactivatedUser);
     }
+
+    @GetMapping("/count/active")
+    public ResponseEntity<Long> countActiveUsers(){
+        long count = userService.countActiveUsers();
+        return ResponseEntity.ok(count);
+    }
 }

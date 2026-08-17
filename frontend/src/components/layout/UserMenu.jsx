@@ -1,42 +1,65 @@
 // Logged-in user dropdown (avatar, profile, favorites, quizzes, settings, logout). Used by Layout.
-import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import {
+  ChevronDown,
+  User,
+  Heart,
+  FileCheck2,
+  Settings,
+  Sliders,
+  Shield,
+  LogOut,
+} from 'lucide-react'
 import { useMe, useLogout } from '../../hooks/queries'
-import { roleLabel, userInitial, isAdmin, canManageContent } from '../../lib/roles'
+import { ROLE, roleLabel, userInitial } from '../../lib/roles'
 import ThemeToggle from './ThemeToggle'
 import { toast } from '../../store/toastStore'
+import { useNavigate } from 'react-router-dom'
+
+function canManageContent(user) {
+  return user?.role === ROLE.ADMIN || user?.role === ROLE.HELPER
+}
+
+function isAdmin(user) {
+  return user?.role === ROLE.ADMIN
+}
 
 function UserMenu() {
   const navigate = useNavigate()
   const { user } = useMe()
-  const logoutMutation = useLogout()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
+  const logoutMutation = useLogout()
 
-  useEffect(() => {
-    if (!open) return
-    function onClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
-    }
-    function onKey(e) {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('mousedown', onClick)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onClick)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
-
-  if (!user) return null
-
-  async function handleLogout() {
+  const handleLogout = async () => {
     setOpen(false)
     await logoutMutation.mutateAsync().catch(() => {})
     toast.success('Αποσυνδέθηκες επιτυχώς.')
     navigate('/login')
   }
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false)
+      }
+    }
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+
+    if (open) {
+      document.addEventListener('click', handleOutsideClick)
+      document.addEventListener('keydown', handleEscape)
+    }
+    return () => {
+      document.removeEventListener('click', handleOutsideClick)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [open])
+
+  if (!user) return null
 
   const label = roleLabel(user)
   const initial = userInitial(user)
@@ -56,9 +79,7 @@ function UserMenu() {
         <span className="hidden sm:inline text-sm font-medium max-w-[10rem] truncate">
           {user.displayName}
         </span>
-        <svg className="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <ChevronDown className="w-3.5 h-3.5 opacity-70" />
       </button>
 
       {open && (
@@ -85,7 +106,7 @@ function UserMenu() {
               className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
               <span className="flex items-center gap-3">
-                <span className="w-5 text-center">👤</span>
+                <User className="w-4 h-4 text-slate-400" />
                 <span>Το προφίλ μου</span>
               </span>
             </Link>
@@ -97,7 +118,7 @@ function UserMenu() {
               className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
               <span className="flex items-center gap-3">
-                <span className="w-5 text-center">❤️</span>
+                <Heart className="w-4 h-4 text-rose-500" />
                 <span>Αγαπημένα</span>
               </span>
             </Link>
@@ -109,7 +130,7 @@ function UserMenu() {
               className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
               <span className="flex items-center gap-3">
-                <span className="w-5 text-center">📝</span>
+                <FileCheck2 className="w-4 h-4 text-indigo-500" />
                 <span>Τα Κουίζ μου</span>
               </span>
             </Link>
@@ -121,7 +142,7 @@ function UserMenu() {
               className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
               <span className="flex items-center gap-3">
-                <span className="w-5 text-center">⚙️</span>
+                <Settings className="w-4 h-4 text-slate-400" />
                 <span>Ρυθμίσεις</span>
               </span>
             </Link>
@@ -134,7 +155,7 @@ function UserMenu() {
                 className="flex items-center justify-between px-5 py-2.5 text-sm font-semibold text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-colors border-t border-slate-100 dark:border-slate-800"
               >
                 <span className="flex items-center gap-3">
-                  <span className="w-5 text-center">🛠️</span>
+                  <Sliders className="w-4 h-4 text-brand-600" />
                   <span>Πίνακας Ελέγχου</span>
                 </span>
               </Link>
@@ -148,7 +169,7 @@ function UserMenu() {
                 className="flex items-center justify-between px-5 py-2.5 text-sm font-semibold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
               >
                 <span className="flex items-center gap-3">
-                  <span className="w-5 text-center">👑</span>
+                  <Shield className="w-4 h-4 text-amber-500" />
                   <span>Πίνακας Admin</span>
                 </span>
               </Link>
@@ -167,9 +188,10 @@ function UserMenu() {
             onClick={handleLogout}
             disabled={logoutMutation.isPending}
             role="menuitem"
-            className="w-full text-left px-4 py-2.5 text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:opacity-50 border-t border-slate-200/80 dark:border-slate-800 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:opacity-50 border-t border-slate-200/80 dark:border-slate-800 transition-colors cursor-pointer"
           >
-            {logoutMutation.isPending ? 'Αποσύνδεση…' : 'Αποσύνδεση'}
+            <LogOut className="w-4 h-4" />
+            <span>{logoutMutation.isPending ? 'Αποσύνδεση…' : 'Αποσύνδεση'}</span>
           </button>
         </div>
       )}

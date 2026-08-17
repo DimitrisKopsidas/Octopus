@@ -1,6 +1,5 @@
 package com.dkopsidas.octopus.domain.dto;
 
-import com.dkopsidas.octopus.domain.entity.Answer;
 
 import java.util.List;
 

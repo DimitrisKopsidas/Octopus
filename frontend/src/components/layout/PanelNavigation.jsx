@@ -1,4 +1,15 @@
 import { Link, useLocation } from 'react-router-dom'
+import {
+  LayoutDashboard,
+  BookOpen,
+  Flag,
+  Users,
+  KeyRound,
+  ShieldCheck,
+  Bug,
+  Sliders,
+  Shield,
+} from 'lucide-react'
 import { useMe } from '../../hooks/queries'
 import { ROLE } from '../../lib/roles'
 
@@ -8,145 +19,112 @@ export default function PanelNavigation({ activeTab }) {
   const currentPath = activeTab || location.pathname
 
   const isAdmin = user?.role === ROLE.ADMIN
+  const isAdminSection = currentPath.startsWith('/admin-panel')
 
-  const isControlPanelActive = currentPath === '/control-panel'
-  const isCoursesActive = currentPath === '/control-panel/courses' || currentPath.startsWith('/control-panel/courses/')
-  const isReportsActive = currentPath === '/control-panel/reports'
-  const isAdminPanelActive = currentPath === '/admin-panel'
-  const isAuditsActive = currentPath === '/admin-panel/audits'
-  const isCrashesActive = currentPath === '/admin-panel/crashes'
-  const isInviteCodesActive = currentPath === '/admin-panel/invite-codes'
-  const isUsersActive = currentPath === '/admin-panel/users'
+  // Control Panel sub-routes
+  const isControlOverview = currentPath === '/control-panel'
+  const isCourses = currentPath === '/control-panel/courses' || currentPath.startsWith('/control-panel/courses/')
+  const isReports = currentPath === '/control-panel/reports'
+
+  // Admin Panel sub-routes
+  const isAdminOverview = currentPath === '/admin-panel'
+  const isUsers = currentPath === '/admin-panel/users'
+  const isInviteCodes = currentPath === '/admin-panel/invite-codes'
+  const isAudits = currentPath === '/admin-panel/audits'
+  const isCrashes = currentPath === '/admin-panel/crashes'
+
+  const tabClass = (isActive) =>
+    `inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${
+      isActive
+        ? 'bg-brand-600 text-white shadow-md shadow-brand-600/25 dark:bg-brand-500 dark:text-slate-950'
+        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+    }`
 
   return (
-    <div className="mb-8 border-b border-slate-200 dark:border-slate-800">
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
-        {/* Navigation Tabs */}
-        <nav className="flex flex-wrap items-center gap-2" aria-label="Πλοήγηση Διαχείρισης">
-          {/* Overview Control Panel */}
-          <Link
-            to="/control-panel"
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-              isControlPanelActive
-                ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/25'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
-          >
-            <span>🛠️ Πίνακας Ελέγχου</span>
-          </Link>
+    <div className="mb-8 space-y-3">
+      {/* Level 1: Context Switcher (Centered) */}
+      <div className="flex items-center justify-center pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
+        {isAdmin ? (
+          <div className="p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 inline-flex items-center gap-1 shadow-inner">
+            <Link
+              to="/control-panel"
+              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                !isAdminSection
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+              }`}
+            >
+              <Sliders className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+              <span>Περιεχόμενο</span>
+            </Link>
 
-          {/* Courses & Questions */}
-          <Link
-            to="/control-panel/courses"
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-              isCoursesActive
-                ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/25'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
-          >
-            <span>📚 Μαθήματα</span>
-          </Link>
-
-          {/* Reports & Feedback */}
-          <Link
-            to="/control-panel/reports"
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-              isReportsActive
-                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
-                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-            }`}
-          >
-            <span>🚩 Αναφορές</span>
-          </Link>
-
-          {/* Admin Panel Tab (Admins only) */}
-          {isAdmin && (
             <Link
               to="/admin-panel"
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                isAdminPanelActive
-                  ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                isAdminSection
+                  ? 'bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
               }`}
             >
-              <span>👑 Πίνακας Admin</span>
+              <Shield className="w-3.5 h-3.5 text-amber-500" />
+              <span>Διαχείριση Συστήματος</span>
             </Link>
-          )}
-
-          {/* Users & Roles Tab (Admins only) */}
-          {isAdmin && (
-            <Link
-              to="/admin-panel/users"
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                isUsersActive
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              <span>👥 Χρήστες & Ρόλοι</span>
-            </Link>
-          )}
-
-          {/* Invite Codes Tab (Admins only) */}
-          {isAdmin && (
-            <Link
-              to="/admin-panel/invite-codes"
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                isInviteCodesActive
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              <span>🔑 Invite Codes</span>
-            </Link>
-          )}
-
-          {/* Audit Logs Tab (Admins only) */}
-          {isAdmin && (
-            <Link
-              to="/admin-panel/audits"
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                isAuditsActive
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              <span>📜 Audit Logs</span>
-            </Link>
-          )}
-
-          {/* Crash Logs Tab (Admins only) */}
-          {isAdmin && (
-            <Link
-              to="/admin-panel/crashes"
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                isCrashesActive
-                  ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/25'
-                  : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              <span>💥 Crash Logs</span>
-            </Link>
-          )}
-        </nav>
-
-        {/* Current User Role Badge */}
-        {user && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs">
-            <span className="text-slate-500 dark:text-slate-400">Χρήστης:</span>
-            <span className="font-semibold text-slate-900 dark:text-slate-100">@{user.username}</span>
-            <span
-              className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                isAdmin
-                  ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20'
-                  : 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20'
-              }`}
-            >
-              {user.role}
-            </span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/60 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
+            <Sliders className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+            <span>Πίνακας Ελέγχου</span>
           </div>
         )}
       </div>
+
+      {/* Level 2: Section Sub-Navigation Tabs (Centered) */}
+      <nav
+        className="flex items-center justify-center gap-1.5 overflow-x-auto pb-1 text-sm no-scrollbar"
+        aria-label="Υπο-ενότητες Διαχείρισης"
+      >
+        {!isAdminSection ? (
+          /* Control Panel Tabs */
+          <>
+            <Link to="/control-panel" className={tabClass(isControlOverview)}>
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Επισκόπηση</span>
+            </Link>
+            <Link to="/control-panel/courses" className={tabClass(isCourses)}>
+              <BookOpen className="w-4 h-4" />
+              <span>Μαθήματα & Ερωτήσεις</span>
+            </Link>
+            <Link to="/control-panel/reports" className={tabClass(isReports)}>
+              <Flag className="w-4 h-4" />
+              <span>Αναφορές</span>
+            </Link>
+          </>
+        ) : (
+          /* Admin Panel Tabs */
+          <>
+            <Link to="/admin-panel" className={tabClass(isAdminOverview)}>
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Επισκόπηση Admin</span>
+            </Link>
+            <Link to="/admin-panel/users" className={tabClass(isUsers)}>
+              <Users className="w-4 h-4" />
+              <span>Χρήστες & Ρόλοι</span>
+            </Link>
+            <Link to="/admin-panel/invite-codes" className={tabClass(isInviteCodes)}>
+              <KeyRound className="w-4 h-4" />
+              <span>Invite Codes</span>
+            </Link>
+            <Link to="/admin-panel/audits" className={tabClass(isAudits)}>
+              <ShieldCheck className="w-4 h-4" />
+              <span>Audit Logs</span>
+            </Link>
+            <Link to="/admin-panel/crashes" className={tabClass(isCrashes)}>
+              <Bug className="w-4 h-4" />
+              <span>Crash Logs</span>
+            </Link>
+          </>
+        )}
+      </nav>
     </div>
   )
 }

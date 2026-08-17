@@ -3,14 +3,6 @@ import { Link } from 'react-router-dom'
 import { useHomeStats } from '../hooks/queries'
 import t from '../content/home.json'
 
-// MOCK — see the POPULAR section below for why. Mirrors CourseResponseDto plus
-// the two counters the card needs, so the swap to real data is a one-liner.
-const MOCK_POPULAR = [
-  { id: 1101, name: 'Μαθηματικά Ι', semester: 1, questionCount: 184, updatedLabel: 'πριν 2 μέρες' },
-  { id: 1102, name: 'Δομημένος Προγραμματισμός', semester: 1, questionCount: 142, updatedLabel: 'πριν 5 μέρες' },
-  { id: 1104, name: 'Ηλεκτρονική Φυσική', semester: 1, questionCount: 96, updatedLabel: 'πριν 1 εβδομάδα' },
-]
-
 function Home() {
   const stats = useHomeStats()
 
@@ -76,36 +68,6 @@ function Home() {
           <div className="lg:col-span-6 animate-fade-up" style={{ animationDelay: '0.12s' }}>
             <QuizPreview />
           </div>
-        </div>
-      </section>
-
-      {/* POPULAR — mock until "popular" is a real measure.
-          Ranking by plays needs a course_id on `bundles`, which does not exist
-          yet, so nothing real can back this section today. The shape below is
-          what the endpoint should return, so swapping MOCK_POPULAR for a query
-          is the only change this section will need. */}
-      <section className="py-14 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex flex-wrap items-end justify-between gap-3 mb-8">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-600 dark:text-brand-400">
-              {t.popular.eyebrow}
-            </p>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
-              {t.popular.title}
-            </h2>
-          </div>
-          <Link
-            to="/courses"
-            className="text-sm font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
-          >
-            {t.popular.allLink} →
-          </Link>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {MOCK_POPULAR.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
         </div>
       </section>
 
@@ -215,38 +177,6 @@ function HeroStat({ value, label }) {
       </p>
       <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-[9rem]">{label}</p>
     </div>
-  )
-}
-
-function CourseCard({ course }) {
-  return (
-    <Link
-      to={`/courses/${course.id}/start`}
-      className="group flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm hover:border-brand-400 dark:hover:border-brand-600 hover:shadow-md transition-all"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-          {course.semester}ο εξάμηνο
-        </span>
-        <span
-          aria-hidden="true"
-          className="text-slate-300 dark:text-slate-600 group-hover:text-brand-500 transition-colors"
-        >
-          ↗
-        </span>
-      </div>
-
-      <h3 className="mt-2 font-bold text-slate-900 dark:text-slate-100 leading-snug">
-        {course.name}
-      </h3>
-
-      <div className="mt-auto pt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-        <span className="font-semibold text-brand-600 dark:text-brand-400 tabular-nums">
-          {course.questionCount.toLocaleString('el-GR')} {t.popular.questions}
-        </span>
-        <span>{course.updatedLabel}</span>
-      </div>
-    </Link>
   )
 }
 

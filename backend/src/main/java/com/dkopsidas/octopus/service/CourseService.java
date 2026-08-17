@@ -2,7 +2,6 @@ package com.dkopsidas.octopus.service;
 
 import com.dkopsidas.octopus.domain.dto.CourseResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateCourseRequestDto;
-import com.dkopsidas.octopus.domain.entity.Course;
 
 
 import java.util.List;

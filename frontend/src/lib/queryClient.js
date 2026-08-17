@@ -62,6 +62,7 @@ export const qk = {
     all: ['users'],
     list: (params) => ['users', 'list', params],
     count: () => ['users', 'count'],
+    countActive: () => ['users', 'countActive'],
   },
 }
 

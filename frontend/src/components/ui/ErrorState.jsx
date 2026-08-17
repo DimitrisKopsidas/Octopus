@@ -1,6 +1,7 @@
 // Error card with retry (+ compact banner variant). Used across pages.
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AlertCircle, AlertTriangle, RotateCw } from 'lucide-react'
 
 function ErrorState({
   message,
@@ -25,9 +26,7 @@ function ErrorState({
     return (
       <div className="rounded-xl bg-rose-50/90 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 p-4 flex items-center justify-between gap-3 flex-wrap shadow-sm">
         <div className="flex items-center gap-3 text-rose-700 dark:text-rose-300 text-sm">
-          <svg className="w-5 h-5 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
           <span className="font-medium">{message}</span>
         </div>
         {onRetry && (
@@ -45,9 +44,7 @@ function ErrorState({
 
         {/* Icon */}
         <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 mb-5 shadow-sm">
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
+          <AlertTriangle className="w-8 h-8" />
         </div>
 
         <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">{title}</h3>
@@ -81,14 +78,7 @@ function RetryButton({ onClick, retrying, label, small }) {
         small ? 'px-3.5 py-1.5 text-xs' : 'px-5 py-2.5 text-sm'
       }`}
     >
-      <svg
-        className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`}
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-      </svg>
+      <RotateCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} />
       <span>{retrying ? 'Προσπάθεια…' : label}</span>
     </button>
   )

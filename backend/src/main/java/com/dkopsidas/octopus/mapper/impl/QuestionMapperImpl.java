@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.time.LocalTime.now;
 
 @Component
 public class QuestionMapperImpl implements QuestionMapper {
