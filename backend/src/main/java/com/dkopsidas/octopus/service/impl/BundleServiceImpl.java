@@ -6,17 +6,13 @@ import com.dkopsidas.octopus.domain.entity.Answer;
 import com.dkopsidas.octopus.domain.entity.Bundle;
 import com.dkopsidas.octopus.mapper.BundleMapper;
 import com.dkopsidas.octopus.repository.AnswerRepository;
-import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.BundleRepository;
 import com.dkopsidas.octopus.service.BundleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
 import org.springframework.context.ApplicationEventPublisher;
-
-import java.text.DecimalFormat;
 import java.util.List;
 
 @RequiredArgsConstructor

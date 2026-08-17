@@ -2,11 +2,7 @@ package com.dkopsidas.octopus.controller;
 
 
 import com.dkopsidas.octopus.domain.dto.CourseResponseDto;
-import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateCourseRequestDto;
-import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
-import com.dkopsidas.octopus.domain.entity.Course;
-import com.dkopsidas.octopus.mapper.CourseMapper;
 import com.dkopsidas.octopus.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
