@@ -60,13 +60,7 @@ public class BundleServiceImpl implements BundleService {
 
     @Override
     public Long countByCourse(Long courseId) {
-        List<Bundle> bundles = bundleRepository.findAll();
-
-        return bundles.stream().filter(
-                        bundle -> bundle.getAnswers().stream().anyMatch(
-                        answer -> answer.getQuestion().getCourse().getId()
-                                .equals(courseId))).count();
+        return bundleRepository.countByCourseId(courseId);
     }
-
 }
 
