@@ -44,6 +44,9 @@ public class User {
     @Column(name = "active", nullable = false)
     private boolean active;
 
+    @Column(name = "discord_name")
+    private String discordName;
+
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;
 
