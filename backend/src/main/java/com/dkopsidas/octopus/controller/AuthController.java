@@ -9,7 +9,6 @@ import com.dkopsidas.octopus.security.AuthService;
 import com.dkopsidas.octopus.security.LoginResult;
 import com.dkopsidas.octopus.security.RefreshTokenCookieService;
 
-import jakarta.el.ELException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
