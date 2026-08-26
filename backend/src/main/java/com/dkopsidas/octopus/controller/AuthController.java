@@ -58,9 +58,6 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        if(true) { 
-            throw new ELException();
-        }
         refreshTokenCookieService.read(request).ifPresent(authService::logout);
         refreshTokenCookieService.clear(response);
         return ResponseEntity.noContent().build();
