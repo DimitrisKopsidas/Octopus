@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
                     500,
                     null,
                     null,
-                    request.getRemoteAddr(),
+                    request.getHeader("X-Forwarded-For"),
                     request.getHeader("User-Agent")
             );
         } catch (Exception loggingEx) {
