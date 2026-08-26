@@ -8,7 +8,6 @@ import com.dkopsidas.octopus.exception.MissingRefreshTokenException;
 import com.dkopsidas.octopus.security.AuthService;
 import com.dkopsidas.octopus.security.LoginResult;
 import com.dkopsidas.octopus.security.RefreshTokenCookieService;
-import jakarta.el.ELException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -57,9 +56,6 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        if(true){
-            throw new ELException();
-        }
         refreshTokenCookieService.read(request).ifPresent(authService::logout);
         refreshTokenCookieService.clear(response);
         return ResponseEntity.noContent().build();
