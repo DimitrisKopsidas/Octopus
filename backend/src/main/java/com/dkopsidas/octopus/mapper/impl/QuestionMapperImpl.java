@@ -83,7 +83,9 @@ public class QuestionMapperImpl implements QuestionMapper {
                 question.getImageUrl(),
                 question.getIsActive(),
                 answers,
-                question.getCourse().getId()
+                question.getCourse().getId(),
+                question.getCreatedBy().getId(),
+                question.getCreatedBy().getDisplayName()
         );
     }
 

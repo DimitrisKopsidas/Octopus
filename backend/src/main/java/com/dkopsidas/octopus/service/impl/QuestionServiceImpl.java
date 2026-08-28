@@ -1,12 +1,10 @@
 package com.dkopsidas.octopus.service.impl;
 
 import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
-import com.dkopsidas.octopus.domain.entity.Answer;
+import com.dkopsidas.octopus.domain.entity.*;
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
-import com.dkopsidas.octopus.domain.entity.Course;
-import com.dkopsidas.octopus.domain.entity.Question;
 import com.dkopsidas.octopus.exception.CorrectAnswerCountException;
 import com.dkopsidas.octopus.exception.CourseNotFoundException;
 import com.dkopsidas.octopus.exception.QuestionNotFoundException;
@@ -14,11 +12,13 @@ import com.dkopsidas.octopus.exception.SimpleException;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.QuestionRepository;
+import com.dkopsidas.octopus.repository.UserRepository;
+import com.dkopsidas.octopus.security.AuthenticatedUser;
 import com.dkopsidas.octopus.service.QuestionService;
 import lombok.RequiredArgsConstructor;
-import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Transactional at class level on purpose. spring.jpa.open-in-view is disabled,
@@ -42,16 +43,25 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final QuestionRepository questionRepository;
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
     private final QuestionMapper questionMapper;
     private final ImageService imageService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public QuestionResponseDto createQuestion(CreateQuestionRequestDto createRequest) {
-        Course courseFromDto = courseRepository.findById(createRequest.courseId()).
-                orElseThrow(() -> new CourseNotFoundException(createRequest.courseId()));
+        Course courseFromDto = courseRepository.findById(createRequest.courseId())
+                .orElseThrow(() -> new CourseNotFoundException(createRequest.courseId()));
+
+        AuthenticatedUser principal = (AuthenticatedUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        User userRef = userRepository.getReferenceById(principal.getId());
 
         Question question = questionMapper.toEntity(createRequest, courseFromDto);
+        question.setCreatedBy(userRef);
 
         checkCorrectAnswerCount(question);
 

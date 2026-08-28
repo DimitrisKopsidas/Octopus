@@ -40,6 +40,10 @@ public class Question {
     @JoinColumn(name = "course_id", nullable = false)//column name
     private Course course;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", updatable = false, nullable = false)
+    private User createdBy;
+
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;
 
