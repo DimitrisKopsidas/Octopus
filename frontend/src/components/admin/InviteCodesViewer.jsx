@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Plus, ChevronDown, Search, RotateCw, Loader2, KeyRound } from 'lucide-react'
 import { useInviteCodes, useGenerateInviteCode, useDeleteInviteCode } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
 import t from '../../content/inviteCodes.json'
@@ -28,17 +29,20 @@ export default function InviteCodesViewer() {
 
   const [showGenerateModal, setShowGenerateModal] = useState(false)
   const [modalRole, setModalRole] = useState('HELPER')
-  const [modalCustomCode, setModalCustomCode] = useState('')
+  const [modalExpiresInHours, setModalExpiresInHours] = useState('72')
+  const [modalMaxUses, setModalMaxUses] = useState('1')
+  const [copiedId, setCopiedId] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const params = {
+  const size = 15
+  const { codes, totalPages, totalElements, isPending, isFetching, error, refetch } = useInviteCodes({
+    role: roleFilter || undefined,
+    status: statusFilter || undefined,
+    query: query.trim() || undefined,
     page,
-    size: 15,
-    ...(roleFilter ? { targetRole: roleFilter } : {}),
-    ...(statusFilter !== '' ? { used: statusFilter === 'used' } : {}),
-    ...(query.trim() ? { query: query.trim() } : {}),
-  }
+    size,
+  })
 
-  const { codes, totalPages, totalElements, isPending, isFetching, error, refetch } = useInviteCodes(params)
   const generateMutation = useGenerateInviteCode()
   const deleteMutation = useDeleteInviteCode()
 
@@ -65,35 +69,40 @@ export default function InviteCodesViewer() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [showGenerateModal])
 
-  function handleCopy(code) {
-    navigator.clipboard.writeText(code)
-    toast.success(t.toast.copied)
-  }
-
-  async function handleGenerate(e) {
+  const handleGenerate = async (e) => {
     e.preventDefault()
     try {
-      const created = await generateMutation.mutateAsync({
-        targetRole: modalRole,
-        customCode: modalCustomCode.trim() || undefined,
-      })
+      const payload = {
+        role: modalRole,
+        expiresInHours: modalExpiresInHours ? parseInt(modalExpiresInHours, 10) : undefined,
+        maxUses: modalMaxUses ? parseInt(modalMaxUses, 10) : 1,
+      }
+      await generateMutation.mutateAsync(payload)
       toast.success(t.toast.generated)
       setShowGenerateModal(false)
-      setModalCustomCode('')
-      handleCopy(created.code)
+      setModalExpiresInHours('72')
+      setModalMaxUses('1')
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Σφάλμα δημιουργίας κωδικού')
+      toast.error(err.message || t.toast.generateFailed)
     }
   }
 
-  async function handleDelete(id) {
-    if (!window.confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτόν τον κωδικό;')) return
+  const handleDelete = async () => {
+    if (!deleteTarget) return
     try {
-      await deleteMutation.mutateAsync(id)
+      await deleteMutation.mutateAsync(deleteTarget.id)
       toast.success(t.toast.deleted)
+      setDeleteTarget(null)
     } catch (err) {
-      toast.error('Σφάλμα διαγραφής κωδικού')
+      toast.error(err.message || t.toast.deleteFailed)
     }
+  }
+
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard.writeText(text)
+    setCopiedId(id)
+    toast.success(t.toast.copied)
+    setTimeout(() => setCopiedId(null), 2000)
   }
 
   return (
@@ -102,7 +111,7 @@ export default function InviteCodesViewer() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2.5">
-            <span>🔑</span> {t.title}
+            <KeyRound className="w-6 h-6 text-emerald-500" /> {t.title}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {t.subtitle}
@@ -113,9 +122,7 @@ export default function InviteCodesViewer() {
           onClick={() => setShowGenerateModal(true)}
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm shadow-md shadow-brand-600/20 transition-all cursor-pointer self-start sm:self-auto"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="w-4 h-4" />
           {t.actions.generate}
         </button>
       </div>
@@ -138,9 +145,7 @@ export default function InviteCodesViewer() {
               <option value="ADMIN" className={OPTION_CLASS}>👑 ADMIN</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDown className="w-4 h-4" />
             </div>
           </div>
 
@@ -159,9 +164,7 @@ export default function InviteCodesViewer() {
               <option value="used" className={OPTION_CLASS}>🔴 {t.actions.used}</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDown className="w-4 h-4" />
             </div>
           </div>
 
@@ -178,9 +181,7 @@ export default function InviteCodesViewer() {
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <Search className="w-4 h-4" />
             </div>
           </div>
         </div>
@@ -196,9 +197,7 @@ export default function InviteCodesViewer() {
             className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             title="Aνανέωση"
           >
-            <svg className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
+            <RotateCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
@@ -207,10 +206,7 @@ export default function InviteCodesViewer() {
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         {isPending ? (
           <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-            <svg className="w-8 h-8 animate-spin mx-auto mb-3 text-brand-600" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
+            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-brand-600" />
             Φόρτωση κωδικών...
           </div>
         ) : error ? (

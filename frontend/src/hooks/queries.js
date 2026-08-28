@@ -71,10 +71,6 @@ export function useCourseQuestions(courseId, fallbackError = 'Σφάλμα φό�
 
 
 
-//   const users = useQuery({ queryKey: qk.users.count(), queryFn: usersApi.count, retry: false })
-
-const MOCK_ACTIVE_USERS = 428
-
 export function useHomeStats() {
   const tests = useQuery({
     queryKey: qk.bundles.count(),
@@ -86,10 +82,15 @@ export function useHomeStats() {
     queryFn: coursesApi.countWithContent,
     retry: false,
   })
+  const users = useQuery({
+    queryKey: qk.users.countActive(),
+    queryFn: usersApi.countActive,
+    retry: false,
+  })
   return {
     tests: tests.data ?? null,
     courses: courses.data ?? null,
-    users: MOCK_ACTIVE_USERS,
+    users: users.data ?? null,
   }
 }
 

@@ -1,5 +1,6 @@
 // Course card in the Courses grid matching custom design system. Used by Courses page.
 import { Link } from 'react-router-dom'
+import { ArrowUpRight, BookOpen, Clock } from 'lucide-react'
 import { useMe } from '../../hooks/queries'
 import t from '../../content/courses.json'
 
@@ -44,9 +45,7 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
         )}
         {!disabled && (
           <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:text-brand-600 dark:group-hover:text-brand-400 group-hover:border-brand-500/40 transition-all shrink-0">
-            <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M7 17L17 7M17 7H7M17 7V17" />
-            </svg>
+            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </div>
         )}
       </div>
@@ -83,9 +82,6 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
 
       {/* Footer Info Row */}
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-        {/* The question count is the one number that decides whether a course is
-            worth opening, so it carries the brand colour rather than blending
-            into the metadata row. */}
         <div
           className={`flex items-center gap-1.5 rounded-lg px-2 py-1 font-bold ${
             disabled
@@ -93,16 +89,12 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
               : 'bg-brand-50 dark:bg-brand-950/50 text-brand-700 dark:text-brand-300'
           }`}
         >
-          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
+          <BookOpen className="w-4 h-4 shrink-0" />
           <span className="tabular-nums">{questionCount}</span>
           <span className="font-medium">{t.courseCard.questions}</span>
         </div>
         <div className="flex items-center gap-1.5 font-medium">
-          <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <Clock className="w-4 h-4 text-slate-400 shrink-0" />
           <span>{lastUpdatedText}</span>
         </div>
       </div>

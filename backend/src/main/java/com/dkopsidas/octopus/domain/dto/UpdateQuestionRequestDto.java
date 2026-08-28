@@ -1,6 +1,5 @@
 package com.dkopsidas.octopus.domain.dto;
 
-import com.dkopsidas.octopus.domain.entity.Answer;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { AlertOctagon, RotateCw, ChevronDown } from 'lucide-react'
 import { useCrashLogs, useResolveCrashLog } from '../../hooks/queries'
 import Skeleton from '../ui/Skeleton'
 import ErrorState from '../ui/ErrorState'
@@ -24,6 +25,16 @@ const RESOLVED_OPTIONS = [
 
 const SIZE_OPTIONS = [10, 15, 25, 50]
 
+const computeDateRange = (range) => {
+  const now = new Date()
+  if (!range) return { startDate: null, endDate: null }
+  const start = new Date()
+  if (range === 'TODAY') start.setHours(0, 0, 0, 0)
+  else if (range === 'WEEK') start.setDate(now.getDate() - 7)
+  else if (range === 'MONTH') start.setDate(now.getDate() - 30)
+  return { startDate: start.toISOString(), endDate: now.toISOString() }
+}
+
 export default function CrashLogsViewer() {
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(15)
@@ -32,35 +43,30 @@ export default function CrashLogsViewer() {
   const [selectedDateRange, setSelectedDateRange] = useState('')
   const [selectedLog, setSelectedLog] = useState(null)
 
-  const resolveMutation = useResolveCrashLog()
-
-  // Body scroll lock & ESC key handling for detail modal
   useEffect(() => {
-    if (selectedLog) {
-      document.body.classList.add('overflow-hidden')
-      const handleKeyDown = (e) => {
-        if (e.key === 'Escape') setSelectedLog(null)
-      }
-      window.addEventListener('keydown', handleKeyDown)
-      return () => {
-        document.body.classList.remove('overflow-hidden')
-        window.removeEventListener('keydown', handleKeyDown)
-      }
-    } else {
-      document.body.classList.remove('overflow-hidden')
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedLog(null)
     }
+    if (selectedLog) {
+      window.addEventListener('keydown', handleKeyDown)
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedLog])
 
-  const queryParams = {
+  const resolveMutation = useResolveCrashLog()
+
+  const { startDate, endDate } = computeDateRange(selectedDateRange)
+  const params = {
     page,
     size: pageSize,
     sort: 'timestamp,desc',
-    ...(exceptionQuery.trim() ? { exceptionClass: exceptionQuery.trim() } : {}),
+    ...(exceptionQuery.trim() ? { exception: exceptionQuery.trim() } : {}),
     ...(selectedResolved !== '' ? { resolved: selectedResolved === 'true' } : {}),
-    ...(selectedDateRange ? { dateRange: selectedDateRange } : {}),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
   }
 
-  const { logs, page: currentPage, totalPages, totalElements, isPending, isFetching, error, refetch } = useCrashLogs(queryParams)
+  const { logs, page: currentPage, totalPages, totalElements, isPending, isFetching, error, refetch } = useCrashLogs(params)
 
   const formatTimestamp = (ts) => {
     if (!ts) return '-'
@@ -74,12 +80,15 @@ export default function CrashLogsViewer() {
     })
   }
 
-  const handleToggleResolve = async (log, e) => {
+  const handleToggleResolved = async (log, e) => {
     if (e) e.stopPropagation()
-    const newStatus = !log.resolved
-    await resolveMutation.mutateAsync({ id: log.id, resolved: newStatus })
-    if (selectedLog && selectedLog.id === log.id) {
-      setSelectedLog({ ...selectedLog, resolved: newStatus })
+    try {
+      await resolveMutation.mutateAsync({ id: log.id, resolved: !log.resolved })
+      if (selectedLog?.id === log.id) {
+        setSelectedLog((prev) => (prev ? { ...prev, resolved: !prev.resolved } : null))
+      }
+    } catch {
+      // Handled in queries
     }
   }
 
@@ -90,7 +99,7 @@ export default function CrashLogsViewer() {
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2.5">
             <span className="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm shadow-sm">
-              💥
+              <AlertOctagon className="w-4 h-4" />
             </span>
             {t.title}
           </h2>
@@ -104,9 +113,7 @@ export default function CrashLogsViewer() {
           disabled={isFetching}
           className="inline-flex items-center justify-center px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
         >
-          <svg className={`w-3.5 h-3.5 mr-1.5 ${isFetching ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
+          <RotateCw className={`w-3.5 h-3.5 mr-1.5 ${isFetching ? 'animate-spin' : ''}`} />
           {t.refresh}
         </button>
       </div>
@@ -149,9 +156,7 @@ export default function CrashLogsViewer() {
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDown className="w-3.5 h-3.5" />
             </div>
           </div>
         </div>
@@ -176,9 +181,7 @@ export default function CrashLogsViewer() {
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDown className="w-3.5 h-3.5" />
             </div>
           </div>
         </div>
@@ -203,9 +206,7 @@ export default function CrashLogsViewer() {
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <ChevronDown className="w-3.5 h-3.5" />
             </div>
           </div>
         </div>
