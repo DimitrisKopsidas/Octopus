@@ -20,7 +20,6 @@ public record CreateUserRequestDto(
 
         @Min(value = 2000, message = ERROR_MESSAGE_YEAR_MIN)
         @Max(value = 2030, message = ERROR_MESSAGE_YEAR_MAX)
-        @NotBlank(message = ERROR_MESSAGE_YEAR_REQUIRED)
         Integer year,
 
         @Size(max = 50, message = ERROR_MESSAGE_USER_CODE_SIZE)
