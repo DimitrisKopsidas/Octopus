@@ -128,12 +128,21 @@ html.dark::-webkit-scrollbar-thumb:hover,
 .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-float   { animation: floatY 5s ease-in-out infinite; }
 
+/* Indeterminate bar: a short segment sweeping across, for work whose
+   duration we cannot know (a bulk import is one round trip, not N). */
+@keyframes sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+.animate-sweep { animation: sweep 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .animate-float,
   .animate-fadeIn,
   .animate-slideInRight,
+  .animate-sweep,
   .animate-reveal {
     animation: none !important;
   }

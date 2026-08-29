@@ -7,6 +7,7 @@ import Modal from '../components/ui/Modal'
 import ConfirmModal from '../components/ui/ConfirmModal'
 import BackButton from '../components/ui/BackButton'
 import QuestionForm from '../components/question/QuestionForm'
+import QuestionImportForm from '../components/question/QuestionImportForm'
 import QuestionCard from '../components/question/QuestionCard'
 import QuestionCardSkeleton from '../components/question/QuestionCardSkeleton'
 import ErrorState from '../components/ui/ErrorState'
@@ -34,11 +35,13 @@ function AdminCourse() {
 
   const [modalState, setModalState] = useState({ open: false, editing: null })
   const [settingsOpen, setSettingsOpen] = useState(false)
+  // Create modal shows either the single-question form or the JSON import.
+  const [createMode, setCreateMode] = useState('form')
   const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const openCreate = () => setModalState({ open: true, editing: null })
+  const openCreate = () => { setCreateMode('form'); setModalState({ open: true, editing: null }) }
   const openEdit = (question) => setModalState({ open: true, editing: question })
-  const closeModal = () => setModalState({ open: false, editing: null })
+  const closeModal = () => { setModalState({ open: false, editing: null }); setCreateMode('form') }
   const requestDelete = (question) => setDeleteTarget(question)
   const cancelDelete = () => { if (!deleting) setDeleteTarget(null) }
 
@@ -127,16 +130,42 @@ function AdminCourse() {
       <Modal
         open={modalState.open}
         onClose={closeModal}
-        title={modalState.editing ? t.modal.editTitle : t.modal.createTitle}
+        title={
+          modalState.editing
+            ? t.modal.editTitle
+            : createMode === 'import'
+              ? t.modal.importTitle
+              : t.modal.createTitle
+        }
         size="lg"
       >
-        <QuestionForm
-          courseId={courseId}
-          initialQuestion={modalState.editing}
-          onCreated={() => { toast.success(t.toast.questionCreated) }}
-          onUpdated={() => { closeModal(); toast.success(t.toast.questionUpdated) }}
-          onCancel={closeModal}
-        />
+        {!modalState.editing && (
+          <div className="px-6 pt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setCreateMode(createMode === 'import' ? 'form' : 'import')}
+              className="text-sm font-medium text-brand-700 dark:text-brand-400 hover:underline"
+            >
+              {createMode === 'import' ? t.import.backToForm : t.importButton}
+            </button>
+          </div>
+        )}
+
+        {createMode === 'import' && !modalState.editing ? (
+          <QuestionImportForm
+            courseId={courseId}
+            onImported={closeModal}
+            onCancel={closeModal}
+          />
+        ) : (
+          <QuestionForm
+            courseId={courseId}
+            initialQuestion={modalState.editing}
+            onCreated={() => { toast.success(t.toast.questionCreated) }}
+            onUpdated={() => { closeModal(); toast.success(t.toast.questionUpdated) }}
+            onCancel={closeModal}
+          />
+        )}
       </Modal>
 
       <Modal

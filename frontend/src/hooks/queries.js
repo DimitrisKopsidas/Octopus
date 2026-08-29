@@ -146,6 +146,16 @@ export function useUpdateQuestion(courseId) {
 }
 
 // Soft-delete (PATCH toggles isActive server-side).
+// Bulk import. Same invalidation as create: the list, settingsInfo and the
+// with-content set all shift when a course gains questions.
+export function useImportQuestions(courseId) {
+  const invalidate = useInvalidateCourseContent()
+  return useMutation({
+    mutationFn: (payload) => questionsApi.importToCourse(courseId, payload),
+    onSuccess: () => invalidate(courseId),
+  })
+}
+
 export function useDeleteQuestion(courseId) {
   const invalidate = useInvalidateCourseContent()
   return useMutation({
