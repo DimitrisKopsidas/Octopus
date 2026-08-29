@@ -25,16 +25,6 @@ const RESOLVED_OPTIONS = [
 
 const SIZE_OPTIONS = [10, 15, 25, 50]
 
-const computeDateRange = (range) => {
-  const now = new Date()
-  if (!range) return { startDate: null, endDate: null }
-  const start = new Date()
-  if (range === 'TODAY') start.setHours(0, 0, 0, 0)
-  else if (range === 'WEEK') start.setDate(now.getDate() - 7)
-  else if (range === 'MONTH') start.setDate(now.getDate() - 30)
-  return { startDate: start.toISOString(), endDate: now.toISOString() }
-}
-
 export default function CrashLogsViewer() {
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(15)
@@ -55,15 +45,13 @@ export default function CrashLogsViewer() {
 
   const resolveMutation = useResolveCrashLog()
 
-  const { startDate, endDate } = computeDateRange(selectedDateRange)
   const params = {
     page,
     size: pageSize,
     sort: 'timestamp,desc',
-    ...(exceptionQuery.trim() ? { exception: exceptionQuery.trim() } : {}),
+    ...(exceptionQuery.trim() ? { exceptionClass: exceptionQuery.trim() } : {}),
     ...(selectedResolved !== '' ? { resolved: selectedResolved === 'true' } : {}),
-    ...(startDate ? { startDate } : {}),
-    ...(endDate ? { endDate } : {}),
+    ...(selectedDateRange ? { dateRange: selectedDateRange } : {}),
   }
 
   const { logs, page: currentPage, totalPages, totalElements, isPending, isFetching, error, refetch } = useCrashLogs(params)
@@ -270,7 +258,7 @@ export default function CrashLogsViewer() {
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <button
-                        onClick={(e) => handleToggleResolve(log, e)}
+                        onClick={(e) => handleToggleResolved(log, e)}
                         disabled={resolveMutation.isPending}
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border transition-colors cursor-pointer ${
                           log.resolved
@@ -360,7 +348,7 @@ export default function CrashLogsViewer() {
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 break-words">{selectedLog.message}</div>
                 </div>
                 <button
-                  onClick={(e) => handleToggleResolve(selectedLog, e)}
+                  onClick={(e) => handleToggleResolved(selectedLog, e)}
                   disabled={resolveMutation.isPending}
                   className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all disabled:opacity-60 ${
                     selectedLog.resolved

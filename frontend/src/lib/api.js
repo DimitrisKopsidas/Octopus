@@ -151,6 +151,8 @@ export const questionsApi = {
   byRandomCount: (courseId, count) =>
     unwrap(http.get(`/questions/${courseId}/randomCount=${count}`)),
   create: (payload) => unwrap(http.post('/questions', payload)),
+  importToCourse: (courseId, payload) =>
+    unwrap(http.post(`/questions/${courseId}/import`, payload, { timeout: UPLOAD_TIMEOUT })),
   update: (id, payload) => unwrap(http.put(`/questions/${id}`, payload)),
   // Image is a separate two-step concern: save the question first (to get its id),
   // then upload/delete its image via these endpoints (multipart "file" param).

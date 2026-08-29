@@ -6,11 +6,15 @@ import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.domain.entity.Course;
 import com.dkopsidas.octopus.domain.entity.Question;
 import com.dkopsidas.octopus.domain.entity.User;
+import com.dkopsidas.octopus.domain.dto.AnswerRequestDto;
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
+import com.dkopsidas.octopus.domain.dto.ImportQuestionsRequestDto;
+import com.dkopsidas.octopus.domain.dto.ImportQuestionsResponseDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.exception.CorrectAnswerCountException;
 import com.dkopsidas.octopus.exception.CourseNotFoundException;
+import com.dkopsidas.octopus.exception.QuestionImportException;
 import com.dkopsidas.octopus.exception.QuestionNotFoundException;
 import com.dkopsidas.octopus.exception.SimpleException;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
@@ -30,7 +34,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -77,6 +83,95 @@ public class QuestionServiceImpl implements QuestionService {
         ));
 
         return questionMapper.toDto(saved);
+    }
+
+    /**
+     * Bulk import for one course. Validates the whole file first and writes
+     * nothing if any entry is unusable, so a rejected upload never leaves the
+     * course half-filled. Titles already present are skipped rather than
+     * duplicated, which makes re-running the same file safe.
+     *
+     * There is no question "type" to declare: a true/false question is simply
+     * one with two answers titled Σωστό and Λάθος, exactly as the editor stores it.
+     */
+    @Override
+    public ImportQuestionsResponseDto importQuestions(Long courseId, ImportQuestionsRequestDto importRequest) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
+
+        List<ImportQuestionsRequestDto.ImportedQuestion> entries = importRequest.questions();
+        List<String> problems = new ArrayList<>();
+        Set<String> seenInFile = new LinkedHashSet<>();
+
+        for (int i = 0; i < entries.size(); i++) {
+            ImportQuestionsRequestDto.ImportedQuestion entry = entries.get(i);
+            String position = "#" + (i + 1) + " \"" + preview(entry.title()) + "\"";
+
+            boolean hasCorrect = entry.answers().stream().anyMatch(AnswerRequestDto::isCorrect);
+            if (!hasCorrect) {
+                problems.add(position + ": no answer is marked correct");
+            }
+
+            if (!seenInFile.add(normalise(entry.title()))) {
+                problems.add(position + ": appears more than once in the file");
+            }
+        }
+
+        if (!problems.isEmpty()) {
+            throw new QuestionImportException(problems);
+        }
+
+        Set<String> existingTitles = questionRepository.findTitlesByCourseId(courseId).stream()
+                .map(this::normalise)
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User userRef = userRepository.getReferenceById(UUID.fromString(jwt.getSubject()));
+
+        List<Question> toSave = new ArrayList<>();
+        List<String> skipped = new ArrayList<>();
+
+        for (ImportQuestionsRequestDto.ImportedQuestion entry : entries) {
+            if (existingTitles.contains(normalise(entry.title()))) {
+                skipped.add(entry.title().trim());
+                continue;
+            }
+
+            CreateQuestionRequestDto asCreate = new CreateQuestionRequestDto(
+                    entry.title().trim(),
+                    entry.imageUrl(),
+                    entry.answers(),
+                    courseId
+            );
+
+            Question question = questionMapper.toEntity(asCreate, course);
+            question.setCreatedBy(userRef);
+            toSave.add(question);
+        }
+
+        List<Question> saved = questionRepository.saveAll(toSave);
+
+        eventPublisher.publishEvent(AuditEvent.success(
+                null,
+                null,
+                AuditAction.QUESTION_CREATED,
+                "QUESTION",
+                courseId.toString(),
+                "Imported " + saved.size() + " question(s) into course " + courseId
+                        + (skipped.isEmpty() ? "" : ", skipped " + skipped.size() + " duplicate(s)")
+        ));
+
+        return new ImportQuestionsResponseDto(saved.size(), skipped.size(), skipped);
+    }
+
+    private String normalise(String title) {
+        return title == null ? "" : title.trim().toLowerCase();
+    }
+
+    private String preview(String title) {
+        if (title == null) return "";
+        String trimmed = title.trim();
+        return trimmed.length() <= 60 ? trimmed : trimmed.substring(0, 57) + "...";
     }
 
     @Override

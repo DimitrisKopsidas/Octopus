@@ -9,8 +9,10 @@
     "inactive": "Απενεργοποιημένοι"
   },
   "table": {
+    "user": "Χρήστης",
     "username": "Username",
     "displayName": "Ονοματεπώνυμο",
+    "discordName": "Discord",
     "role": "Ρόλος",
     "year": "Έτος Εισαγωγής",
     "status": "Κατάσταση",

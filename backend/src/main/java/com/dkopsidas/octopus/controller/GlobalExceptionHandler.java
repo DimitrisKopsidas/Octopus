@@ -31,6 +31,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Import problems come back as one 400 listing every bad entry, so the file
+     * is fixed in a single pass instead of one upload per mistake.
+     */
+    @ExceptionHandler(QuestionImportException.class)
+    public ResponseEntity<ErrorResponseDto> handleQuestionImportException(QuestionImportException ex) {
+        String message = ex.getMessage() + ":\n" + String.join("\n", ex.getProblems());
+        return ResponseEntity.badRequest().body(new ErrorResponseDto(message));
+    }
+
     @ExceptionHandler(SimpleException.class)
     public ResponseEntity<String> handleSimpleExceptions(SimpleException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());

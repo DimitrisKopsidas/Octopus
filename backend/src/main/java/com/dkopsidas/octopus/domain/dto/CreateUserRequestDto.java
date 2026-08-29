@@ -10,7 +10,6 @@ public record CreateUserRequestDto(
         @Size(max = 50, message = ERROR_MESSAGE_USERNAME_SIZE)
         String username,
 
-        @NotBlank(message = ERROR_MESSAGE_DISPLAY_NAME_REQUIRED)
         @Size(max = 100, message = ERROR_MESSAGE_DISPLAY_NAME_SIZE)
         String displayName,
 
@@ -30,7 +29,6 @@ public record CreateUserRequestDto(
 ) {
     private static final String ERROR_MESSAGE_USERNAME_REQUIRED = "Username is required";
     private static final String ERROR_MESSAGE_USERNAME_SIZE = "Username must be 50 characters or less";
-    private static final String ERROR_MESSAGE_DISPLAY_NAME_REQUIRED = "Display name is required";
     private static final String ERROR_MESSAGE_DISPLAY_NAME_SIZE = "Display name must be 100 characters or less";
     private static final String ERROR_MESSAGE_PASSWORD_REQUIRED = "Password is required";
     private static final String ERROR_MESSAGE_PASSWORD_SIZE = "Password must be 100 characters or less";

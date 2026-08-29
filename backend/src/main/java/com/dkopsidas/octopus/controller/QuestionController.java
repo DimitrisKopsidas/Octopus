@@ -1,6 +1,8 @@
 package com.dkopsidas.octopus.controller;
 
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
+import com.dkopsidas.octopus.domain.dto.ImportQuestionsRequestDto;
+import com.dkopsidas.octopus.domain.dto.ImportQuestionsResponseDto;
 import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,6 +52,7 @@ public class QuestionController {
         return ResponseEntity.ok(questionResponseDtos);
     }
 
+    @PreAuthorize("hasAnyRole('HELPER','ADMIN')")
     @PostMapping(path = "/{questionId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<QuestionResponseDto> uploadImage(
             @PathVariable Long questionId,
@@ -56,13 +60,27 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.uploadImage(questionId, file));
     }
 
+    @PreAuthorize("hasAnyRole('HELPER','ADMIN')")
     @DeleteMapping(path = "/{questionId}/image")
     public ResponseEntity<QuestionResponseDto> deleteImage(
             @PathVariable Long questionId) throws IOException {
         return ResponseEntity.ok(questionService.deleteImage(questionId));
     }
 
+    // Writes are HELPER/ADMIN only. The GET endpoints stay open: SecurityConfig
+    // permits /api/v1/questions/** for anonymous readers, and the quiz needs that.
     //BASIC CRUD---------------------------------------------------------------------------------------
+    @PreAuthorize("hasAnyRole('HELPER','ADMIN')")
+    @PostMapping(path = "/{courseId}/import")
+    public ResponseEntity<ImportQuestionsResponseDto> importQuestions(
+            @PathVariable Long courseId,
+            @Valid @RequestBody ImportQuestionsRequestDto importRequestDto
+    ) {
+        ImportQuestionsResponseDto result = questionService.importQuestions(courseId, importRequestDto);
+        return ResponseEntity.ok(result);
+    }
+
+    @PreAuthorize("hasAnyRole('HELPER','ADMIN')")
     @PostMapping //CREATE QUESTION
     public ResponseEntity<QuestionResponseDto> createQuestion(
             @Valid @RequestBody CreateQuestionRequestDto createQuestionRequestDto
@@ -79,6 +97,7 @@ public class QuestionController {
         return ResponseEntity.ok(questionResponseDtos);
     }
 
+    @PreAuthorize("hasAnyRole('HELPER','ADMIN')")
     @PutMapping(path = "/{questionId}")
     public ResponseEntity<QuestionResponseDto> updateQuestion(
             @PathVariable Long questionId,
@@ -88,6 +107,7 @@ public class QuestionController {
         return ResponseEntity.ok(updatedQuestion);
     }
 
+    @PreAuthorize("hasAnyRole('HELPER','ADMIN')")
     @PatchMapping(path = "/{questionId}")
     public ResponseEntity<QuestionResponseDto> deactivateQuestion (
             @PathVariable Long questionId) {

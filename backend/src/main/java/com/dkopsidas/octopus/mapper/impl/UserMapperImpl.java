@@ -14,8 +14,12 @@ public class UserMapperImpl implements UserMapper {
     @Override
     public User toEntity(CreateUserRequestDto dto, String passwordHash, UserRole role) {
         User user = new User();
-        user.setUsername(dto.username().trim());
-        user.setDisplayName(dto.displayName().trim());
+        String username = dto.username().trim();
+        user.setUsername(username);
+        String displayName = dto.displayName();
+        user.setDisplayName(displayName != null && !displayName.isBlank()
+                ? displayName.trim()
+                : username);
         user.setPasswordHash(passwordHash);
         user.setYear(dto.year());
         user.setDiscordName(dto.discordName() != null ? dto.discordName().trim() : null);

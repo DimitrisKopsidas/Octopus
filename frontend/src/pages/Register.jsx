@@ -23,7 +23,6 @@ function Register() {
   const navigate = useNavigate()
   const registerMutation = useRegister()
 
-  const [displayName, setDisplayName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -39,7 +38,7 @@ function Register() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (submitting) return
-    if (!displayName.trim() || !username.trim() || !password) {
+    if (!username.trim() || !password) {
       setError(t.errors.requiredAll)
       return
     }
@@ -54,7 +53,6 @@ function Register() {
     setError(null)
     try {
       await registerMutation.mutateAsync({
-        displayName: displayName.trim(),
         username: username.trim(),
         password,
         year: Number(year),
@@ -92,17 +90,11 @@ function Register() {
 
         <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
           <Field
-            label={t.fields.displayName}
-            value={displayName}
-            onChange={setDisplayName}
-            placeholder={t.placeholders.displayName}
-            autoFocus
-          />
-          <Field
             label={t.fields.username}
             value={username}
             onChange={setUsername}
             placeholder={t.placeholders.username}
+            autoFocus
           />
           
           <div>

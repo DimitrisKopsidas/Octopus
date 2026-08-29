@@ -7,6 +7,7 @@ import com.dkopsidas.octopus.service.CourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,6 +47,7 @@ public class CourseController {
         return ResponseEntity.ok(courseResponseDtos);
     }
 
+    @PreAuthorize("hasAnyRole('HELPER','ADMIN')")
     @PutMapping(path = "/{courseId}")
     public ResponseEntity<CourseResponseDto> updateQuestion(
             @PathVariable Long courseId,
