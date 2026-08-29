@@ -2,14 +2,12 @@
   "title": "Δημιουργία λογαριασμού",
   "subtitle": "Μπες στο Octopus και ξεκίνα την εξάσκηση.",
   "fields": {
-    "displayName": "Ονοματεπώνυμο",
     "username": "Username",
     "password": "Κωδικός",
     "year": "Έτος Εισαγωγής",
     "discordName": "Discord username"
   },
   "placeholders": {
-    "displayName": "π.χ. Γιώργος Παπαδόπουλος",
     "username": "π.χ. giorgos",
     "password": "••••••••",
     "helperCode": "π.χ. HLP2026X",
@@ -17,7 +15,7 @@
     "discordName": "π.χ. giorgos_pap"
   },
   "hints": {
-    "discordName": "Προαιρετικό. Για να σε βρίσκουμε στο Discord του Octopus."
+    "discordName": "Προαιρετικό, για επικοινωνία μέσω του σέρβερ της σχολής."
   },
   "role": {
     "label": "Ρόλος",

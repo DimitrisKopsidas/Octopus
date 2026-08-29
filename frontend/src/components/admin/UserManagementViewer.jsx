@@ -155,12 +155,12 @@ export default function UserManagementViewer() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/50 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  <th className="px-5 py-3.5">Χρήστης</th>
-                  <th className="px-5 py-3.5">Email</th>
-                  <th className="px-5 py-3.5">Ρόλος</th>
-                  <th className="px-5 py-3.5">Έτος</th>
-                  <th className="px-5 py-3.5">Κατάσταση</th>
-                  <th className="px-5 py-3.5 text-right">Ενέργειες</th>
+                  <th className="px-5 py-3.5">{t.table.user}</th>
+                  <th className="px-5 py-3.5">{t.table.discordName}</th>
+                  <th className="px-5 py-3.5">{t.table.role}</th>
+                  <th className="px-5 py-3.5">{t.table.year}</th>
+                  <th className="px-5 py-3.5">{t.table.status}</th>
+                  <th className="px-5 py-3.5 text-right">{t.table.actions}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm">
@@ -178,7 +178,7 @@ export default function UserManagementViewer() {
                       </div>
                     </td>
                     <td className="px-5 py-4 text-slate-600 dark:text-slate-400 text-xs">
-                      {u.email || '-'}
+                      {u.discordName || '-'}
                     </td>
                     <td className="px-5 py-4">
                       <div className="relative inline-block">
