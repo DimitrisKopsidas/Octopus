@@ -1,6 +1,7 @@
 // Sidebar info card (questions count, code, semester). Used by CourseStart.
 import InfoRow from './InfoRow'
-import SoonBadge from '../ui/SoonBadge'
+// import SoonBadge from '../ui/SoonBadge'
+import { formatLastUpdated } from '../../lib/dates'
 import t from '../../content/courseStart.json'
 
 function CourseInfoCard({ course, questionCount, coverage }) {
@@ -32,8 +33,13 @@ function CourseInfoCard({ course, questionCount, coverage }) {
             </InfoRow>
           </>
         )}
-        <InfoRow label={t.info.lastExam} muted><SoonBadge /></InfoRow>
-        <InfoRow label={t.info.recentAdditions} muted><SoonBadge /></InfoRow>
+        {/* Parked until we decide how a helper/admin claims a course.
+        <InfoRow label={t.info.lastExam} muted><SoonBadge /></InfoRow> */}
+        <InfoRow label={t.info.recentAdditions}>
+          <span className="text-slate-700 dark:text-slate-300">
+            {formatLastUpdated(course?.lastUpdated)}
+          </span>
+        </InfoRow>
       </dl>
     </div>
   )

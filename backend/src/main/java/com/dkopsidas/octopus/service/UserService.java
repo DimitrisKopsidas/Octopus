@@ -1,6 +1,7 @@
 package com.dkopsidas.octopus.service;
 
 import com.dkopsidas.octopus.domain.dto.CreateUserRequestDto;
+import com.dkopsidas.octopus.domain.dto.UpdateMeRequestDto;
 import com.dkopsidas.octopus.domain.dto.UserResponseDto;
 import com.dkopsidas.octopus.domain.entity.UserRole;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,7 @@ public interface UserService {
 
     UserResponseDto deactivateUser(UUID userId);
 
-    UserResponseDto updateUserYear(UUID userId, Integer year);
+    UserResponseDto updateMe(UUID userId, UpdateMeRequestDto dto);
 
     void updatePassword(UUID userId, String oldPassword, String newPassword);
 

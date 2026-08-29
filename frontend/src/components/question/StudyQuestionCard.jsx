@@ -1,5 +1,6 @@
 // Single study question card: title, image, answers with the correct one(s) highlighted. Used by StudyMaterialPanel.
 import QuestionImage from './QuestionImage'
+import QuestionAuthor from './QuestionAuthor'
 import { isMultiAnswer } from '../../lib/scoring'
 import t from '../../content/courseStart.json'
 
@@ -47,6 +48,8 @@ function StudyQuestionCard({ number, question }) {
             )
           })}
         </ul>
+
+        <QuestionAuthor name={question.createdByName} className="mt-3" />
       </div>
     </li>
   )

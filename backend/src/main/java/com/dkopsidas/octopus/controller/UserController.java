@@ -1,8 +1,8 @@
 package com.dkopsidas.octopus.controller;
 
 import com.dkopsidas.octopus.domain.dto.CreateUserRequestDto;
+import com.dkopsidas.octopus.domain.dto.UpdateMeRequestDto;
 import com.dkopsidas.octopus.domain.dto.UpdatePasswordRequestDto;
-import com.dkopsidas.octopus.domain.dto.UpdateUserYearRequestDto;
 import com.dkopsidas.octopus.domain.dto.UserResponseDto;
 import com.dkopsidas.octopus.domain.entity.UserRole;
 import com.dkopsidas.octopus.service.UserService;
@@ -58,13 +58,13 @@ public class UserController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping(path = "/me/year")
-    public ResponseEntity<UserResponseDto> updateMyYear(
-            @Valid @RequestBody UpdateUserYearRequestDto requestDto,
+    @PatchMapping(path = "/me")
+    public ResponseEntity<UserResponseDto> updateMe(
+            @Valid @RequestBody UpdateMeRequestDto requestDto,
             @AuthenticationPrincipal Jwt jwt
     ) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        UserResponseDto updatedUser = userService.updateUserYear(userId, requestDto.year());
+        UserResponseDto updatedUser = userService.updateMe(userId, requestDto);
         return ResponseEntity.ok(updatedUser);
     }
 

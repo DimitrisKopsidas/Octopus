@@ -7,6 +7,7 @@ import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.entity.Answer;
 import com.dkopsidas.octopus.domain.entity.Course;
 import com.dkopsidas.octopus.domain.entity.Question;
+import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
 import org.springframework.stereotype.Component;
 
@@ -76,6 +77,9 @@ public class QuestionMapperImpl implements QuestionMapper {
                         answer.getIsCorrect()))
                 .toList();
 
+        // Questions created before created_by existed have no author yet.
+        User creator = question.getCreatedBy();
+
         return new QuestionResponseDto(
                 question.getId(),
                 question.getTitle(),
@@ -83,8 +87,8 @@ public class QuestionMapperImpl implements QuestionMapper {
                 question.getIsActive(),
                 answers,
                 question.getCourse().getId(),
-                question.getCreatedBy().getId(),
-                question.getCreatedBy().getDisplayName()
+                creator != null ? creator.getId() : null,
+                creator != null ? creator.getDisplayName() : null
         );
     }
 

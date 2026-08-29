@@ -218,10 +218,10 @@ export function useLogout() {
   })
 }
 
-export function useUpdateYear() {
+export function useUpdateMe() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (year) => authApi.updateYear(year),
+    mutationFn: (payload) => authApi.updateMe(payload),
     onSuccess: (updatedUser) => {
       qc.setQueryData(qk.auth.me(), updatedUser)
     },

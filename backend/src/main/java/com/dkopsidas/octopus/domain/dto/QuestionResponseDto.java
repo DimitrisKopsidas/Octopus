@@ -11,7 +11,7 @@ public record QuestionResponseDto(
         boolean isActive,
         List<AnswerResponseDto> answers,
         Long courseId,
-        UUID createdById,        // add this
+        UUID createdById,
         String createdByName
 ) {
 }

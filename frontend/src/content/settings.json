@@ -4,9 +4,17 @@
   "sections": {
     "profile": {
       "title": "Στοιχεία Προφίλ",
-      "yearLabel": "Έτος Σπουδών",
-      "yearHint": "Επίλεξε το τρέχον έτος φοίτησης για να προσαρμοστούν τα προτεινόμενα μαθήματα.",
-      "saveYear": "Αποθήκευση Έτους"
+      "yearLabel": "Έτος Εισαγωγής",
+      "yearHint": "Επίλεξε τη χρονιά που ξεκίνησες τις σπουδές σου.",
+      "discordLabel": "Discord username",
+      "discordPlaceholder": "π.χ. giorgos_pap",
+      "discordHint": "Προαιρετικό. Άφησέ το κενό για να το αφαιρέσεις.",
+      "displayPreferenceLabel": "Πώς θα εμφανίζεσαι",
+      "displayPreferenceHint": "Ισχύει όπου φαίνεται το όνομά σου — στις ερωτήσεις που πέρασες και μελλοντικά στο leaderboard.",
+      "displayNameOption": "Με το ονοματεπώνυμό μου",
+      "discordNameOption": "Με το Discord username μου",
+      "discordNameOptionDisabled": "Συμπλήρωσε πρώτα Discord username",
+      "saveProfile": "Αποθήκευση προφίλ"
     },
     "password": {
       "title": "Ασφάλεια & Κωδικός Πρόσβασης",

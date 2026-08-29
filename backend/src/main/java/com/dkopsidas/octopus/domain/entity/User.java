@@ -47,6 +47,10 @@ public class User {
     @Column(name = "discord_name")
     private String discordName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "display_preference")
+    private DisplayPreference displayPreference = DisplayPreference.DISPLAY_NAME;
+
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;
 

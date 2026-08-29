@@ -29,23 +29,14 @@
     "labels": {
       "displayName": "Όνομα",
       "username": "Username",
-      "year": "Έτος Σπουδών",
+      "year": "Έτος Εισαγωγής",
       "role": "Ρόλος",
+      "discordName": "Discord",
       "favorites": "Αγαπημένα Μαθήματα"
     },
     "notSet": "Δεν ορίστηκε",
     "coursesCount": "μαθήματα",
     "logoutButton": "Αποσύνδεση",
     "logoutPending": "Αποσύνδεση…"
-  },
-  "rbacTest": {
-    "title": "Έλεγχος Πρόσβασης (RBAC Live Test)",
-    "buttons": {
-      "student": "Test Student Access",
-      "helper": "Test Helper Access",
-      "admin": "Test Admin Access"
-    },
-    "statusSuccess": "✅ 200 OK — Πρόσβαση Επιτράπηκε",
-    "statusError": "❌ Πρόσβαση Απορρίφθηκε"
   }
 }

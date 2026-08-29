@@ -1,11 +1,14 @@
 package com.dkopsidas.octopus.service.impl;
 
 import com.dkopsidas.octopus.domain.dto.CreateUserRequestDto;
+import com.dkopsidas.octopus.domain.dto.UpdateMeRequestDto;
 import com.dkopsidas.octopus.domain.dto.UserResponseDto;
 import com.dkopsidas.octopus.domain.entity.AuditAction;
+import com.dkopsidas.octopus.domain.entity.DisplayPreference;
 import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.domain.entity.UserRole;
 import com.dkopsidas.octopus.exception.InvalidCredentialsException;
+import com.dkopsidas.octopus.exception.SimpleException;
 import com.dkopsidas.octopus.exception.InvalidUserCodeException;
 import com.dkopsidas.octopus.exception.UserAlreadyExistsException;
 import com.dkopsidas.octopus.exception.UserNotFoundException;
@@ -132,13 +135,47 @@ public class UserServiceImpl implements UserService {
         return toggleUserStatus(userId, false, null, null);
     }
 
+    /**
+     * Partial update of the caller's own profile: a null field is left untouched,
+     * an empty discordName clears it. Kept as one endpoint so the settings form
+     * saves everything in a single round trip.
+     */
     @Override
     @Transactional
-    public UserResponseDto updateUserYear(UUID userId, Integer year) {
+    public UserResponseDto updateMe(UUID userId, UpdateMeRequestDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        user.setYear(year);
+        List<String> changes = new ArrayList<>();
+
+        if (dto.year() != null) {
+            user.setYear(dto.year());
+            changes.add("year to " + dto.year());
+        }
+
+        if (dto.discordName() != null) {
+            String trimmed = dto.discordName().trim();
+            user.setDiscordName(trimmed.isEmpty() ? null : trimmed);
+            changes.add(trimmed.isEmpty() ? "cleared discord name" : "discord name to " + trimmed);
+        }
+
+        if (dto.displayPreference() != null) {
+            user.setDisplayPreference(dto.displayPreference());
+            changes.add("display preference to " + dto.displayPreference());
+        }
+
+        // Picking Discord without a handle would leave every public surface with
+        // nothing to print, so refuse it instead of silently falling back.
+        boolean wantsDiscord =
+                DisplayPreference.orDefault(user.getDisplayPreference()) == DisplayPreference.DISCORD_NAME;
+        if (wantsDiscord && (user.getDiscordName() == null || user.getDiscordName().isBlank())) {
+            throw new SimpleException("Set a Discord name before choosing to be shown by it");
+        }
+
+        if (changes.isEmpty()) {
+            return userMapper.toDto(user);
+        }
+
         User saved = userRepository.save(user);
 
         eventPublisher.publishEvent(AuditEvent.success(
@@ -147,7 +184,7 @@ public class UserServiceImpl implements UserService {
                 AuditAction.USER_UPDATED,
                 "USER",
                 user.getId().toString(),
-                "Updated study year to: " + year
+                "Updated " + String.join(", ", changes)
         ));
 
         return userMapper.toDto(saved);

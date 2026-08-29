@@ -1,16 +1,25 @@
 // Settings page. Route: /settings
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useMe, useUpdateYear, useUpdatePassword, useLogout } from '../hooks/queries'
+import { useMe, useUpdateMe, useUpdatePassword, useLogout } from '../hooks/queries'
+import { extractErrorMessage } from '../lib/api'
 import { toast } from '../store/toastStore'
 import Skeleton from '../components/ui/Skeleton'
 import ThemeToggle from '../components/layout/ThemeToggle'
+import {
+  ENROLLMENT_YEARS,
+  DEFAULT_ENROLLMENT_YEAR,
+  isValidEnrollmentYear,
+} from '../lib/years'
 import t from '../content/settings.json'
 
 export default function Settings() {
   const navigate = useNavigate()
   const { user, isLoading } = useMe()
-  const [year, setYear] = useState(user?.year || 1)
+  // The profile form reads the saved user until something is edited, then reads
+  // the draft. Nothing copies props into state, so it stays correct while useMe
+  // is still loading and re-syncs on its own after a save.
+  const [profileDraft, setProfileDraft] = useState(null)
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -18,15 +27,17 @@ export default function Settings() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const updateYearMutation = useUpdateYear()
+  const updateMeMutation = useUpdateMe()
   const updatePasswordMutation = useUpdatePassword()
   const logoutMutation = useLogout()
 
-  useEffect(() => {
-    if (user?.year) {
-      setYear(user.year)
-    }
-  }, [user?.year])
+  const savedProfile = {
+    year: isValidEnrollmentYear(user?.year) ? user.year : DEFAULT_ENROLLMENT_YEAR,
+    discordName: user?.discordName ?? '',
+    displayPreference: user?.displayPreference ?? 'DISPLAY_NAME',
+  }
+  const profile = profileDraft ?? savedProfile
+  const editProfile = (patch) => setProfileDraft({ ...profile, ...patch })
 
   if (isLoading) {
     return (
@@ -93,13 +104,22 @@ export default function Settings() {
     )
   }
 
-  async function handleSaveYear(e) {
+  const trimmedDiscordName = profile.discordName.trim()
+  // The server refuses DISCORD_NAME without a handle, so don't offer it either.
+  const canUseDiscordName = trimmedDiscordName.length > 0
+
+  async function handleSaveProfile(e) {
     e.preventDefault()
     try {
-      await updateYearMutation.mutateAsync(year)
-      toast.success('Το έτος σπουδών ενημερώθηκε επιτυχώς!')
+      await updateMeMutation.mutateAsync({
+        year: profile.year,
+        discordName: trimmedDiscordName,
+        displayPreference: canUseDiscordName ? profile.displayPreference : 'DISPLAY_NAME',
+      })
+      setProfileDraft(null)
+      toast.success('Το προφίλ ενημερώθηκε επιτυχώς!')
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Αποτυχία ενημέρωσης έτους.')
+      toast.error(extractErrorMessage(err, 'Αποτυχία ενημέρωσης προφίλ.'))
     }
   }
 
@@ -140,7 +160,7 @@ export default function Settings() {
       </div>
 
       {/* Section 1: Study Year */}
-      <form onSubmit={handleSaveYear} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
+      <form onSubmit={handleSaveProfile} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
           <svg className="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
@@ -155,15 +175,15 @@ export default function Settings() {
           <div className="relative w-full sm:w-64">
             <select
               id="year-select"
-              value={year}
-              onChange={(e) => setYear(Number(e.target.value))}
+              value={profile.year}
+              onChange={(e) => editProfile({ year: Number(e.target.value) })}
               className="w-full appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-4 pr-10 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all cursor-pointer"
             >
-              <option value={1}>1ο Έτος</option>
-              <option value={2}>2ο Έτος</option>
-              <option value={3}>3ο Έτος</option>
-              <option value={4}>4ο Έτος</option>
-              <option value={5}>5ο+ Έτος</option>
+              {ENROLLMENT_YEARS.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,12 +195,70 @@ export default function Settings() {
             {t.sections.profile.yearHint}
           </p>
         </div>
+
+        <div>
+          <label htmlFor="discord-name" className="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
+            {t.sections.profile.discordLabel}
+          </label>
+          <input
+            id="discord-name"
+            type="text"
+            value={profile.discordName}
+            onChange={(e) => editProfile({ discordName: e.target.value })}
+            maxLength={255}
+            autoComplete="off"
+            placeholder={t.sections.profile.discordPlaceholder}
+            className="w-full sm:w-64 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
+          />
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            {t.sections.profile.discordHint}
+          </p>
+        </div>
+
+        <fieldset>
+          <legend className="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
+            {t.sections.profile.displayPreferenceLabel}
+          </legend>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+              <input
+                type="radio"
+                name="displayPreference"
+                value="DISPLAY_NAME"
+                checked={!canUseDiscordName || profile.displayPreference === 'DISPLAY_NAME'}
+                onChange={() => editProfile({ displayPreference: 'DISPLAY_NAME' })}
+                className="accent-brand-600"
+              />
+              <span>{t.sections.profile.displayNameOption}</span>
+            </label>
+            <label className={`flex items-center gap-2.5 text-sm ${canUseDiscordName ? 'text-slate-700 dark:text-slate-300 cursor-pointer' : 'text-slate-400 dark:text-slate-600 cursor-not-allowed'}`}>
+              <input
+                type="radio"
+                name="displayPreference"
+                value="DISCORD_NAME"
+                disabled={!canUseDiscordName}
+                checked={canUseDiscordName && profile.displayPreference === 'DISCORD_NAME'}
+                onChange={() => editProfile({ displayPreference: 'DISCORD_NAME' })}
+                className="accent-brand-600"
+              />
+              <span>
+                {canUseDiscordName
+                  ? t.sections.profile.discordNameOption
+                  : t.sections.profile.discordNameOptionDisabled}
+              </span>
+            </label>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            {t.sections.profile.displayPreferenceHint}
+          </p>
+        </fieldset>
+
         <button
           type="submit"
-          disabled={updateYearMutation.isPending}
+          disabled={updateMeMutation.isPending}
           className="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-600/20 transition-all disabled:opacity-50"
         >
-          {updateYearMutation.isPending ? 'Αποθήκευση...' : t.sections.profile.saveYear}
+          {updateMeMutation.isPending ? 'Αποθήκευση...' : t.sections.profile.saveProfile}
         </button>
       </form>
 
