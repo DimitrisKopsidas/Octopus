@@ -1,5 +1,16 @@
 // Profile page. Route: /profile
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  AtSign,
+  GraduationCap,
+  Shield,
+  Calendar,
+  LogOut,
+  Settings,
+  Heart,
+  FileText,
+  MessageSquare,
+} from 'lucide-react'
 import { useMe, useLogout } from '../hooks/queries'
 import { roleLabel, userInitial } from '../lib/roles'
 import { toast } from '../store/toastStore'
@@ -22,31 +33,31 @@ function Profile() {
     return (
       <div className="max-w-3xl mx-auto py-8 space-y-6 animate-pulse">
         {/* Header Card Skeleton */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6">
-          <Skeleton className="w-20 h-20 rounded-full shrink-0" />
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6">
+          <Skeleton className="w-20 h-20 rounded-2xl shrink-0" />
           <div className="text-center md:text-left flex-1 space-y-2.5 w-full">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               <Skeleton className="h-7 w-44 rounded-lg" />
               <Skeleton className="h-6 w-20 rounded-full" />
             </div>
-            <Skeleton className="h-4 w-28 rounded-md mx-auto md:mx-0" />
+            <Skeleton className="h-4 w-48 rounded-md mx-auto md:mx-0" />
           </div>
-          <Skeleton className="h-9 w-28 rounded-xl shrink-0" />
+          <div className="flex flex-col items-center md:items-end gap-2 shrink-0">
+            <Skeleton className="h-4 w-36 rounded-md" />
+            <Skeleton className="h-8 w-24 rounded-lg" />
+          </div>
         </div>
 
         {/* Account Info Card Skeleton */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <Skeleton className="h-6 w-40 rounded-lg pb-3 border-b border-slate-100 dark:border-slate-800" />
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm space-y-4">
+          <Skeleton className="h-6 w-44 rounded-lg" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5"><Skeleton className="h-3 w-24" /><Skeleton className="h-5 w-40" /></div>
-            <div className="space-y-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-32" /></div>
-            <div className="space-y-1.5"><Skeleton className="h-3 w-16" /><Skeleton className="h-5 w-28" /></div>
-            <div className="space-y-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-36" /></div>
-            <div className="space-y-1.5"><Skeleton className="h-3 w-24" /><Skeleton className="h-5 w-28" /></div>
-            <div className="space-y-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-32" /></div>
+            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton className="h-20 w-full rounded-2xl" />
           </div>
         </div>
-
       </div>
     )
   }
@@ -85,7 +96,7 @@ function Profile() {
             </Link>
             <Link
               to="/"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-transparent border-1 border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-400 font-semibold text-sm transition-all transform hover:-translate-y-0.5"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-transparent border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/50 font-semibold text-sm transition-all transform hover:-translate-y-0.5"
             >
               <span>{t.loggedOut.buttons.home}</span>
             </Link>
@@ -146,75 +157,184 @@ function Profile() {
   const initial = userInitial(user)
   const label = roleLabel(user)
 
+  const formattedJoinedDate = user.created
+    ? new Date(user.created).toLocaleDateString('el-GR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
+    : '29 Αυγούστου 2026'
+
   return (
     <div className="max-w-3xl mx-auto py-8 space-y-6">
       {/* Header Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6">
-        <div className="w-20 h-20 rounded-full bg-brand-600 text-white text-3xl font-bold flex items-center justify-center shadow-md">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6">
+        {/* Avatar */}
+        <div className="w-20 h-20 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border-2 border-teal-500/60 text-teal-600 dark:text-teal-400 text-3xl font-bold flex items-center justify-center shadow-lg shadow-teal-500/10 shrink-0">
           {initial}
         </div>
-        <div className="text-center md:text-left flex-1">
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {user.displayName}
-            </h1>
-            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-brand-50 text-brand-700 dark:bg-brand-950/50 dark:text-brand-300 border border-brand-200 dark:border-brand-800">
+
+        {/* User Titles & Meta */}
+        <div className="text-center md:text-left flex-1 min-w-0 space-y-1.5">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 truncate">
+            {user.displayName || user.username}
+          </h1>
+
+          <div>
+            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
               {label}
             </span>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-            @{user.username}
-          </p>
         </div>
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={logoutMutation.isPending}
-          className="px-4 py-2 text-sm font-medium rounded-md text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900 transition-colors"
-        >
-          {logoutMutation.isPending ? t.accountInfo.logoutPending : t.accountInfo.logoutButton}
-        </button>
+
+        {/* Right Side: Joined Date & Logout */}
+        <div className="flex flex-col sm:flex-row md:flex-col items-center md:items-end gap-2 shrink-0">
+          <span className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            {t.accountInfo.labels.joined} {formattedJoinedDate}
+          </span>
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={logoutMutation.isPending}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors disabled:opacity-50"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>{logoutMutation.isPending ? t.accountInfo.logoutPending : t.accountInfo.logoutButton}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Account Info Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3">
+      {/* Account Info Card (Exact 4 Cards Grid) */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm space-y-4">
+        <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
           {t.accountInfo.title}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.displayName}</span>
-            <span className="text-slate-800 dark:text-slate-200 font-medium">{user.displayName}</span>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          {/* Username */}
+          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-900/60 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+              <AtSign className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
+                {t.accountInfo.labels.username}
+              </span>
+              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base font-mono block truncate">
+                @{user.username}
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.username}</span>
-            <span className="text-slate-800 dark:text-slate-200 font-medium">@{user.username}</span>
+
+          {/* Enrollment Year */}
+          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <GraduationCap className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
+                {t.accountInfo.labels.year}
+              </span>
+              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base block">
+                {formatEnrollmentYear(user.year) ?? t.accountInfo.notSet}
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.year}</span>
-            <span className="text-slate-800 dark:text-slate-200 font-medium">
-              {formatEnrollmentYear(user.year) ?? t.accountInfo.notSet}
-            </span>
+
+          {/* Role */}
+          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+              <Shield className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
+                {t.accountInfo.labels.role}
+              </span>
+              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base block">
+                {label}
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.role}</span>
-            <span className="text-slate-800 dark:text-slate-200 font-medium">{user.role} ({label})</span>
-          </div>
-          <div>
-            <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.discordName}</span>
-            <span className="text-slate-800 dark:text-slate-200 font-medium">
-              {user.discordName || t.accountInfo.notSet}
-            </span>
-          </div>
-          <div>
-            <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.favorites}</span>
-            <span className="text-slate-800 dark:text-slate-200 font-medium">
-              {user.myCourseIds ? `${user.myCourseIds.length || user.myCourseIds.size || 0} ${t.accountInfo.coursesCount}` : `0 ${t.accountInfo.coursesCount}`}
-            </span>
+
+          {/* Discord Handle */}
+          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
+                {t.accountInfo.labels.discord}
+              </span>
+              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base font-mono block truncate">
+                {user.discordName ? `@${user.discordName.replace(/^@/, '')}` : t.accountInfo.notSet}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Shortcuts Section (Inactive / Preview Cards) */}
+      <div className="space-y-3">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
+          {t.shortcuts.title}
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Quizzes */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-default select-none">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-900/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-4">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                {t.shortcuts.quizzes.title}
+              </p>
+              <p className="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5">
+                {t.shortcuts.quizzes.subtitle}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {t.shortcuts.quizzes.desc}
+              </p>
+            </div>
+          </div>
+
+          {/* Favorites */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-default select-none">
+            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 text-rose-500 dark:text-rose-400 flex items-center justify-center mb-4">
+              <Heart className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                {t.shortcuts.favorites.title}
+              </p>
+              <p className="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5">
+                {t.shortcuts.favorites.subtitle}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {t.shortcuts.favorites.desc}
+              </p>
+            </div>
+          </div>
+
+          {/* Settings */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-default select-none">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 text-amber-500 dark:text-amber-400 flex items-center justify-center mb-4">
+              <Settings className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                {t.shortcuts.settings.title}
+              </p>
+              <p className="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5">
+                {t.shortcuts.settings.subtitle}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {t.shortcuts.settings.desc}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

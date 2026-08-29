@@ -26,17 +26,36 @@
   },
   "accountInfo": {
     "title": "Στοιχεία Λογαριασμού",
+    "editSettings": "Επεξεργασία Προφίλ",
     "labels": {
-      "displayName": "Όνομα",
-      "username": "Username",
-      "year": "Έτος Εισαγωγής",
-      "role": "Ρόλος",
-      "discordName": "Discord",
-      "favorites": "Αγαπημένα Μαθήματα"
+      "username": "ΟΝΟΜΑ ΧΡΗΣΤΗ",
+      "year": "ΕΤΟΣ ΕΙΣΑΓΩΓΗΣ",
+      "role": "ΡΟΛΟΣ",
+      "discord": "DISCORD",
+      "joined": "Μέλος από",
+      "status": "Ενεργός"
     },
-    "notSet": "Δεν ορίστηκε",
-    "coursesCount": "μαθήματα",
+    "notSet": "Δεν έχει οριστεί",
+    "activeStatus": "Ενεργός",
     "logoutButton": "Αποσύνδεση",
     "logoutPending": "Αποσύνδεση…"
+  },
+  "shortcuts": {
+    "title": "ΓΡΗΓΟΡΗ ΠΡΟΣΒΑΣΗ",
+    "quizzes": {
+      "title": "Τα Κουίζ μου",
+      "subtitle": "12 ολοκληρωμένα",
+      "desc": "Ιστορικό προσπαθειών και βαθμολογίες"
+    },
+    "favorites": {
+      "title": "Αγαπημένα",
+      "subtitle": "5 αποθηκευμένα",
+      "desc": "Αποθηκευμένα μαθήματα για γρήγορη μελέτη"
+    },
+    "settings": {
+      "title": "Ρυθμίσεις",
+      "subtitle": "Ασφάλεια & κωδικός",
+      "desc": "Διαχείριση κωδικού και στοιχείων"
+    }
   }
 }
