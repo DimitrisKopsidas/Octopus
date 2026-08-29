@@ -78,6 +78,8 @@ public class QuestionMapperImpl implements QuestionMapper {
                 .toList();
 
         // Questions created before created_by existed have no author yet.
+        // publicName() honours the author's display preference -- printing
+        // getDisplayName() here ignored it and always showed the real name.
         User creator = question.getCreatedBy();
 
         return new QuestionResponseDto(
@@ -88,7 +90,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 answers,
                 question.getCourse().getId(),
                 creator != null ? creator.getId() : null,
-                creator != null ? creator.getDisplayName() : null
+                creator != null ? creator.publicName() : null
         );
     }
 

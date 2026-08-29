@@ -69,6 +69,21 @@ public class User {
         updated = Instant.now();
     }
 
+    /**
+     * The name every public surface should print -- profile, user menu, question
+     * attribution, leaderboard. Falls back to the display name when Discord is the
+     * pick but no handle was ever filled in, so a row can never come out blank.
+     * Deliberately not a getter: Jackson must not pick it up as a bean property.
+     */
+    public String publicName() {
+        boolean wantsDiscord =
+                DisplayPreference.orDefault(displayPreference) == DisplayPreference.DISCORD_NAME;
+
+        return wantsDiscord && discordName != null && !discordName.isBlank()
+                ? discordName
+                : displayName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
