@@ -2,6 +2,7 @@ package com.dkopsidas.octopus.mapper.impl;
 
 import com.dkopsidas.octopus.domain.dto.CreateUserRequestDto;
 import com.dkopsidas.octopus.domain.dto.UserResponseDto;
+import com.dkopsidas.octopus.domain.entity.DisplayPreference;
 import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.domain.entity.UserRole;
 import com.dkopsidas.octopus.mapper.UserMapper;
@@ -17,6 +18,7 @@ public class UserMapperImpl implements UserMapper {
         user.setDisplayName(dto.displayName().trim());
         user.setPasswordHash(passwordHash);
         user.setYear(dto.year());
+        user.setDiscordName(dto.discordName() != null ? dto.discordName().trim() : null);
         user.setRole(role != null ? role : UserRole.STUDENT);
         user.setActive(true);
 
@@ -30,10 +32,28 @@ public class UserMapperImpl implements UserMapper {
                 user.getUsername(),
                 user.getDisplayName(),
                 user.getYear(),
+                user.getDiscordName(),
+                DisplayPreference.orDefault(user.getDisplayPreference()),
+                resolvePublicName(user),
                 user.getRole(),
                 user.isActive(),
                 user.getCreated(),
                 user.getUpdated()
         );
+    }
+
+    /**
+     * The name every public surface should print. Falls back to the display name
+     * when Discord is the pick but no handle was ever filled in, so a leaderboard
+     * row can never come out blank.
+     */
+    private String resolvePublicName(User user) {
+        boolean wantsDiscord =
+                DisplayPreference.orDefault(user.getDisplayPreference()) == DisplayPreference.DISCORD_NAME;
+        String discordName = user.getDiscordName();
+
+        return wantsDiscord && discordName != null && !discordName.isBlank()
+                ? discordName
+                : user.getDisplayName();
     }
 }

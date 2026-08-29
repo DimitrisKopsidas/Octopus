@@ -1,5 +1,6 @@
 // Admin question display card (edit/delete). Used by AdminCourse.
 import QuestionImage from './QuestionImage'
+import QuestionAuthor from './QuestionAuthor'
 import t from '../../content/adminCourse.json'
 
 function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
@@ -10,22 +11,25 @@ function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
           <span className="text-slate-400 dark:text-slate-500 mr-2">{index}.</span>
           {question.title}
         </h3>
-        <div className="mt-2 flex items-center justify-end gap-1">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="text-sm px-2.5 py-1 rounded-md text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 font-medium transition-colors"
-          >
-            {t.questionCard.edit}
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            disabled={deleting}
-            className="text-sm px-2.5 py-1 rounded-md text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium disabled:opacity-50 transition-colors"
-          >
-            {deleting ? t.questionCard.deleting : t.questionCard.delete}
-          </button>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <QuestionAuthor name={question.createdByName} />
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="text-sm px-2.5 py-1 rounded-md text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 font-medium transition-colors"
+            >
+              {t.questionCard.edit}
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={deleting}
+              className="text-sm px-2.5 py-1 rounded-md text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-medium disabled:opacity-50 transition-colors"
+            >
+              {deleting ? t.questionCard.deleting : t.questionCard.delete}
+            </button>
+          </div>
         </div>
       </div>
       {question.imageUrl && (

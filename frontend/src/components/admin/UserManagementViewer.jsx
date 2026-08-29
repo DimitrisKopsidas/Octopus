@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Users, ChevronDown, Search, RotateCw, Loader2 } from 'lucide-react'
 import { useUsersList, useUpdateUserRole, useToggleUserStatus } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
+import { formatEnrollmentYear } from '../../lib/years'
 import t from '../../content/usersManagement.json'
 
 // The browser draws the open <option> list itself and lets it inherit the
@@ -203,7 +204,7 @@ export default function UserManagementViewer() {
                       </div>
                     </td>
                     <td className="px-5 py-4 text-slate-600 dark:text-slate-400 text-xs whitespace-nowrap font-medium">
-                      {u.year ? (u.year === 5 ? '5ο+ Έτος' : `${u.year}ο Έτος`) : '-'}
+                      {formatEnrollmentYear(u.year) ?? '-'}
                     </td>
                     <td className="px-5 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${

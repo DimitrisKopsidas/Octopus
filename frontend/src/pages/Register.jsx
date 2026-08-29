@@ -5,6 +5,7 @@ import { useRegister } from '../hooks/queries'
 import { extractErrorMessage } from '../lib/api'
 import { toast } from '../store/toastStore'
 import logo from '../assets/favicon.png'
+import { ENROLLMENT_YEARS, DEFAULT_ENROLLMENT_YEAR } from '../lib/years'
 import t from '../content/register.json'
 
 // Helper and admin codes now live in one table, so the server no longer says
@@ -26,7 +27,8 @@ function Register() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [year, setYear] = useState('1')
+  const [year, setYear] = useState(String(DEFAULT_ENROLLMENT_YEAR))
+  const [discordName, setDiscordName] = useState('')
   const [role, setRole] = useState('student')
   const [helperCode, setHelperCode] = useState('')
   const [adminCode, setAdminCode] = useState('')
@@ -55,7 +57,8 @@ function Register() {
         displayName: displayName.trim(),
         username: username.trim(),
         password,
-        year: year ? Number(year) : 1,
+        year: Number(year),
+        discordName: discordName.trim() || undefined,
         // Both boxes feed the same field: the code row on the server decides
         // whether it grants HELPER or ADMIN.
         userCode:
@@ -139,7 +142,7 @@ function Register() {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Έτος Σπουδών
+              {t.fields.year}
             </label>
             <div className="relative">
               <select
@@ -147,11 +150,11 @@ function Register() {
                 onChange={(e) => setYear(e.target.value)}
                 className="w-full appearance-none pl-3.5 pr-9 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer text-sm font-medium"
               >
-                <option value="1">1ο Έτος</option>
-                <option value="2">2ο Έτος</option>
-                <option value="3">3ο Έτος</option>
-                <option value="4">4ο Έτος</option>
-                <option value="5">5ο+ Έτος</option>
+                {ENROLLMENT_YEARS.map((y) => (
+                  <option key={y} value={String(y)}>
+                    {y}
+                  </option>
+                ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -159,6 +162,23 @@ function Register() {
                 </svg>
               </div>
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="discord-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              {t.fields.discordName}
+            </label>
+            <input
+              id="discord-name"
+              type="text"
+              value={discordName}
+              onChange={(e) => setDiscordName(e.target.value)}
+              maxLength={255}
+              autoComplete="off"
+              placeholder={t.placeholders.discordName}
+              className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+            />
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t.hints.discordName}</p>
           </div>
 
           <div>

@@ -1,5 +1,6 @@
 // Per-question review card (correct/wrong/unanswered). Used by Results.
 import QuestionImage from './QuestionImage'
+import QuestionAuthor from './QuestionAuthor'
 import { getChosenIds, isQuestionCorrect } from '../../lib/scoring'
 import t from '../../content/results.json'
 
@@ -67,6 +68,8 @@ function ReviewCard({ index, question, chosenAnswerId }) {
           )
         })}
       </ul>
+
+      <QuestionAuthor name={question.createdByName} className="px-5 pb-3" />
     </div>
   )
 }

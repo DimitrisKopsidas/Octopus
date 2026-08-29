@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Plus, ChevronDown, Search, RotateCw, Loader2, KeyRound } from 'lucide-react'
 import { useInviteCodes, useGenerateInviteCode, useDeleteInviteCode } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
+import ConfirmModal from '../ui/ConfirmModal'
 import t from '../../content/inviteCodes.json'
 
 // The browser draws the open <option> list itself and lets it inherit the
@@ -29,15 +30,14 @@ export default function InviteCodesViewer() {
 
   const [showGenerateModal, setShowGenerateModal] = useState(false)
   const [modalRole, setModalRole] = useState('HELPER')
-  const [modalExpiresInHours, setModalExpiresInHours] = useState('72')
-  const [modalMaxUses, setModalMaxUses] = useState('1')
+  const [modalCustomCode, setModalCustomCode] = useState('')
   const [copiedId, setCopiedId] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   const size = 15
   const { codes, totalPages, totalElements, isPending, isFetching, error, refetch } = useInviteCodes({
-    role: roleFilter || undefined,
-    status: statusFilter || undefined,
+    targetRole: roleFilter || undefined,
+    used: statusFilter === '' ? undefined : statusFilter === 'used',
     query: query.trim() || undefined,
     page,
     size,
@@ -73,15 +73,14 @@ export default function InviteCodesViewer() {
     e.preventDefault()
     try {
       const payload = {
-        role: modalRole,
-        expiresInHours: modalExpiresInHours ? parseInt(modalExpiresInHours, 10) : undefined,
-        maxUses: modalMaxUses ? parseInt(modalMaxUses, 10) : 1,
+        targetRole: modalRole,
+        customCode: modalCustomCode.trim() || undefined,
       }
       await generateMutation.mutateAsync(payload)
       toast.success(t.toast.generated)
       setShowGenerateModal(false)
-      setModalExpiresInHours('72')
-      setModalMaxUses('1')
+      setModalRole('HELPER')
+      setModalCustomCode('')
     } catch (err) {
       toast.error(err.message || t.toast.generateFailed)
     }
@@ -273,16 +272,16 @@ export default function InviteCodesViewer() {
                       <td className="px-5 py-4 text-right space-x-1 whitespace-nowrap">
                         <button
                           type="button"
-                          onClick={() => handleCopy(item.code)}
+                          onClick={() => copyToClipboard(item.code, item.id)}
                           className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
                           title="Αντιγραφή κωδικού"
                         >
-                          📋 Αντιγραφή
+                          {copiedId === item.id ? '✓ Αντιγράφηκε' : '📋 Αντιγραφή'}
                         </button>
                         {!isUsed && (
                           <button
                             type="button"
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => setDeleteTarget(item)}
                             className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 transition-colors"
                             title="Διαγραφή κωδικού"
                           >
@@ -416,6 +415,17 @@ export default function InviteCodesViewer() {
         </div>,
         document.body
       )}
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        confirming={deleteMutation.isPending}
+        variant="danger"
+        title="Διαγραφή κωδικού"
+        message={`Είστε σίγουροι ότι θέλετε να διαγράψετε τον κωδικό ${deleteTarget?.code ?? ''};`}
+        confirmLabel="Διαγραφή"
+      />
     </div>
   )
 }

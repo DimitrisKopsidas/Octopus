@@ -1,20 +1,16 @@
 // Profile page. Route: /profile
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMe, useLogout } from '../hooks/queries'
-import { authApi } from '../lib/api'
 import { roleLabel, userInitial } from '../lib/roles'
 import { toast } from '../store/toastStore'
 import Skeleton from '../components/ui/Skeleton'
+import { formatEnrollmentYear } from '../lib/years'
 import t from '../content/profile.json'
 
 function Profile() {
   const navigate = useNavigate()
   const { user, isLoading } = useMe()
   const logoutMutation = useLogout()
-
-  const [testResult, setTestResult] = useState(null)
-  const [testingEndpoint, setTestingEndpoint] = useState(null)
 
   async function handleLogout() {
     await logoutMutation.mutateAsync().catch(() => { })
@@ -47,18 +43,10 @@ function Profile() {
             <div className="space-y-1.5"><Skeleton className="h-3 w-16" /><Skeleton className="h-5 w-28" /></div>
             <div className="space-y-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-36" /></div>
             <div className="space-y-1.5"><Skeleton className="h-3 w-24" /><Skeleton className="h-5 w-28" /></div>
+            <div className="space-y-1.5"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-32" /></div>
           </div>
         </div>
 
-        {/* RBAC Card Skeleton */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <Skeleton className="h-6 w-48 rounded-lg" />
-          <div className="flex flex-wrap gap-3">
-            <Skeleton className="h-8 w-28 rounded-lg" />
-            <Skeleton className="h-8 w-28 rounded-lg" />
-            <Skeleton className="h-8 w-28 rounded-lg" />
-          </div>
-        </div>
       </div>
     )
   }
@@ -158,28 +146,6 @@ function Profile() {
   const initial = userInitial(user)
   const label = roleLabel(user)
 
-  async function testRbac(endpointName, apiFn) {
-    setTestingEndpoint(endpointName)
-    setTestResult(null)
-    try {
-      const res = await apiFn()
-      setTestResult({
-        success: true,
-        endpoint: endpointName,
-        data: res,
-      })
-    } catch (err) {
-      setTestResult({
-        success: false,
-        endpoint: endpointName,
-        status: err?.response?.status || 'Error',
-        message: err?.response?.data?.message || err?.message || 'Access Denied',
-      })
-    } finally {
-      setTestingEndpoint(null)
-    }
-  }
-
   return (
     <div className="max-w-3xl mx-auto py-8 space-y-6">
       {/* Header Card */}
@@ -227,12 +193,18 @@ function Profile() {
           <div>
             <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.year}</span>
             <span className="text-slate-800 dark:text-slate-200 font-medium">
-              {user.year ? (user.year >= 5 ? '5ο+ Έτος' : `${user.year}ο Έτος`) : t.accountInfo.notSet}
+              {formatEnrollmentYear(user.year) ?? t.accountInfo.notSet}
             </span>
           </div>
           <div>
             <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.role}</span>
             <span className="text-slate-800 dark:text-slate-200 font-medium">{user.role} ({label})</span>
+          </div>
+          <div>
+            <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.discordName}</span>
+            <span className="text-slate-800 dark:text-slate-200 font-medium">
+              {user.discordName || t.accountInfo.notSet}
+            </span>
           </div>
           <div>
             <span className="text-slate-400 block text-xs uppercase font-medium">{t.accountInfo.labels.favorites}</span>
@@ -243,56 +215,6 @@ function Profile() {
         </div>
       </div>
 
-      {/* RBAC Live Endpoint Testing Section */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-3">
-          {t.rbacTest.title}
-        </h2>
-
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => testRbac('/access/student', authApi.accessStudent)}
-            disabled={testingEndpoint != null}
-            className="px-3.5 py-2 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
-          >
-            {t.rbacTest.buttons.student}
-          </button>
-          <button
-            type="button"
-            onClick={() => testRbac('/access/helper', authApi.accessHelper)}
-            disabled={testingEndpoint != null}
-            className="px-3.5 py-2 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
-          >
-            {t.rbacTest.buttons.helper}
-          </button>
-          <button
-            type="button"
-            onClick={() => testRbac('/access/admin', authApi.accessAdmin)}
-            disabled={testingEndpoint != null}
-            className="px-3.5 py-2 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
-          >
-            {t.rbacTest.buttons.admin}
-          </button>
-        </div>
-
-        {testResult && (
-          <div
-            className={`p-4 rounded-xl text-xs font-mono border ${testResult.success
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200'
-                : 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200'
-              }`}
-          >
-            <div className="font-semibold mb-1">
-              {testResult.success ? t.rbacTest.statusSuccess : `${t.rbacTest.statusError} (${testResult.status})`}
-            </div>
-            <div>Endpoint: {testResult.endpoint}</div>
-            <pre className="mt-2 overflow-x-auto p-2 rounded bg-black/5 dark:bg-black/40">
-              {JSON.stringify(testResult.success ? testResult.data : testResult.message, null, 2)}
-            </pre>
-          </div>
-        )}
-      </div>
     </div>
   )
 }

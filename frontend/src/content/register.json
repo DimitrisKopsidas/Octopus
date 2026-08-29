@@ -4,14 +4,20 @@
   "fields": {
     "displayName": "Ονοματεπώνυμο",
     "username": "Username",
-    "password": "Κωδικός"
+    "password": "Κωδικός",
+    "year": "Έτος Εισαγωγής",
+    "discordName": "Discord username"
   },
   "placeholders": {
     "displayName": "π.χ. Γιώργος Παπαδόπουλος",
     "username": "π.χ. giorgos",
     "password": "••••••••",
     "helperCode": "π.χ. HLP2026X",
-    "adminCode": "π.χ. ADM2026X"
+    "adminCode": "π.χ. ADM2026X",
+    "discordName": "π.χ. giorgos_pap"
+  },
+  "hints": {
+    "discordName": "Προαιρετικό. Για να σε βρίσκουμε στο Discord του Octopus."
   },
   "role": {
     "label": "Ρόλος",
