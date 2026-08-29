@@ -1,5 +1,5 @@
 // Enrollment year (year of enrollment), not year of study.
-// Mirrors the server contract: CreateUserRequestDto / UpdateUserYearRequestDto
+// Mirrors the server contract: CreateUserRequestDto and UpdateMeRequestDto
 // both validate @Min(2000) @Max(2030) on `year`.
 export const MIN_ENROLLMENT_YEAR = 2000
 export const MAX_ENROLLMENT_YEAR = 2030

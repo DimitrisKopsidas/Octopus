@@ -19,8 +19,6 @@ public interface UserService {
 
     UserResponseDto deactivateUser(UUID userId);
 
-    UserResponseDto updateUserYear(UUID userId, Integer year);
-
     UserResponseDto updateMe(UUID userId, UpdateMeRequestDto dto);
 
     void updatePassword(UUID userId, String oldPassword, String newPassword);

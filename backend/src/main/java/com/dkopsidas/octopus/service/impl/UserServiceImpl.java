@@ -135,27 +135,6 @@ public class UserServiceImpl implements UserService {
         return toggleUserStatus(userId, false, null, null);
     }
 
-    @Override
-    @Transactional
-    public UserResponseDto updateUserYear(UUID userId, Integer year) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-
-        user.setYear(year);
-        User saved = userRepository.save(user);
-
-        eventPublisher.publishEvent(AuditEvent.success(
-                user.getId(),
-                user.getUsername(),
-                AuditAction.USER_UPDATED,
-                "USER",
-                user.getId().toString(),
-                "Updated study year to: " + year
-        ));
-
-        return userMapper.toDto(saved);
-    }
-
     /**
      * Partial update of the caller's own profile: a null field is left untouched,
      * an empty discordName clears it. Kept as one endpoint so the settings form

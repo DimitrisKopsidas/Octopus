@@ -187,9 +187,6 @@ export const authApi = {
   logout: () => unwrap(http.post('/auth/logout')),
   updateMe: (payload) => unwrap(http.patch('/users/me', payload)),
   updatePassword: (payload) => unwrap(http.patch('/users/me/password', payload)),
-  accessStudent: () => unwrap(http.get('/access/student')),
-  accessHelper: () => unwrap(http.get('/access/helper')),
-  accessAdmin: () => unwrap(http.get('/access/admin')),
 }
 
 export const auditApi = {
