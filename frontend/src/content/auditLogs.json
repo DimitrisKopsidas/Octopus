@@ -27,6 +27,16 @@
   },
   "modal": {
     "title": "Λεπτομέρειες Audit Log",
-    "close": "Κλείσιμο"
+    "close": "Κλείσιμο",
+    "whatHappened": "Τι έγινε",
+    "noDetails": "Δεν καταγράφηκαν επιπλέον λεπτομέρειες για αυτή την ενέργεια.",
+    "fields": {
+      "actor": "Χρήστης",
+      "resource": "Πόρος",
+      "status": "Κατάσταση",
+      "ip": "Διεύθυνση IP",
+      "userAgent": "User agent",
+      "id": "ID εγγραφής"
+    }
   }
 }

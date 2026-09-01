@@ -52,7 +52,10 @@ public class AuditLogServiceImpl implements AuditLogService {
         String ip = event.ipAddress() != null ? event.ipAddress() : extractClientIp();
         String userAgent = event.userAgent() != null ? event.userAgent() : extractUserAgent();
         auditLog.setIpAddress(ip);
-        auditLog.setUserAgent(userAgent);
+        // Η στήλη user_agent είναι varchar(255) και υπάρχουν browsers που
+        // στέλνουν μεγαλύτερο UA· χωρίς το κόψιμο, η εγγραφή του log σκάει και
+        // παρασέρνει μαζί της το transaction της ενέργειας που κατέγραφε.
+        auditLog.setUserAgent(truncate(userAgent, 255));
 
         AuditLog saved = auditLogRepository.save(auditLog);
         log.info("Audit log recorded: action={}, actor={}, status={}", saved.getAction(), saved.getActorUsername(), saved.getStatus());
@@ -71,7 +74,12 @@ public class AuditLogServiceImpl implements AuditLogService {
         AuditEvent event = new AuditEvent(
                 actorId,
                 actorUsername,
-                dto.action() != null ? dto.action() : AuditAction.CLIENT_AUDIT_EVENT,
+                // Το action ΔΕΝ έρχεται από το request. Το POST /logs/audit είναι
+                // permitAll, οπότε αν το τιμούσαμε, οποιοσδήποτε με ένα curl θα
+                // μπορούσε να γράψει USER_ROLE_CHANGED ή INVITE_CODE_GENERATED
+                // στο audit log και να πνίξει το πραγματικό ιστορικό μέσα σε
+                // πλαστές εγγραφές. Ό,τι συνέβη το λέει το details.
+                AuditAction.CLIENT_AUDIT_EVENT,
                 dto.resourceType(),
                 dto.resourceId(),
                 dto.status() != null ? dto.status() : "SUCCESS",
@@ -80,6 +88,13 @@ public class AuditLogServiceImpl implements AuditLogService {
                 dto.details()
         );
         return logEvent(event);
+    }
+
+    private static String truncate(String value, int maxLength) {
+        if (value == null || value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, maxLength);
     }
 
     @Override

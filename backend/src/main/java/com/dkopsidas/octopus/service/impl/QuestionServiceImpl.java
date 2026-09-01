@@ -79,7 +79,7 @@ public class QuestionServiceImpl implements QuestionService {
                 AuditAction.QUESTION_CREATED,
                 "QUESTION",
                 saved.getId().toString(),
-                "Created question in course " + courseFromDto.getId()
+                "Created question " + describe(saved)
         ));
 
         return questionMapper.toDto(saved);
@@ -155,9 +155,12 @@ public class QuestionServiceImpl implements QuestionService {
                 null,
                 null,
                 AuditAction.QUESTION_CREATED,
-                "QUESTION",
+                // resourceId εδώ είναι το μάθημα, όχι μία ερώτηση: το import
+                // αφορά ολόκληρο το course, οπότε το resourceType πρέπει να το λέει.
+                "COURSE",
                 courseId.toString(),
-                "Imported " + saved.size() + " question(s) into course " + courseId
+                "Imported " + saved.size() + " question(s) into course \"" + course.getName()
+                        + "\" (#" + courseId + ")"
                         + (skipped.isEmpty() ? "" : ", skipped " + skipped.size() + " duplicate(s)")
         ));
 
@@ -199,7 +202,8 @@ public class QuestionServiceImpl implements QuestionService {
                 AuditAction.QUESTION_UPDATED,
                 "QUESTION",
                 saved.getId().toString(),
-                "Updated question titled: " + saved.getTitle()
+                "Updated question " + describe(saved)
+                        + ", answers: " + saved.getAnswers().size()
         ));
 
         return questionMapper.toDto(saved);
@@ -219,7 +223,7 @@ public class QuestionServiceImpl implements QuestionService {
                 AuditAction.QUESTION_DEACTIVATED,
                 "QUESTION",
                 saved.getId().toString(),
-                "Deactivated question"
+                "Deactivated question " + describe(saved)
         ));
 
         return questionMapper.toDto(saved);
@@ -283,7 +287,7 @@ public class QuestionServiceImpl implements QuestionService {
                 AuditAction.QUESTION_IMAGE_UPLOADED,
                 "QUESTION",
                 saved.getId().toString(),
-                "Uploaded image for question " + questionId
+                "Uploaded image for question " + describe(saved)
         ));
 
         return questionMapper.toDto(saved);
@@ -303,10 +307,30 @@ public class QuestionServiceImpl implements QuestionService {
                 AuditAction.QUESTION_IMAGE_DELETED,
                 "QUESTION",
                 saved.getId().toString(),
-                "Deleted image for question " + questionId
+                "Deleted image for question " + describe(saved)
         ));
 
         return questionMapper.toDto(saved);
+    }
+
+    /**
+     * Η ταυτότητα μιας ερώτησης όπως θέλει να τη δει ο admin στο audit log:
+     * τίτλος + σε ποιο μάθημα ανήκει. Χωρίς αυτό, ένα "Updated question"
+     * χρειάζεται χειροκίνητο ψάξιμο στη βάση για να σημαίνει κάτι.
+     * <p>
+     * Ο τίτλος κόβεται στους 120 χαρακτήρες: το πεδίο details είναι TEXT, αλλά
+     * μια γραμμή 510 χαρακτήρων κάνει τη λίστα των logs αδιάβαστη.
+     */
+    private String describe(Question question) {
+        String title = question.getTitle() == null ? "" : question.getTitle();
+        if (title.length() > 120) {
+            title = title.substring(0, 117) + "...";
+        }
+        Course course = question.getCourse();
+        String courseLabel = course == null
+                ? "unknown course"
+                : "\"" + course.getName() + "\" (#" + course.getId() + ")";
+        return "\"" + title + "\" (#" + question.getId() + ") in course " + courseLabel;
     }
 
     private void checkCorrectAnswerCount(Question question) {
@@ -315,7 +339,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .count();
 
         if (correctCount == 0) {
-            throw new CorrectAnswerCountException(question.getId());
+            throw new CorrectAnswerCountException(question.getTitle());
         }
     }
 
