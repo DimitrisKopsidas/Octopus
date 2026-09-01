@@ -50,6 +50,32 @@ public class Question {
     @Column(name = "updated", nullable = false)
     private Instant updated;
 
+    /**
+     * Same lifecycle callbacks as {@link User}, so the two entities stop doing
+     * the same job in two different ways.
+     * <p>
+     * Before these existed, {@code updated} was written once by QuestionMapper
+     * and never again: updateQuestion copies title, image and answers onto the
+     * managed entity but never touched the timestamp. The column read as "last
+     * modified" and in fact meant "created", which is why Course.lastContentUpdate
+     * now reads created explicitly instead of relying on the accident.
+     * <p>
+     * Note this fires on every flush of the row -- deactivation and image
+     * upload/delete included. That is the correct meaning of "last touched";
+     * just do not read it as "new material arrived".
+     */
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        created = now;
+        updated = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updated = Instant.now();
+    }
+
     public void addAnswer(Answer a) {
         answers.add(a);
         a.setQuestion(this);
