@@ -7,6 +7,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { queryClient } from './lib/queryClient'
 import './index.css'
 import ScrollToTop from './components/layout/ScrollToTop.jsx'
+import ErrorBoundary from './components/layout/ErrorBoundary.jsx'
+import { installGlobalErrorHandlers } from './lib/clientLog'
 import Layout from './components/layout/Layout.jsx'
 import RequireRole from './components/layout/RequireRole.jsx'
 import { ROLE } from './lib/roles'
@@ -33,8 +35,13 @@ import Quizzes from './pages/Quizzes.jsx'
 import Info from './pages/Info.jsx'
 import NotFound from './pages/NotFound.jsx'
 
+// Πριν το render: ό,τι σκάσει από εδώ και πέρα -- ακόμα και κατά το mount --
+// φτάνει στα crash logs αντί να χαθεί στην κονσόλα του χρήστη.
+installGlobalErrorHandlers()
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <ScrollToTop />
@@ -85,5 +92,6 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
     {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />}
     </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )
