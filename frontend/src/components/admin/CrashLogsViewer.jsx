@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import useBodyScrollLock from '../../hooks/useBodyScrollLock'
 import { AlertOctagon, RotateCw, ChevronDown } from 'lucide-react'
 import { useCrashLogs, useResolveCrashLog } from '../../hooks/queries'
 import Skeleton from '../ui/Skeleton'
@@ -32,6 +33,10 @@ export default function CrashLogsViewer() {
   const [selectedResolved, setSelectedResolved] = useState('')
   const [selectedDateRange, setSelectedDateRange] = useState('')
   const [selectedLog, setSelectedLog] = useState(null)
+
+  // Έλειπε εντελώς: το modal είχε backdrop αλλά ο πίνακας από πίσω σκρόλαρε
+  // κανονικά με τη ρόδα, οπότε το modal "έφευγε" από πάνω του.
+  useBodyScrollLock(Boolean(selectedLog))
 
   useEffect(() => {
     const handleKeyDown = (e) => {
