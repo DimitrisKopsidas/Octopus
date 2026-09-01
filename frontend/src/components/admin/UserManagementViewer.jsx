@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Users, ChevronDown, Search, RotateCw, Loader2 } from 'lucide-react'
+import { Users, ChevronDown, ChevronUp, ChevronsUpDown, Search, RotateCw, Loader2 } from 'lucide-react'
 import { useUsersList, useUpdateUserRole, useToggleUserStatus } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
 import { formatEnrollmentYear } from '../../lib/years'
+import { formatDate, formatDateTime } from '../../lib/dates'
 import t from '../../content/usersManagement.json'
 
 // The browser draws the open <option> list itself and lets it inherit the
@@ -14,14 +15,33 @@ export default function UserManagementViewer() {
   const [statusFilter, setStatusFilter] = useState('')
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(0)
+  // Η ταξινόμηση γίνεται στο backend: το GET /users δέχεται Pageable, οπότε
+  // αρκεί το `sort=<πεδίο>,<κατεύθυνση>`. Έτσι ταξινομείται όλο το σύνολο και
+  // όχι μόνο η σελίδα που τυχαίνει να βλέπουμε.
+  const [sortField, setSortField] = useState('created')
+  const [sortDir, setSortDir] = useState('desc')
 
   const size = 15
   const params = {
     page,
     size,
+    sort: `${sortField},${sortDir}`,
     ...(roleFilter ? { role: roleFilter } : {}),
     ...(statusFilter !== '' ? { active: statusFilter === 'active' } : {}),
     ...(query.trim() ? { query: query.trim() } : {}),
+  }
+
+  // Κλικ στην ίδια στήλη αντιστρέφει· κλικ σε άλλη ξεκινάει από φθίνουσα για
+  // ημερομηνίες και έτη (το «πιο πρόσφατο πρώτα» είναι σχεδόν πάντα το ζητούμενο)
+  // και από αύξουσα για κείμενο.
+  const handleSort = (field) => {
+    if (field === sortField) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortField(field)
+      setSortDir(field === 'username' ? 'asc' : 'desc')
+    }
+    setPage(0)
   }
 
   const { users, totalPages, totalElements, isPending, isFetching, error, refetch } = useUsersList(params)
@@ -155,10 +175,29 @@ export default function UserManagementViewer() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/50 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  <th className="px-5 py-3.5">{t.table.user}</th>
+                  <SortableHeader
+                    label={t.table.user}
+                    field="username"
+                    sortField={sortField}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
                   <th className="px-5 py-3.5">{t.table.discordName}</th>
                   <th className="px-5 py-3.5">{t.table.role}</th>
-                  <th className="px-5 py-3.5">{t.table.year}</th>
+                  <SortableHeader
+                    label={t.table.year}
+                    field="year"
+                    sortField={sortField}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
+                  <SortableHeader
+                    label={t.table.registered}
+                    field="created"
+                    sortField={sortField}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  />
                   <th className="px-5 py-3.5">{t.table.status}</th>
                   <th className="px-5 py-3.5 text-right">{t.table.actions}</th>
                 </tr>
@@ -205,6 +244,12 @@ export default function UserManagementViewer() {
                     </td>
                     <td className="px-5 py-4 text-slate-600 dark:text-slate-400 text-xs whitespace-nowrap font-medium">
                       {formatEnrollmentYear(u.year) ?? '-'}
+                    </td>
+                    <td
+                      className="px-5 py-4 text-slate-600 dark:text-slate-400 text-xs whitespace-nowrap font-medium tabular-nums"
+                      title={formatDateTime(u.created)}
+                    >
+                      {formatDate(u.created)}
                     </td>
                     <td className="px-5 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
@@ -265,5 +310,34 @@ export default function UserManagementViewer() {
         )}
       </div>
     </div>
+  )
+}
+
+/**
+ * Κεφαλίδα στήλης που ταξινομεί. Το βελάκι δείχνει την τρέχουσα κατεύθυνση,
+ * και το aria-sort το ανακοινώνει σε screen reader.
+ */
+function SortableHeader({ label, field, sortField, sortDir, onSort, align = 'left' }) {
+  const active = sortField === field
+  const Icon = !active ? ChevronsUpDown : sortDir === 'asc' ? ChevronUp : ChevronDown
+
+  return (
+    <th
+      className={`px-5 py-3.5 ${align === 'right' ? 'text-right' : ''}`}
+      aria-sort={active ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+    >
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className={`inline-flex items-center gap-1.5 uppercase tracking-wider font-bold transition-colors cursor-pointer ${
+          active
+            ? 'text-brand-600 dark:text-brand-400'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+        }`}
+      >
+        {label}
+        <Icon className={`w-3 h-3 ${active ? '' : 'opacity-40'}`} />
+      </button>
+    </th>
   )
 }
