@@ -1,20 +1,26 @@
 // Course card in the Courses grid matching custom design system. Used by Courses page.
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, BookOpen, Clock } from 'lucide-react'
-import { useMe } from '../../hooks/queries'
+// import { useMe } from '../../hooks/queries' // ξαναβάλε το μαζί με την Πρόοδο
 import { formatLastUpdated } from '../../lib/dates'
 import t from '../../content/courses.json'
 
+// Το `progress` περνιέται ακόμα από το Courses.jsx και ξαναχρησιμοποιείται
+// μόλις ξεσχολιαστεί η μπάρα προόδου παρακάτω.
+// eslint-disable-next-line no-unused-vars
 function CourseCard({ course, hasContent, disabled, progress = 0 }) {
-  const { user } = useMe()
+  // const { user } = useMe() // ξαναβάλε το μαζί με την Πρόοδο
   const questionCount = course.questionCount ?? 0
+  // Πότε ήρθε νέα ύλη το λέει η γραμμή «Πριν X μέρες» στο footer της κάρτας.
+  // Δεν υπάρχει και badge για το ίδιο πράγμα: δύο σημεία στην ίδια κάρτα να
+  // διαβάζουν το ίδιο course.lastUpdated είναι θόρυβος, όχι έμφαση.
   const lastUpdatedText = formatLastUpdated(course.lastUpdated)
 
   const inner = (
     <div className="relative z-10 flex flex-col h-full space-y-4">
       {/* Top Header Row */}
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-wide  text-slate-500 dark:text-slate-400">
+        <span className="text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400">
           {course.semester}ο Εξάμηνο
         </span>
         {disabled && (
@@ -43,7 +49,11 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
         </p>
       </div>
 
-      {/* Progress Section (Only visible for logged-in users) */}
+      {/* Πρόοδος — προσωρινά εκτός: το backend δεν επιστρέφει ακόμα πραγματικό
+          ποσοστό, οπότε η μπάρα έδειχνε πάντα 0% και υποσχόταν feature που δεν
+          υπάρχει. Ξαναβάλε το μαζί με το ιστορικό (V1.2), μαζί με το useMe
+          import και το `const { user } = useMe()` στην κορυφή του αρχείου.
+
       {user != null && (
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between text-xs font-medium">
@@ -58,6 +68,7 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
           </div>
         </div>
       )}
+      */}
 
       {/* Footer Info Row */}
       <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">

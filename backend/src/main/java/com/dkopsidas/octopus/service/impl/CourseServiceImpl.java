@@ -14,6 +14,7 @@ import com.dkopsidas.octopus.security.audit.AuditEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -50,10 +51,23 @@ public class CourseServiceImpl implements CourseService {
                 orElseThrow(() -> new CourseNotFoundException(courseId));
         Course courseFromDto = courseMapper.toEntity(updateRequest);
 
+        // Οι παλιές τιμές διαβάζονται πριν το set: το audit log χωρίς το «από τι»
+        // λέει μόνο ότι κάτι άλλαξε, όχι τι έγινε.
+        int oldSetSize = course.getQuestionSetSize();
+        int oldTimer = course.getDefaultTimerMinutes();
+
         course.setQuestionSetSize(courseFromDto.getQuestionSetSize());
         course.setDefaultTimerMinutes(courseFromDto.getDefaultTimerMinutes());
 
         Course saved = courseRepository.save(course);
+
+        List<String> changes = new ArrayList<>();
+        if (oldSetSize != saved.getQuestionSetSize()) {
+            changes.add("questionSetSize " + oldSetSize + " -> " + saved.getQuestionSetSize());
+        }
+        if (oldTimer != saved.getDefaultTimerMinutes()) {
+            changes.add("defaultTimerMinutes " + oldTimer + " -> " + saved.getDefaultTimerMinutes());
+        }
 
         eventPublisher.publishEvent(AuditEvent.success(
                 null,
@@ -61,7 +75,9 @@ public class CourseServiceImpl implements CourseService {
                 AuditAction.COURSE_UPDATED,
                 "COURSE",
                 saved.getId().toString(),
-                "Updated questionSetSize=" + saved.getQuestionSetSize() + ", defaultTimerMinutes=" + saved.getDefaultTimerMinutes()
+                "Course \"" + saved.getName() + "\" (#" + saved.getId() + ", "
+                        + saved.getSemester() + "o semester): "
+                        + (changes.isEmpty() ? "saved with no value changes" : String.join(", ", changes))
         ));
 
         return courseMapper.toDto(saved);

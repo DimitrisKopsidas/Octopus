@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import useBodyScrollLock from '../../hooks/useBodyScrollLock'
 import { Plus, ChevronDown, Search, RotateCw, Loader2, KeyRound } from 'lucide-react'
 import { useInviteCodes, useGenerateInviteCode, useDeleteInviteCode } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
@@ -46,17 +47,10 @@ export default function InviteCodesViewer() {
   const generateMutation = useGenerateInviteCode()
   const deleteMutation = useDeleteInviteCode()
 
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (showGenerateModal) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [showGenerateModal])
+  // Ίδιο κλείδωμα με τα υπόλοιπα modals. Το προηγούμενο έγραφε κατευθείαν στο
+  // body.style και μηδένιζε το overflow στο cleanup, οπότε αν ήταν ανοιχτό και
+  // δεύτερο overlay το ξεκλείδωνε μαζί.
+  useBodyScrollLock(showGenerateModal)
 
   // Listen to ESC key to close modal
   useEffect(() => {

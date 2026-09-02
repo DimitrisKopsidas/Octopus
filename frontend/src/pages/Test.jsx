@@ -1,7 +1,8 @@
 // Active test page: one question at a time, answer select, navigator, timer. Route: /test/:courseId
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
+import { logClientEvent, logClientEventOnUnload } from '../lib/clientLog'
 import { useCountdown } from '../hooks/useCountdown'
 import { useFlash } from '../hooks/useFlash'
 import { useTestKeyboard } from '../hooks/useTestKeyboard'
@@ -90,14 +91,54 @@ function Test() {
     clearAnswer(questionId)
     setFlash('cleared')
   }
+  // Το ref εμποδίζει τη διπλή αναφορά όταν ο χρήστης πατήσει ακύρωση και μετά
+  // κλείσει και την καρτέλα.
+  const abandonReported = useRef(false)
+
+  function describeAbandon(reason) {
+    const elapsedSec = startedAt ? Math.round((Date.now() - startedAt) / 1000) : null
+    return (
+      `Quiz ${reason} in course "${courseName}" (#${courseId})` +
+      `, answered ${Object.keys(answers).length}/${questions.length}` +
+      `, at question ${currentIndex + 1}` +
+      (elapsedSec != null ? `, after ${elapsedSec}s` : '')
+    )
+  }
+
   function handleFinish() {
     finish()
     navigate(`/test/${courseId}/results`)
   }
   function handleCancel() {
+    // Το backend βλέπει μόνο τα quiz που ΤΕΛΕΙΩΝΟΥΝ (BUNDLE_CREATED). Πόσοι τα
+    // παρατάνε στη μέση, σε ποιο μάθημα και σε ποια ερώτηση, το ξέρει μόνο ο
+    // browser -- και είναι από τα πιο χρήσιμα νούμερα για την ποιότητα της ύλης.
+    abandonReported.current = true
+    logClientEvent({
+      resourceType: 'BUNDLE',
+      resourceId: courseId,
+      details: describeAbandon('cancelled'),
+    })
     reset()
     navigate(`/courses/${courseId}/start`, { replace: true })
   }
+
+
+  // Κλείσιμο καρτέλας με το quiz ανοιχτό. Το axios request θα ακυρωνόταν μαζί
+  // με τη σελίδα, γι' αυτό εδώ φεύγει με sendBeacon.
+  useEffect(() => {
+    function onBeforeUnload() {
+      if (!hasSession || endedAt || abandonReported.current) return
+      abandonReported.current = true
+      logClientEventOnUnload({
+        resourceType: 'BUNDLE',
+        resourceId: String(courseId),
+        details: describeAbandon('left open'),
+      })
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  })
 
   useTestKeyboard({
     enabled: hasSession,

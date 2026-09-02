@@ -1,7 +1,16 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { ScrollText, RotateCw, ChevronDown } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ScrollText, RotateCw, ChevronDown, X, ExternalLink } from 'lucide-react'
 import { useAuditLogs } from '../../hooks/queries'
+import useBodyScrollLock from '../../hooks/useBodyScrollLock'
+import {
+  AUDIT_ACTIONS,
+  auditActionLabel,
+  auditActionClass,
+  resourceLabel,
+  resourceHref,
+} from '../../lib/auditActions'
 import Skeleton from '../ui/Skeleton'
 import ErrorState from '../ui/ErrorState'
 import t from '../../content/auditLogs.json'
@@ -10,26 +19,11 @@ import t from '../../content/auditLogs.json'
 // closed select's colours. Pinning each option to a plain surface stops that.
 const OPTION_CLASS = 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium'
 
+// Χτίζεται από το κοινό AUDIT_ACTIONS: πριν ήταν χειρόγραφη λίστα που είχε
+// ήδη ξεμείνει από το enum του backend (έλειπε το USER_UPDATED).
 const ACTION_OPTIONS = [
   { value: '', label: 'Όλες οι ενέργειες' },
-  { value: 'USER_LOGIN_SUCCESS', label: 'USER_LOGIN_SUCCESS' },
-  { value: 'USER_LOGIN_FAILED', label: 'USER_LOGIN_FAILED' },
-  { value: 'USER_LOGOUT', label: 'USER_LOGOUT' },
-  { value: 'USER_REGISTERED', label: 'USER_REGISTERED' },
-  { value: 'USER_REGISTER_FAILED', label: 'USER_REGISTER_FAILED' },
-  { value: 'USER_ROLE_CHANGED', label: 'USER_ROLE_CHANGED' },
-  { value: 'USER_DEACTIVATED', label: 'USER_DEACTIVATED' },
-  { value: 'INVITE_CODE_GENERATED', label: 'INVITE_CODE_GENERATED' },
-  { value: 'INVITE_CODE_DELETED', label: 'INVITE_CODE_DELETED' },
-  { value: 'TOKEN_REFRESHED', label: 'TOKEN_REFRESHED' },
-  { value: 'COURSE_UPDATED', label: 'COURSE_UPDATED' },
-  { value: 'QUESTION_CREATED', label: 'QUESTION_CREATED' },
-  { value: 'QUESTION_UPDATED', label: 'QUESTION_UPDATED' },
-  { value: 'QUESTION_DEACTIVATED', label: 'QUESTION_DEACTIVATED' },
-  { value: 'QUESTION_IMAGE_UPLOADED', label: 'QUESTION_IMAGE_UPLOADED' },
-  { value: 'QUESTION_IMAGE_DELETED', label: 'QUESTION_IMAGE_DELETED' },
-  { value: 'BUNDLE_CREATED', label: 'BUNDLE_CREATED' },
-  { value: 'CLIENT_AUDIT_EVENT', label: 'CLIENT_AUDIT_EVENT' },
+  ...AUDIT_ACTIONS.map((action) => ({ value: action.value, label: action.label })),
 ]
 
 const STATUS_OPTIONS = [
@@ -56,21 +50,17 @@ export default function AuditLogsViewer() {
   const [selectedDateRange, setSelectedDateRange] = useState('')
   const [selectedLog, setSelectedLog] = useState(null)
 
-  // Body scroll lock & ESC key handling for detail modal
+  // Το κλείδωμα του scroll ζει πλέον σε κοινό hook, ώστε ο πίνακας από πίσω να
+  // μένει ακίνητος με τον ίδιο τρόπο σε κάθε modal της διαχείρισης.
+  useBodyScrollLock(Boolean(selectedLog))
+
   useEffect(() => {
-    if (selectedLog) {
-      document.body.classList.add('overflow-hidden')
-      const handleKeyDown = (e) => {
-        if (e.key === 'Escape') setSelectedLog(null)
-      }
-      window.addEventListener('keydown', handleKeyDown)
-      return () => {
-        document.body.classList.remove('overflow-hidden')
-        window.removeEventListener('keydown', handleKeyDown)
-      }
-    } else {
-      document.body.classList.remove('overflow-hidden')
+    if (!selectedLog) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedLog(null)
     }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedLog])
 
   const queryParams = {
@@ -96,18 +86,6 @@ export default function AuditLogsViewer() {
     })
   }
 
-  const getActionBadgeColor = (action, status) => {
-    if (status === 'FAILURE' || action?.includes('DEACTIVATED') || action?.includes('FAILED')) {
-      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
-    }
-    if (action?.includes('LOGIN') || action?.includes('REGISTERED')) {
-      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-    }
-    if (action?.includes('UPDATED') || action?.includes('UPLOADED')) {
-      return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-    }
-    return 'bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/20'
-  }
 
   return (
     <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl rounded-2xl p-6 mb-8 animate-fade-up">
@@ -278,8 +256,11 @@ export default function AuditLogsViewer() {
                       {formatTimestamp(log.timestamp)}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getActionBadgeColor(log.action, log.status)}`}>
-                        {log.action}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${auditActionClass(log.action, log.status)}`}
+                        title={log.action}
+                      >
+                        {auditActionLabel(log.action)}
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap font-semibold text-slate-900 dark:text-slate-100">
@@ -334,61 +315,153 @@ export default function AuditLogsViewer() {
         </div>
       )}
 
-      {/* Detail Modal with Backdrop Lock & Esc Dismiss.
-          Rendered into document.body: inside the page tree any ancestor with a
-          transform or filter would make `fixed` resolve against that ancestor
-          instead of the viewport, and the modal drifted with the scroll. */}
+      {/* Modal λεπτομερειών. Μπαίνει στο document.body: μέσα στο δέντρο της
+          σελίδας, οποιοσδήποτε πρόγονος με transform ή filter κάνει το `fixed`
+          να μετράει ως προς εκείνον αντί για το viewport, και το modal
+          ταξίδευε μαζί με το scroll. */}
       {selectedLog && createPortal(
         <div
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedLog(null)
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-slate-950/70 backdrop-blur-md animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="audit-detail-title"
         >
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 space-y-4 animate-reveal">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <span>📜</span>
-                <span>{t.modal.title}</span>
-              </h3>
-              <button
-                onClick={() => setSelectedLog(null)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg leading-none p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
-              <div><strong className="text-slate-900 dark:text-slate-100">ID:</strong> {selectedLog.id}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">Ημερομηνία:</strong> {formatTimestamp(selectedLog.timestamp)}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">Ενέργεια:</strong> {selectedLog.action}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">Actor Username:</strong> {selectedLog.actorUsername || '—'}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">Actor ID:</strong> {selectedLog.actorId || '—'}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">Resource:</strong> {selectedLog.resourceType} #{selectedLog.resourceId}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">Status:</strong> {selectedLog.status}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">IP:</strong> {selectedLog.ipAddress || '—'}</div>
-              <div><strong className="text-slate-900 dark:text-slate-100">User Agent:</strong> <span className="font-mono text-[11px] block break-all mt-0.5 p-2 bg-slate-50 dark:bg-slate-800 rounded-lg">{selectedLog.userAgent || '—'}</span></div>
-              <div>
-                <strong className="text-slate-900 dark:text-slate-100">Details:</strong>
-                <pre className="font-mono text-[11px] whitespace-pre-wrap break-all mt-1 p-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-800 dark:text-slate-200 max-h-40 overflow-y-auto">
-                  {selectedLog.details || 'Δεν υπάρχουν επιπλέον λεπτομέρειες'}
-                </pre>
+          <div className="relative w-full max-w-2xl my-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-h-[calc(100vh-4rem)] flex flex-col animate-reveal overflow-hidden">
+            <header className="flex items-start justify-between gap-4 px-6 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
+              <div className="min-w-0">
+                <h3 id="audit-detail-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  {auditActionLabel(selectedLog.action)}
+                </h3>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                  <span className="font-mono">{selectedLog.action}</span>
+                  <span aria-hidden="true">·</span>
+                  <span className="font-mono tabular-nums">{formatTimestamp(selectedLog.timestamp)}</span>
+                </p>
               </div>
+              <button
+                type="button"
+                onClick={() => setSelectedLog(null)}
+                aria-label={t.modal.close}
+                className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </header>
+
+            <div className="flex-1 overflow-y-auto scrollbar-custom px-6 py-5 space-y-5">
+              {/* Τι έγινε -- η μία γραμμή που απαντά στην ερώτηση χωρίς σκρολάρισμα */}
+              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  {t.modal.whatHappened}
+                </p>
+                <p className="mt-1.5 text-sm text-slate-800 dark:text-slate-200 leading-relaxed break-words">
+                  {selectedLog.details || t.modal.noDetails}
+                </p>
+              </div>
+
+              <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-4">
+                <DetailField label={t.modal.fields.actor}>
+                  <span className="font-semibold">@{selectedLog.actorUsername || 'system'}</span>
+                  {selectedLog.actorId && (
+                    <span className="block font-mono text-[10px] text-slate-400 dark:text-slate-500 break-all mt-0.5">
+                      {selectedLog.actorId}
+                    </span>
+                  )}
+                </DetailField>
+
+                <DetailField label={t.modal.fields.resource}>
+                  <ResourceValue
+                    resourceType={selectedLog.resourceType}
+                    resourceId={selectedLog.resourceId}
+                    onNavigate={() => setSelectedLog(null)}
+                  />
+                </DetailField>
+
+                <DetailField label={t.modal.fields.status}>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${
+                      selectedLog.status === 'SUCCESS'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    {selectedLog.status}
+                  </span>
+                </DetailField>
+
+                <DetailField label={t.modal.fields.ip}>
+                  <span className="font-mono">{selectedLog.ipAddress || '—'}</span>
+                </DetailField>
+              </dl>
+
+              <DetailField label={t.modal.fields.userAgent}>
+                <span className="font-mono text-[11px] block break-all p-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                  {selectedLog.userAgent || '—'}
+                </span>
+              </DetailField>
+
+              <DetailField label={t.modal.fields.id}>
+                <span className="font-mono text-[10px] break-all text-slate-400 dark:text-slate-500">
+                  {selectedLog.id}
+                </span>
+              </DetailField>
             </div>
 
-            <div className="pt-2 text-right">
+            <footer className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 text-right shrink-0">
               <button
+                type="button"
                 onClick={() => setSelectedLog(null)}
                 className="px-4 py-2 text-xs font-semibold bg-brand-600 text-white rounded-xl hover:bg-brand-700 transition-colors shadow-md shadow-brand-600/20"
               >
                 {t.modal.close}
               </button>
-            </div>
+            </footer>
           </div>
         </div>,
         document.body
       )}
     </div>
+  )
+}
+
+/** Μία σειρά ετικέτα/τιμή στο modal λεπτομερειών. */
+function DetailField({ label, children }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        {label}
+      </dt>
+      <dd className="mt-1 text-xs text-slate-700 dark:text-slate-300 break-words">{children}</dd>
+    </div>
+  )
+}
+
+/**
+ * Ο πόρος στον οποίο αναφέρεται το log. Γίνεται σύνδεσμος μόνο όταν υπάρχει
+ * σελίδα να δείξει -- ένα link που βγάζει 404 είναι χειρότερο από απλό κείμενο.
+ */
+function ResourceValue({ resourceType, resourceId, onNavigate }) {
+  if (!resourceType && !resourceId) return <span>—</span>
+
+  const label = resourceLabel(resourceType)
+  const href = resourceHref(resourceType, resourceId)
+  const text = resourceId ? `${label} #${resourceId}` : label
+
+  if (!href) {
+    return <span className="font-semibold">{text}</span>
+  }
+
+  return (
+    <Link
+      to={href}
+      onClick={onNavigate}
+      className="inline-flex items-center gap-1 font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+    >
+      {text}
+      <ExternalLink className="w-3 h-3" />
+    </Link>
   )
 }

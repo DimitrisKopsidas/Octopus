@@ -21,3 +21,29 @@ export function formatLastUpdated(dateVal) {
     return 'Ποτέ'
   }
 }
+
+
+/**
+ * Απόλυτη ημερομηνία + ώρα για πίνακες διαχείρισης, όπου το «Πριν 3 μέρες»
+ * δεν αρκεί: ο admin θέλει να συγκρίνει και να ταξινομεί.
+ */
+export function formatDateTime(dateVal) {
+  if (!dateVal) return '—'
+  const d = new Date(dateVal)
+  if (isNaN(d.getTime())) return '—'
+  return d.toLocaleString('el-GR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/** Μόνο η ημερομηνία, για στήλες που δεν χωράνε και την ώρα. */
+export function formatDate(dateVal) {
+  if (!dateVal) return '—'
+  const d = new Date(dateVal)
+  if (isNaN(d.getTime())) return '—'
+  return d.toLocaleDateString('el-GR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}

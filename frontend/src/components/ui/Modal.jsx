@@ -2,20 +2,18 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import useBodyScrollLock from '../../hooks/useBodyScrollLock'
 
 function Modal({ open, onClose, title, children, size = 'lg' }) {
+  useBodyScrollLock(open)
+
   useEffect(() => {
     if (!open) return
     function handleKey(e) {
       if (e.key === 'Escape') onClose?.()
     }
     document.addEventListener('keydown', handleKey)
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = prevOverflow
-    }
+    return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
   if (!open) return null
@@ -27,7 +25,12 @@ function Modal({ open, onClose, title, children, size = 'lg' }) {
     xl: 'max-w-4xl',
   }[size] || 'max-w-2xl'
 
-  return (
+  // Μέσα στο δέντρο της σελίδας, οποιοσδήποτε πρόγονος με transform ή filter
+  // κάνει το `fixed` να μετράει ως προς εκείνον αντί για το viewport -- και το
+  // modal ταξιδεύει με το scroll. Το createPortal ήταν ήδη imported εδώ αλλά
+  // δεν χρησιμοποιούνταν· τώρα το overlay βγαίνει πράγματι στο document.body,
+  // όπως ήδη κάνουν τα modals της διαχείρισης.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
       role="dialog"
@@ -65,7 +68,8 @@ function Modal({ open, onClose, title, children, size = 'lg' }) {
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

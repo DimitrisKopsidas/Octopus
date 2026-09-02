@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom'
 import { useHomeStats } from '../hooks/queries'
 import t from '../content/home.json'
+import news from '../content/news.json'
 
 function Home() {
   const stats = useHomeStats()
@@ -71,68 +72,10 @@ function Home() {
         </div>
       </section>
 
-      {/* EXAM SIMULATION — every claim here maps to shipped behaviour:
-          the countdown in Test, useTestKeyboard, FlagButton, and the review on
-          Results. Nothing aspirational, so the page cannot promise more than
-          the product delivers. */}
-      <section className="py-14">
-        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-brand-50 to-white dark:from-brand-950/40 dark:to-slate-900 p-6 sm:p-10">
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <span className="inline-flex items-center rounded-full border border-brand-200 dark:border-brand-900 bg-white/70 dark:bg-slate-900/60 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-brand-700 dark:text-brand-300">
-                {t.simulation.eyebrow}
-              </span>
-
-              <h2 className="mt-4 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
-                {t.simulation.title}
-              </h2>
-              <p className="mt-3 text-slate-600 dark:text-slate-300 leading-relaxed">
-                {t.simulation.body}
-              </p>
-
-              <dl className="mt-8 grid sm:grid-cols-2 gap-x-6 gap-y-5">
-                {t.simulation.features.map((feature) => (
-                  <div key={feature.title} className="flex gap-3">
-                    <span aria-hidden="true" className="text-lg leading-none mt-0.5">{feature.icon}</span>
-                    <div className="min-w-0">
-                      <dt className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        {feature.title}
-                      </dt>
-                      <dd className="mt-0.5 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                        {feature.body}
-                      </dd>
-                    </div>
-                  </div>
-                ))}
-              </dl>
-
-              <Link
-                to="/courses"
-                className="mt-8 inline-flex items-center gap-2 rounded-xl bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/20 transition-colors"
-              >
-                {t.simulation.cta}
-                <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-lg">
-              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                Keyboard shortcuts
-              </p>
-              <ul className="mt-4 divide-y divide-slate-100 dark:divide-slate-800">
-                {t.simulation.shortcuts.map((shortcut) => (
-                  <li key={shortcut.keys} className="flex items-center justify-between gap-4 py-2.5">
-                    <span className="text-sm text-slate-600 dark:text-slate-300">{shortcut.label}</span>
-                    <kbd className="shrink-0 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-2.5 py-1 font-mono text-xs font-bold text-slate-700 dark:text-slate-200 shadow-sm">
-                      {shortcut.keys}
-                    </kbd>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ΝΕΑ & ΤΙ ΕΡΧΕΤΑΙ — αντικατέστησε το EXAM SIMULATION κομμάτι.
+          Το περιεχόμενο ζει στο content/news.json, που τροφοδοτεί και το
+          Roadmap του /info: μία λίστα να ενημερώνεις, όχι δύο που ξεφεύγουν. */}
+      <NewsSection />
 
       {/* HOW IT WORKS — connected numbered stepper.
           scroll-mt clears the sticky header when the hero link jumps here. */}
@@ -166,6 +109,63 @@ function Home() {
         </div>
       </section>
     </div>
+  )
+}
+
+/*
+ * Μόνο ό,τι μπήκε στην τρέχουσα έκδοση. Τα επόμενα ζουν στο roadmap του /info:
+ * η Αρχική απαντά «τι καινούργιο έχει τώρα», όχι «τι σχεδιάζουμε» -- ένας
+ * επισκέπτης που βλέπει μισή σελίδα υποσχέσεις δεν ξέρει τι μπορεί να κάνει.
+ */
+function NewsSection() {
+  const release = news.releases.find((r) => r.version === news.currentVersion)
+  if (!release || release.items.length === 0) return null
+
+  return (
+    <section className="py-14">
+      <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-brand-50 to-white dark:from-brand-950/40 dark:to-slate-900 p-6 sm:p-10">
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 dark:border-brand-900 bg-white/70 dark:bg-slate-900/60 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-brand-700 dark:text-brand-300">
+            {news.home.eyebrow}
+            <span className="font-mono normal-case tracking-normal opacity-70">v{release.version}</span>
+          </span>
+
+          <h2 className="mt-4 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
+            {news.home.title}
+          </h2>
+          <p className="mt-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+            {news.home.subtitle}
+          </p>
+        </div>
+
+        <ul className="mt-10 grid sm:grid-cols-2 gap-4">
+          {release.items.map((item) => (
+            <li
+              key={item.title}
+              className="flex gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm"
+            >
+              <span aria-hidden="true" className="text-xl leading-none mt-0.5 shrink-0">
+                {item.emoji}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{item.title}</p>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">{item.body}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 text-center">
+          <Link
+            to="/info#roadmap"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/60 px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            {news.home.ctaInfo}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
   )
 }
 

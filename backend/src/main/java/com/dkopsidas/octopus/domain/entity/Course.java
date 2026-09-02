@@ -42,16 +42,22 @@ public class Course {
     private long questionCount;
 
     /**
-     * When material was last added or edited in this course.
+     * When material last ARRIVED in this course.
      * <p>
      * Deliberately not {@link #updatedAt}: that one only moves when the course
      * row itself is saved — a change to questionSetSize or the timer — and is
      * null for every course seeded straight into the database. What the course
      * card claims next to the question count is "when did content last arrive",
      * and that lives on the questions.
+     * <p>
+     * Reads {@code created} and not {@code updated} on purpose. The two used to
+     * be interchangeable only because Question.updated was never maintained;
+     * now that it is, max(updated) would move on every typo correction and this
+     * field would quietly stop meaning "new material" and start meaning
+     * "somebody touched something".
      */
     @org.hibernate.annotations.Formula(
-            "(select max(q.updated) from questions q where q.course_id = id and q.is_active = true)"
+            "(select max(q.created) from questions q where q.course_id = id and q.is_active = true)"
     )
     private java.time.Instant lastContentUpdate;
 
