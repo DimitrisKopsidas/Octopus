@@ -81,5 +81,19 @@ jobs:
           git checkout --detach "$DEPLOY_SHA"
           docker compose up -d --build
 
+          for attempt in {1..12}; do
+            if curl --fail --silent "http://localhost:8080/api/v1/healthz" > /dev/null; then
+              echo "Backend health check passed."
+              break
+            fi
+
+            if [[ "$attempt" -eq 12 ]]; then
+              echo "Backend health check failed."
+              exit 1
+            fi
+
+            sleep 5
+          done
+
           echo "Deployed commit: $DEPLOY_SHA"
           REMOTE_SCRIPT
