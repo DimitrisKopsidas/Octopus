@@ -23,7 +23,7 @@ function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
-      <header className="sticky top-0 bg-brand-900/95 dark:bg-brand-950/95 backdrop-blur-md border-b border-brand-800/60 shadow-lg z-30">
+      <header className="sticky top-0 bg-purple-900/95 dark:bg-purple-950/95 backdrop-blur-md border-b border-purple-800/60 shadow-lg z-30">
         <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left: Brand / Logo */}
           <NavLink to="/" className="flex items-center gap-2.5 text-white font-bold text-lg tracking-tight group shrink-0">
