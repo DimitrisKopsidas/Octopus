@@ -19,13 +19,15 @@ jobs:
       SSH_HOST: ${{ secrets.PRODUCTION_SSH_HOST }}
       SSH_USERNAME: ${{ secrets.PRODUCTION_SSH_USERNAME }}
       SSHPASS: ${{ secrets.PRODUCTION_SSH_PASSWORD }}
+      S3_BUCKET: ${{ vars.PRODUCTION_S3_BUCKET }}
+      AWS_REGION: ${{ vars.PRODUCTION_AWS_REGION }}
 
     steps:
       - name: Validate SSH configuration
         run: |
-          for name in SSH_HOST SSH_USERNAME SSHPASS; do
+          for name in SSH_HOST SSH_USERNAME SSHPASS S3_BUCKET AWS_REGION; do
             if [[ -z "${!name:-}" ]]; then
-              echo "Missing required production secret: $name"
+              echo "Missing required production configuration: $name"
               exit 1
             fi
           done
@@ -44,13 +46,11 @@ jobs:
           sshpass -e ssh \
             -o StrictHostKeyChecking=accept-new \
             -o "ProxyCommand=${RUNNER_TEMP}/cloudflared access ssh --hostname %h" \
-            "${SSH_USERNAME}@${SSH_HOST}" 'bash -se' <<'REMOTE_SCRIPT'
+            "${SSH_USERNAME}@${SSH_HOST}" \
+            "S3_BUCKET='$S3_BUCKET' AWS_REGION='$AWS_REGION' bash -se" <<'REMOTE_SCRIPT'
           umask 077
 
-          BACKUP_DIR="$HOME/backups/octopus"
-          BACKUP_FILE="$BACKUP_DIR/octopus-$(date -u +%Y%m%dT%H%M%SZ).dump"
-
-          mkdir -p "$BACKUP_DIR"
+          BACKUP_FILE="$HOME/octopus-$(date -u +%Y%m%dT%H%M%SZ).dump"
 
           docker exec octopus-db-1 sh -c '
             exec pg_dump \
@@ -65,4 +65,12 @@ jobs:
           docker exec -i octopus-db-1 pg_restore --list < "$BACKUP_FILE" > /dev/null
 
           echo "Database backup created: $BACKUP_FILE"
+
+          aws s3 cp \
+            "$BACKUP_FILE" \
+            "s3://${S3_BUCKET}/postgres/$(basename "$BACKUP_FILE")" \
+            --region "$AWS_REGION" \
+            --only-show-errors
+
+          echo "Database backup uploaded to S3."
           REMOTE_SCRIPT
