@@ -2,6 +2,9 @@ package com.dkopsidas.octopus.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateUserRequestDto(
         @NotBlank(message = ERROR_MESSAGE_USERNAME_REQUIRED)
@@ -16,8 +19,12 @@ public record CreateUserRequestDto(
         @Size(max = 100, message = ERROR_MESSAGE_PASSWORD_SIZE)
         String password,
 
-        @NotBlank(message = ERROR_MESSAGE_YEAR_REQUIRED)
-        @Size(min = 2000, max = 2030, message = ERROR_MESSAGE_YEAR_LIMIT)
+        @NotNull(message = ERROR_MESSAGE_YEAR_REQUIRED)
+        //Potential error
+        //@Size(min = 2000, max = 2030, message = ERROR_MESSAGE_YEAR_LIMIT)
+        //Potential fix
+        @Min(1)
+        @Max(5)
         Integer year,
 
         @Size(max = 50, message = ERROR_MESSAGE_USER_CODE_SIZE)
