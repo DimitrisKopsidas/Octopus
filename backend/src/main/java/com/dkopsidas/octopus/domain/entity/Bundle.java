@@ -39,6 +39,10 @@ public class Bundle {
     )
     private List<Answer> answers = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", updatable = false, nullable = false)
+    private User createdBy;
+
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;
 

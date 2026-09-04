@@ -4,11 +4,15 @@ import com.dkopsidas.octopus.domain.dto.CreateBundleRequestDto;
 import com.dkopsidas.octopus.domain.dto.BundleResponseDto;
 import com.dkopsidas.octopus.domain.entity.Answer;
 import com.dkopsidas.octopus.domain.entity.Bundle;
+import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.mapper.BundleMapper;
 import com.dkopsidas.octopus.repository.AnswerRepository;
 import com.dkopsidas.octopus.repository.BundleRepository;
+import com.dkopsidas.octopus.repository.UserRepository;
+import com.dkopsidas.octopus.security.AuthenticatedUser;
 import com.dkopsidas.octopus.service.BundleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.dkopsidas.octopus.domain.entity.AuditAction;
@@ -20,6 +24,7 @@ import java.util.List;
 @Service
 public class BundleServiceImpl implements BundleService {
 
+    private final UserRepository userRepository;
     private final BundleRepository bundleRepository;
     private final AnswerRepository answerRepository;
     private final BundleMapper bundleMapper;
@@ -35,6 +40,13 @@ public class BundleServiceImpl implements BundleService {
     @Transactional
     public BundleResponseDto createBundle(CreateBundleRequestDto createRequest) {
         List<Answer> answers = answerRepository.findAllById(createRequest.answerIds());
+
+        AuthenticatedUser principal = (AuthenticatedUser) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        User userRef = userRepository.getReferenceById(principal.getId());
 
         int score = (int) answers.stream()
                 .filter(Answer::getIsCorrect)
@@ -63,6 +75,8 @@ public class BundleServiceImpl implements BundleService {
                         + (createRequest.timeForCompletion() != null
                                 ? ", time " + createRequest.timeForCompletion() + "s" : "")
         ));
+
+        bundle.setCreatedBy(userRef);
 
         return bundleMapper.toDto(saved);
     }

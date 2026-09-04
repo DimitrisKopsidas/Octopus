@@ -41,7 +41,9 @@ public class BundleMapperImpl implements BundleMapper {
                 bundle.getSetNum(),
                 bundle.getScore(),
                 answers,
-                bundle.getCreated()
+                bundle.getCreated(),
+                bundle.getCreatedBy().getId(),
+                bundle.getCreatedBy().getDisplayName()
         );
     }
 
