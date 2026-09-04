@@ -42,6 +42,10 @@ public class Bundle {
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", updatable = true, nullable = false)
+    private User user;
+
     public void addAnswer(Answer a) {
         answers.add(a);
     }
