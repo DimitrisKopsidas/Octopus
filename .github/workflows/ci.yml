@@ -15,7 +15,6 @@ jobs:
   deploy-production:
     name: Back up database and deploy
     runs-on: ubuntu-latest
-    environment: PROD
     env:
       SSH_HOST: ${{ secrets.PRODUCTION_SSH_HOST }}
       SSH_USERNAME: ${{ secrets.PRODUCTION_SSH_USERNAME }}
