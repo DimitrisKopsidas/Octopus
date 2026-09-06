@@ -40,19 +40,15 @@ public class Bundle {
     private List<Answer> answers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", updatable = false, nullable = false)
-    private User createdBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", updatable = false, nullable = false)
+    private User createdBy;
+
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", updatable = true, nullable = false)
-    private User user;
 
     public void addAnswer(Answer a) {
         answers.add(a);

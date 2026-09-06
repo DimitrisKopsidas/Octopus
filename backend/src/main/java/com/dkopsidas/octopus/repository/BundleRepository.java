@@ -13,6 +13,5 @@ public interface BundleRepository extends JpaRepository<Bundle, Long> {
     Long countByCourseId(@Param("courseId") Long courseId);
 
     //Methods for leaderboard implementation
-    List<Bundle> findAll();
     List<Bundle> findDistinctByAnswers_Question_Course_Id(Long courseId);
 }
