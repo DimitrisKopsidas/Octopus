@@ -44,6 +44,13 @@ Helper team from IEE IHU Discord for ideas and further content creation
 ### Running the Application
 
 #### Production (Main Branch)
+Before starting production, create the `.htpasswd` file in the project root for pgAdmin's additional Nginx login:
+```bash
+sudo apt-get install apache2-utils
+htpasswd -c .htpasswd your_username
+```
+The command prompts for the password. Keep `.htpasswd` out of version control. pgAdmin is then available at `https://your-domain/pgadmin/` after both the Nginx login and the pgAdmin login.
+
 To update to the main branch and run the production build:
 ```powershell
 ./scripts/run-update-main.sh

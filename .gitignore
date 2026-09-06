@@ -46,3 +46,6 @@ images/
 docs/
 # Claude Code local tooling 
 .claude/
+
+# Nginx auth config
+.htpasswd

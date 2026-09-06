@@ -63,6 +63,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@octopus.dev
       PGADMIN_DEFAULT_PASSWORD: admin
+      GUNICORN_TIMEOUT: 60
     volumes:
       - pgadmin_data_dev:/var/lib/pgadmin
 
