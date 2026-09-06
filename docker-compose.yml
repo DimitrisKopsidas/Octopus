@@ -3,8 +3,8 @@ name: octopus
 services:
   db:
     image: postgres:16
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     restart: always
     env_file:
       - .env
@@ -17,8 +17,8 @@ services:
 
   backend:
     build: ./backend
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       - db
     env_file:
@@ -49,6 +49,7 @@ services:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api/v1}
     ports:
       - "80:80"
+    restart: always
     volumes:
       - /var/www/octopus/images:/var/www/octopus/images
       - ./.htpasswd:/etc/nginx/.htpasswd:ro
@@ -59,6 +60,7 @@ services:
     image: dpage/pgadmin4:latest
     expose:
       - "80"
+    restart: always
     depends_on:
       - db
     environment:
