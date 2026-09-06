@@ -51,8 +51,24 @@ services:
       - "80:80"
     volumes:
       - /var/www/octopus/images:/var/www/octopus/images
+      - ./.htpasswd:/etc/nginx/.htpasswd:ro
     depends_on:
       - backend
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    expose:
+      - "80"
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SCRIPT_NAME: ${PGADMIN_CONFIG_SCRIPT_NAME:-'/pgadmin'}
+      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-60}
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   postgres_data:
+  pgadmin_data:
