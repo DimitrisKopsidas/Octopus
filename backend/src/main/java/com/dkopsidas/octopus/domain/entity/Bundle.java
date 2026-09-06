@@ -43,6 +43,10 @@ public class Bundle {
     @JoinColumn(name = "created_by", updatable = false, nullable = false)
     private User createdBy;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(name = "created", updatable = false, nullable = false)
     private Instant created;
 
