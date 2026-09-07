@@ -35,37 +35,46 @@ Helper team from IEE IHU Discord for ideas and further content creation
 
 ## Quick start
 
-1. Copy the sample environment file to a real local configuration file:
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-2. Review the values in [.env](.env) if needed.
+Create a `.env` file in the project root with the required application and Docker configuration values.
 
-### Running the Application
+For local access over plain HTTP, set `AUTH_REFRESH_COOKIE_SECURE=false` so the browser can accept the refresh cookie.
 
-#### Production (Main Branch)
-Before starting production, create the `.htpasswd` file in the project root for pgAdmin's additional Nginx login:
+### Production setup (recommended)
+
+The production setup is recommended for local testing because it more closely simulates the production environment. Only Nginx is exposed on port `80`; the backend, database, and pgAdmin ports are internal to Docker.
+
+Before starting, create a `.htpasswd` file in the project root for pgAdmin's additional Nginx login. On Debian/Ubuntu:
+
 ```bash
 sudo apt-get install apache2-utils
 htpasswd -c .htpasswd your_username
 ```
-The command prompts for the password. Keep `.htpasswd` out of version control. pgAdmin is then available at `https://your-domain/pgadmin/` after both the Nginx login and the pgAdmin login.
 
-To update to the main branch and run the production build:
-```powershell
-./scripts/run-update-main.sh
-```
-This will:
-- Checkout the main branch
-- Pull latest changes
-- Build and start containers
+The command prompts for a password. Keep `.htpasswd` out of version control. Set `PGADMIN_DEFAULT_EMAIL` and `PGADMIN_DEFAULT_PASSWORD` in `.env` for the separate pgAdmin login.
 
-#### Development (with pgAdmin4)
-To run the development instance with pgAdmin4 for database management:
-```powershell
-./scripts/run-dev.sh
+Start the application using [docker-compose.yml](docker-compose.yml):
+
+```bash
+docker compose up -d --build
 ```
-This uses [docker-compose.dev.yml](docker-compose.dev.yml) and provides:
+
+- Frontend: http://localhost
+- Backend API: http://localhost/api/ (API endpoints use `/api/v1`)
+- pgAdmin: http://localhost/pgadmin/ — sign in with the Nginx credentials first, then the pgAdmin credentials from `.env`.
+
+### Development setup
+
+Start the application using [docker-compose.dev.yml](docker-compose.dev.yml):
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
+
+Development exposes the service ports directly:
+
 - Frontend: http://localhost:80
-- Backend API: http://localhost:8080
-- pgAdmin4: http://localhost:5050 (admin@octopus.dev / admin)
+- Backend API: http://localhost:8080/api/v1
+- pgAdmin: http://localhost:5050 (email: `admin@octopus.dev`, password: `admin`)
+- PostgreSQL: `localhost:5432` (credentials from `.env`)
+
+Stop the running setup before switching between production and development, since both use port `80`.
