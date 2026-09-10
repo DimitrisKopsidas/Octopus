@@ -83,7 +83,7 @@ jobs:
           docker compose up -d --build
 
           for attempt in {1..12}; do
-            if curl --fail --silent "http://localhost/api/v1/healthz" > /dev/null; then
+            if curl --fail --silent "http://localhost/api/v1/healthz" > /dev/null && curl --fail --silent "http://localhost/api/v1/readyz" > /dev/null; then
               echo "Backend health check passed."
               break
             fi
