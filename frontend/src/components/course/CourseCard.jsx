@@ -1,6 +1,6 @@
 // Course card in the Courses grid matching custom design system. Used by Courses page.
 import { Link } from 'react-router-dom'
-import { ArrowUpRight, BookOpen, Clock } from 'lucide-react'
+import { ArrowUpRight, BookOpen, History } from 'lucide-react'
 // import { useMe } from '../../hooks/queries' // ξαναβάλε το μαζί με την Πρόοδο
 import { formatLastUpdated } from '../../lib/dates'
 import t from '../../content/courses.json'
@@ -44,9 +44,11 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
         }`}>
           {course.name}
         </h3>
-        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-          {course.description || `Κωδικός μαθήματος: ${course.id}`}
-        </p>
+        {course.description && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+            {course.description}
+          </p>
+        )}
       </div>
 
       {/* Πρόοδος — προσωρινά εκτός: το backend δεν επιστρέφει ακόμα πραγματικό
@@ -83,8 +85,8 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
           <span className="tabular-nums">{questionCount}</span>
           <span className="font-medium">{t.courseCard.questions}</span>
         </div>
-        <div className="flex items-center gap-1.5 font-medium">
-          <Clock className="w-4 h-4 text-slate-400 shrink-0" />
+        <div className="flex items-center gap-1.5 font-medium" title="Τελευταία ενημέρωση">
+          <History className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span>{lastUpdatedText}</span>
         </div>
       </div>
@@ -96,7 +98,7 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
       <div
         title={t.emptyDisabledTooltip}
         aria-disabled="true"
-        className="relative overflow-hidden bg-slate-50/60 dark:bg-slate-900/40 rounded-2xl p-6 border border-dashed border-slate-300 dark:border-slate-700 opacity-70 cursor-not-allowed select-none"
+        className="relative overflow-hidden bg-slate-50/80 dark:bg-slate-900/50 rounded-2xl p-6 border border-dashed border-slate-300 dark:border-slate-700 opacity-70 cursor-not-allowed select-none"
       >
         {inner}
       </div>
@@ -106,7 +108,7 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
   return (
     <Link
       to={`/courses/${course.id}/start`}
-      className="group relative overflow-hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 pt-7 border border-slate-200/80 dark:border-slate-800 shadow-lg hover:shadow-2xl hover:border-brand-500/50 hover:-translate-y-1 transition-all duration-300"
+      className="group relative overflow-hidden bg-white dark:bg-slate-900 rounded-2xl p-6 pt-7 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-500/50 hover:-translate-y-0.5 transition-all duration-200"
     >
       {/* Accent bar along the top edge: the fastest way to tell a playable
           course from an empty one while scanning the grid. */}
@@ -114,8 +116,6 @@ function CourseCard({ course, hasContent, disabled, progress = 0 }) {
         aria-hidden="true"
         className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-500 to-teal-400"
       />
-      {/* Ambient gradient top-right glow */}
-      <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-brand-500/10 dark:bg-brand-500/15 blur-2xl pointer-events-none group-hover:bg-brand-500/25 transition-all" />
       {inner}
     </Link>
   )

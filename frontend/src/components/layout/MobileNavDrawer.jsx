@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import ThemeToggle from './ThemeToggle'
 import { useMe, useLogout } from '../../hooks/queries'
-import { canManageContent, userInitial } from '../../lib/roles'
+import { userInitial } from '../../lib/roles'
 import t from '../../content/layout.json'
 
 const mobileNavLinkClass = ({ isActive }) =>
@@ -20,7 +20,6 @@ function MobileNavDrawer({ open, onClose }) {
   const navigate = useNavigate()
   const { user, isLoading } = useMe()
   const logoutMutation = useLogout()
-  const showAdmin = canManageContent(user)
 
   useEffect(() => {
     if (open) {
@@ -63,6 +62,11 @@ function MobileNavDrawer({ open, onClose }) {
             <NavLink to="/" end onClick={onClose} className={mobileNavLinkClass}>{t.nav.home}</NavLink>
             <NavLink to="/courses" onClick={onClose} className={mobileNavLinkClass}>{t.nav.courses}</NavLink>
             <NavLink to="/info" onClick={onClose} className={mobileNavLinkClass}>{t.nav.info}</NavLink>
+          </div>
+
+          <div className="flex items-center justify-between px-4 py-2 text-brand-100 text-sm font-semibold rounded-lg hover:bg-brand-800/80 transition-colors">
+            <span>{t.mobile.themeLabel}</span>
+            <ThemeToggle />
           </div>
         </div>
 

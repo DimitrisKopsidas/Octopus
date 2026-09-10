@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react'
 import logo from '../../assets/logo.png'
 import MobileNavDrawer from './MobileNavDrawer'
 import UserMenu from './UserMenu'
+import ThemeToggle from './ThemeToggle'
 import Footer from './Footer'
 import ToastContainer from '../ui/Toast'
 import { useMe } from '../../hooks/queries'
@@ -44,8 +45,10 @@ function Layout() {
             </NavLink>
           </div>
 
-          {/* Right: User Menu or Login + Mobile Toggle */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Right: Theme Toggle (desktop, logged out only) + User Menu or Login + Mobile Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {!isLoading && !user && <ThemeToggle className="hidden md:flex" />}
+
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-brand-800/80 animate-pulse border border-brand-700/50 flex items-center justify-center">
                 <div className="w-4 h-4 rounded-full bg-brand-600/50" />

@@ -5,7 +5,6 @@ import {
   ChevronDown,
   User,
   Heart,
-  FileCheck2,
   Settings,
   Sliders,
   Shield,
@@ -124,18 +123,6 @@ function UserMenu() {
             </Link>
 
             <Link
-              to="/quizzes"
-              onClick={() => setOpen(false)}
-              role="menuitem"
-              className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
-            >
-              <span className="flex items-center gap-3">
-                <FileCheck2 className="w-4 h-4 text-indigo-500" />
-                <span>Τα Κουίζ μου</span>
-              </span>
-            </Link>
-
-            <Link
               to="/settings"
               onClick={() => setOpen(false)}
               role="menuitem"
@@ -179,7 +166,7 @@ function UserMenu() {
           {/* Quick Theme Toggle Row */}
           <div className="px-4 py-2 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/40">
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Εμφάνιση</span>
-            <ThemeToggle />
+            <ThemeToggle variant="panel" />
           </div>
 
           {/* Logout Button */}

@@ -6,9 +6,6 @@ import {
   Shield,
   Calendar,
   LogOut,
-  Settings,
-  Heart,
-  FileText,
   MessageSquare,
 } from 'lucide-react'
 import { useMe, useLogout } from '../hooks/queries'
@@ -269,68 +266,6 @@ function Profile() {
               <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base font-mono block truncate">
                 {user.discordName ? `@${user.discordName.replace(/^@/, '')}` : t.accountInfo.notSet}
               </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Shortcuts Section (Inactive / Preview Cards) */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
-          {t.shortcuts.title}
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {/* Quizzes */}
-          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-default select-none">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-900/60 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-4">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                {t.shortcuts.quizzes.title}
-              </p>
-              <p className="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5">
-                {t.shortcuts.quizzes.subtitle}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                {t.shortcuts.quizzes.desc}
-              </p>
-            </div>
-          </div>
-
-          {/* Favorites */}
-          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-default select-none">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 text-rose-500 dark:text-rose-400 flex items-center justify-center mb-4">
-              <Heart className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                {t.shortcuts.favorites.title}
-              </p>
-              <p className="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5">
-                {t.shortcuts.favorites.subtitle}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                {t.shortcuts.favorites.desc}
-              </p>
-            </div>
-          </div>
-
-          {/* Settings */}
-          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-default select-none">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 text-amber-500 dark:text-amber-400 flex items-center justify-center mb-4">
-              <Settings className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                {t.shortcuts.settings.title}
-              </p>
-              <p className="text-xs font-semibold text-teal-600 dark:text-teal-400 mt-0.5">
-                {t.shortcuts.settings.subtitle}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                {t.shortcuts.settings.desc}
-              </p>
             </div>
           </div>
         </div>

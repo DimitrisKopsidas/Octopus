@@ -12,6 +12,7 @@ function CoursesFilterModal({
   setDraftSemesters,
   draftOnlyWithContent,
   setDraftOnlyWithContent,
+  showContentFilter = true,
   onApply,
   onReset,
   resetDisabled,
@@ -46,35 +47,37 @@ function CoursesFilterModal({
           </div>
         </section>
 
-        <section>
-          <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-            {t.filterModal.contentTitle}
-          </h3>
-          <label className="flex items-center gap-3 cursor-pointer p-3 rounded-md border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 transition-colors">
-            <input
-              type="checkbox"
-              checked={draftOnlyWithContent}
-              onChange={e => setDraftOnlyWithContent(e.target.checked)}
-              className="sr-only peer"
-            />
-            <span
-              className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-2 ${
-                draftOnlyWithContent
-                  ? 'bg-brand-600 border-brand-600'
-                  : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-600'
-              }`}
-            >
-              {draftOnlyWithContent && (
-                <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <polyline points="3 8 7 12 13 4" />
-                </svg>
-              )}
-            </span>
-            <span className="text-sm text-slate-900 dark:text-slate-100">
-              {t.filterModal.onlyWithContent}
-            </span>
-          </label>
-        </section>
+        {showContentFilter && (
+          <section>
+            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+              {t.filterModal.contentTitle}
+            </h3>
+            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-md border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-600 transition-colors">
+              <input
+                type="checkbox"
+                checked={draftOnlyWithContent}
+                onChange={e => setDraftOnlyWithContent(e.target.checked)}
+                className="sr-only peer"
+              />
+              <span
+                className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 peer-focus-visible:ring-offset-2 ${
+                  draftOnlyWithContent
+                    ? 'bg-brand-600 border-brand-600'
+                    : 'bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-600'
+                }`}
+              >
+                {draftOnlyWithContent && (
+                  <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="3 8 7 12 13 4" />
+                  </svg>
+                )}
+              </span>
+              <span className="text-sm text-slate-900 dark:text-slate-100">
+                {t.filterModal.onlyWithContent}
+              </span>
+            </label>
+          </section>
+        )}
       </div>
 
       <footer className="flex items-center justify-between gap-2 px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 rounded-b-xl">

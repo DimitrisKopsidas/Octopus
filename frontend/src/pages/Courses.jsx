@@ -45,61 +45,93 @@ function Courses() {
 
   // Applied filters
   const [semesters, setSemesters] = useState([])   // empty = all
-  const [onlyWithContent, setOnlyWithContent] = useState(false)
 
   // Draft filters (modal state)
   const [filterOpen, setFilterOpen] = useState(false)
   const [draftSemesters, setDraftSemesters] = useState([])
-  const [draftOnlyWithContent, setDraftOnlyWithContent] = useState(false)
 
-  const [visibleCount, setVisibleCount] = useState(6)
+  const [extraEmptyCount, setExtraEmptyCount] = useState(0)
+  const [prevFilterKey, setPrevFilterKey] = useState('')
   const [showScrollTop, setShowScrollTop] = useState(false)
 
-  useEffect(() => { setVisibleCount(6) }, [query, semesters, onlyWithContent])
+  const filterKey = `${query}|${semesters.join(',')}`
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey)
+    setExtraEmptyCount(0)
+  }
 
   useEffect(() => {
-    function onScroll() { setShowScrollTop(window.scrollY > 400) }
+    let ticking = false
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowScrollTop(window.scrollY > 400)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
   function retry() {
     return refetchCourses()
   }
 
-  const filtered = useMemo(() => {
-    if (!courses) return []
+  const { contentCourses, emptyCourses } = useMemo(() => {
+    if (!courses) return { contentCourses: [], emptyCourses: [] }
     const normalize = (s) =>
       s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
     const q = normalize(query.trim())
-    return courses
+
+    const matched = courses
       .filter(c => semesters.length === 0 || semesters.includes(c.semester))
-      .filter(c => !onlyWithContent || c.questionCount > 0)
       .filter(c => !q || normalize(c.name).includes(q) || String(c.id).includes(q))
       .sort((a, b) => {
-        const aHas = a.questionCount > 0 ? 1 : 0
-        const bHas = b.questionCount > 0 ? 1 : 0
-        if (aHas !== bHas) return bHas - aHas
         if (a.semester !== b.semester) return a.semester - b.semester
         return a.name.localeCompare(b.name, 'el')
       })
-  }, [courses, query, semesters, onlyWithContent])
 
-  const activeFilterCount = (semesters.length > 0 ? 1 : 0) + (onlyWithContent ? 1 : 0)
-  const draftActiveCount = (draftSemesters.length > 0 ? 1 : 0) + (draftOnlyWithContent ? 1 : 0)
+    const withContent = []
+    const withoutContent = []
+
+    for (const c of matched) {
+      if ((c.questionCount || 0) > 0) {
+        withContent.push(c)
+      } else {
+        withoutContent.push(c)
+      }
+    }
+
+    return { contentCourses: withContent, emptyCourses: withoutContent }
+  }, [courses, query, semesters])
+
+  const initialEmptyCount =
+    contentCourses.length > 0
+      ? (3 - (contentCourses.length % 3)) % 3
+      : Math.min(6, emptyCourses.length)
+
+  const visibleEmptyCount = Math.min(emptyCourses.length, initialEmptyCount + extraEmptyCount)
+  const visibleCourses = [
+    ...contentCourses,
+    ...emptyCourses.slice(0, visibleEmptyCount),
+  ]
+  const hasMoreEmpty = emptyCourses.length > visibleEmptyCount
+
+  const activeFilterCount = semesters.length > 0 ? 1 : 0
+  const draftActiveCount = draftSemesters.length > 0 ? 1 : 0
 
   function openFilters() {
     setDraftSemesters(semesters)
-    setDraftOnlyWithContent(onlyWithContent)
     setFilterOpen(true)
   }
   function applyFilters() {
     setSemesters(draftSemesters)
-    setOnlyWithContent(draftOnlyWithContent)
     setFilterOpen(false)
   }
   function resetDraft() {
     setDraftSemesters([])
-    setDraftOnlyWithContent(false)
   }
 
   return (
@@ -147,14 +179,14 @@ function Courses() {
         <ErrorState message={error} onRetry={retry} retryLabel={t.retry} />
       )}
 
-      {!loading && !error && filtered.length === 0 && (
+      {!loading && !error && visibleCourses.length === 0 && (
         <div className="rounded-lg bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
           <p className="text-slate-600 dark:text-slate-400">{t.empty}</p>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.slice(0, visibleCount).map(course => {
+        {visibleCourses.map(course => {
           const hasContent = (course.questionCount || 0) > 0
           const disabled = !hasContent
           return (
@@ -163,11 +195,11 @@ function Courses() {
         })}
       </div>
 
-      {filtered.length > visibleCount && (
+      {hasMoreEmpty && (
         <div className="mt-8 flex justify-center">
           <button
             type="button"
-            onClick={() => setVisibleCount(prev => prev + 6)}
+            onClick={() => setExtraEmptyCount(prev => prev + 6)}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-semibold hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-white shadow-sm transition-all cursor-pointer group"
           >
             <span>{t.showMore}</span>
@@ -183,8 +215,7 @@ function Courses() {
         onClose={() => setFilterOpen(false)}
         draftSemesters={draftSemesters}
         setDraftSemesters={setDraftSemesters}
-        draftOnlyWithContent={draftOnlyWithContent}
-        setDraftOnlyWithContent={setDraftOnlyWithContent}
+        showContentFilter={false}
         onApply={applyFilters}
         onReset={resetDraft}
         resetDisabled={draftActiveCount === 0}

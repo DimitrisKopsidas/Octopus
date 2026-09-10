@@ -71,17 +71,19 @@ public class User {
 
     /**
      * The name every public surface should print -- profile, user menu, question
-     * attribution, leaderboard. Falls back to the display name when Discord is the
-     * pick but no handle was ever filled in, so a row can never come out blank.
+     * attribution, leaderboard. If the user provided a Discord handle, it is
+     * displayed in parentheses next to their display name.
      * Deliberately not a getter: Jackson must not pick it up as a bean property.
      */
     public String publicName() {
-        boolean wantsDiscord =
-                DisplayPreference.orDefault(displayPreference) == DisplayPreference.DISCORD_NAME;
-
-        return wantsDiscord && discordName != null && !discordName.isBlank()
-                ? discordName
-                : displayName;
+        if (discordName != null && !discordName.isBlank()) {
+            String cleanDiscord = discordName.trim();
+            if (!cleanDiscord.startsWith("@")) {
+                cleanDiscord = "@" + cleanDiscord;
+            }
+            return displayName + " (" + cleanDiscord + ")";
+        }
+        return displayName;
     }
 
     @Override
