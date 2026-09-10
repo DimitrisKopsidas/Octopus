@@ -397,7 +397,7 @@ export default function Settings() {
               {t.sections.theme.hint}
             </p>
           </div>
-          <ThemeToggle />
+          <ThemeToggle variant="panel" />
         </div>
       </div>
     </div>

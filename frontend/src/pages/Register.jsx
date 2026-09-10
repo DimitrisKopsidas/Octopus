@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useRegister } from '../hooks/queries'
 import { extractErrorMessage } from '../lib/api'
 import { toast } from '../store/toastStore'
-import logo from '../assets/favicon.png'
+import logo from '../assets/logo.png'
 import { ENROLLMENT_YEARS, DEFAULT_ENROLLMENT_YEAR } from '../lib/years'
 import t from '../content/register.json'
 
@@ -77,7 +77,7 @@ function Register() {
     <div className="max-w-md mx-auto py-8">
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <header className="text-center px-6 pt-8 pb-5">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/50 mb-3">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-50 dark:bg-brand-950/50 border border-brand-100/80 dark:border-brand-900/50 mb-3 shadow-xs">
             <img src={logo} alt="Octopus" className="w-10 h-10" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-200">

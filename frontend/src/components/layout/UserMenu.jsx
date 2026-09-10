@@ -179,7 +179,7 @@ function UserMenu() {
           {/* Quick Theme Toggle Row */}
           <div className="px-4 py-2 border-t border-slate-200/80 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/40">
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Εμφάνιση</span>
-            <ThemeToggle />
+            <ThemeToggle variant="panel" />
           </div>
 
           {/* Logout Button */}
