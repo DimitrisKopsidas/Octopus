@@ -34,7 +34,6 @@ export default function Settings() {
   const savedProfile = {
     year: isValidEnrollmentYear(user?.year) ? user.year : DEFAULT_ENROLLMENT_YEAR,
     discordName: user?.discordName ?? '',
-    displayPreference: user?.displayPreference ?? 'DISPLAY_NAME',
   }
   const profile = profileDraft ?? savedProfile
   const editProfile = (patch) => setProfileDraft({ ...profile, ...patch })
@@ -105,8 +104,6 @@ export default function Settings() {
   }
 
   const trimmedDiscordName = profile.discordName.trim()
-  // The server refuses DISCORD_NAME without a handle, so don't offer it either.
-  const canUseDiscordName = trimmedDiscordName.length > 0
 
   async function handleSaveProfile(e) {
     e.preventDefault()
@@ -114,7 +111,6 @@ export default function Settings() {
       await updateMeMutation.mutateAsync({
         year: profile.year,
         discordName: trimmedDiscordName,
-        displayPreference: canUseDiscordName ? profile.displayPreference : 'DISPLAY_NAME',
       })
       setProfileDraft(null)
       toast.success('Το προφίλ ενημερώθηκε επιτυχώς!')
@@ -214,44 +210,6 @@ export default function Settings() {
             {t.sections.profile.discordHint}
           </p>
         </div>
-
-        <fieldset>
-          <legend className="block text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1.5">
-            {t.sections.profile.displayPreferenceLabel}
-          </legend>
-          <div className="space-y-2">
-            <label className="flex items-center gap-2.5 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
-              <input
-                type="radio"
-                name="displayPreference"
-                value="DISPLAY_NAME"
-                checked={!canUseDiscordName || profile.displayPreference === 'DISPLAY_NAME'}
-                onChange={() => editProfile({ displayPreference: 'DISPLAY_NAME' })}
-                className="accent-brand-600"
-              />
-              <span>{t.sections.profile.displayNameOption}</span>
-            </label>
-            <label className={`flex items-center gap-2.5 text-sm ${canUseDiscordName ? 'text-slate-700 dark:text-slate-300 cursor-pointer' : 'text-slate-400 dark:text-slate-600 cursor-not-allowed'}`}>
-              <input
-                type="radio"
-                name="displayPreference"
-                value="DISCORD_NAME"
-                disabled={!canUseDiscordName}
-                checked={canUseDiscordName && profile.displayPreference === 'DISCORD_NAME'}
-                onChange={() => editProfile({ displayPreference: 'DISCORD_NAME' })}
-                className="accent-brand-600"
-              />
-              <span>
-                {canUseDiscordName
-                  ? t.sections.profile.discordNameOption
-                  : t.sections.profile.discordNameOptionDisabled}
-              </span>
-            </label>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-            {t.sections.profile.displayPreferenceHint}
-          </p>
-        </fieldset>
 
         <button
           type="submit"
