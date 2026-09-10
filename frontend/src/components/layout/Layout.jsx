@@ -45,9 +45,9 @@ function Layout() {
             </NavLink>
           </div>
 
-          {/* Right: Theme Toggle (desktop) + User Menu or Login + Mobile Toggle */}
+          {/* Right: Theme Toggle (desktop, logged out only) + User Menu or Login + Mobile Toggle */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <ThemeToggle className="hidden md:flex" />
+            {!isLoading && !user && <ThemeToggle className="hidden md:flex" />}
 
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-brand-800/80 animate-pulse border border-brand-700/50 flex items-center justify-center">
