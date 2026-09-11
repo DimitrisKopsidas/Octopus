@@ -9,9 +9,9 @@ import com.dkopsidas.octopus.mapper.BundleMapper;
 import com.dkopsidas.octopus.repository.AnswerRepository;
 import com.dkopsidas.octopus.repository.BundleRepository;
 import com.dkopsidas.octopus.repository.UserRepository;
-import com.dkopsidas.octopus.security.AuthenticatedUser;
 import com.dkopsidas.octopus.service.BundleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +19,9 @@ import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import java.util.List;
+import org.springframework.security.oauth2.jwt.Jwt;
+import java.util.UUID;
+
 
 @RequiredArgsConstructor
 @Service
@@ -41,19 +44,18 @@ public class BundleServiceImpl implements BundleService {
     public BundleResponseDto createBundle(CreateBundleRequestDto createRequest) {
         List<Answer> answers = answerRepository.findAllById(createRequest.answerIds());
 
-        AuthenticatedUser principal = (AuthenticatedUser) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        User userRef = userRepository.getReferenceById(principal.getId());
-
+        User userRef = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+                userRef = userRepository.getReferenceById(UUID.fromString(jwt.getSubject()));
+        }
         int score = (int) answers.stream()
                 .filter(Answer::getIsCorrect)
                 .count();
 
         Bundle bundle = bundleMapper.toEntity(createRequest, answers);
         bundle.setScore(score);
+        bundle.setCreatedBy(userRef);
 
         Bundle saved = bundleRepository.save(bundle);
 
@@ -75,8 +77,6 @@ public class BundleServiceImpl implements BundleService {
                         + (createRequest.timeForCompletion() != null
                                 ? ", time " + createRequest.timeForCompletion() + "s" : "")
         ));
-
-        bundle.setCreatedBy(userRef);
 
         return bundleMapper.toDto(saved);
     }

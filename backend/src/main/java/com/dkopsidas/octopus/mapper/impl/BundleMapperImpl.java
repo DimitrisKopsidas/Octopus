@@ -6,6 +6,7 @@ import com.dkopsidas.octopus.domain.dto.BundleResponseDto;
 import com.dkopsidas.octopus.domain.entity.Answer;
 import com.dkopsidas.octopus.domain.entity.Bundle;
 import com.dkopsidas.octopus.mapper.BundleMapper;
+import com.dkopsidas.octopus.domain.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -36,14 +37,16 @@ public class BundleMapperImpl implements BundleMapper {
                         answer.getIsCorrect()))
                 .toList();
 
+        User creator = bundle.getCreatedBy();
+
         return new BundleResponseDto(
                 bundle.getId(),
                 bundle.getSetNum(),
                 bundle.getScore(),
                 answers,
                 bundle.getCreated(),
-                bundle.getCreatedBy().getId(),
-                bundle.getCreatedBy().getDisplayName()
+                creator != null ? creator.getId() : null,
+                creator != null ? creator.getDisplayName() : null
         );
     }
 

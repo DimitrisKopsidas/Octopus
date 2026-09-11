@@ -40,7 +40,7 @@ public class Bundle {
     private List<Answer> answers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", updatable = false)
+    @JoinColumn(name = "created_by", updatable = false, nullable = true)
     private User createdBy;
 
     @Column(name = "created", updatable = false, nullable = false)
