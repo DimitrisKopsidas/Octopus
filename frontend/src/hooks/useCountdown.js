@@ -1,25 +1,38 @@
-// Countdown timer hook (returns remaining seconds). Used by Test.
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // Returns remaining seconds (or null when no timer). Calls onZero once when it hits 0.
 export function useCountdown(durationSeconds, startedAt, onZero) {
-  const [remaining, setRemaining] = useState(null)
+  const [remaining, setRemaining] = useState(() => {
+    if (!durationSeconds || !startedAt) return null
+    const elapsed = Math.floor((Date.now() - startedAt) / 1000)
+    return Math.max(0, durationSeconds - elapsed)
+  })
+
+  const onZeroRef = useRef(onZero)
+  useEffect(() => {
+    onZeroRef.current = onZero
+  })
+
+  const hasFiredRef = useRef(false)
 
   useEffect(() => {
-    if (!durationSeconds || !startedAt) {
-      setRemaining(null)
-      return
-    }
+    hasFiredRef.current = false
+    if (!durationSeconds || !startedAt) return
+
     function tick() {
       const elapsed = Math.floor((Date.now() - startedAt) / 1000)
-      const left = durationSeconds - elapsed
+      const left = Math.max(0, durationSeconds - elapsed)
       setRemaining(left)
-      if (left <= 0) onZero?.()
+      if (left <= 0 && !hasFiredRef.current) {
+        hasFiredRef.current = true
+        onZeroRef.current?.()
+      }
     }
+
     tick()
     const id = setInterval(tick, 500)
     return () => clearInterval(id)
-  }, [durationSeconds, startedAt, onZero])
+  }, [durationSeconds, startedAt])
 
-  return remaining
+  return !durationSeconds || !startedAt ? null : remaining
 }

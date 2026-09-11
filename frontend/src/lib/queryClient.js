@@ -64,6 +64,11 @@ export const qk = {
     count: () => ['users', 'count'],
     countActive: () => ['users', 'countActive'],
   },
+  courseProgress: {
+    all: ['course-progress'],
+    list: () => ['course-progress', 'list'],
+    byCourse: (courseId) => ['course-progress', 'byCourse', String(courseId)],
+  },
 }
 
 // Shared error mapper so every hook surfaces the same Greek message shape the
