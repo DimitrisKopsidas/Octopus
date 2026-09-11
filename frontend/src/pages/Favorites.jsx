@@ -1,23 +1,38 @@
 // Favorites page. Route: /favorites
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { useMe } from '../hooks/queries'
+import { useMe, useCourses, useCourseProgressList } from '../hooks/queries'
+import CourseCard from '../components/course/CourseCard'
+import CourseCardSkeleton from '../components/course/CourseCardSkeleton'
 import Skeleton from '../components/ui/Skeleton'
-import ComingSoonPanel from '../components/ui/ComingSoonPanel'
 import t from '../content/favorites.json'
 
-// Το feature δεν έχει βγει ακόμα: η σελίδα δείχνει πάνελ «Έρχεται σύντομα»
-// αντί για empty state που υπονοεί ότι ήδη δουλεύει. Το πραγματικό empty state
-// είναι γραμμένο και περιμένει από κάτω — γύρνα αυτό σε false όταν βγει.
-const COMING_SOON = true
-
 function Favorites() {
-  const { user, isLoading } = useMe()
+  const { user, isLoading: loadingUser } = useMe()
+  const { data: courses, isLoading: loadingCourses } = useCourses(t.errorLoad)
+  const { progressMap, isLoading: loadingProgress } = useCourseProgressList()
 
-  if (isLoading) {
+  const loading = loadingUser || (user && (loadingCourses || loadingProgress))
+
+  const favoriteCourses = useMemo(() => {
+    if (!courses || !progressMap) return []
+    return courses
+      .filter((c) => Boolean(progressMap[c.id]?.isFavorite))
+      .sort((a, b) => {
+        if (a.semester !== b.semester) return a.semester - b.semester
+        return a.name.localeCompare(b.name, 'el')
+      })
+  }, [courses, progressMap])
+
+  if (loading) {
     return (
-      <div className="max-w-4xl mx-auto py-8 space-y-6">
+      <div className="max-w-6xl mx-auto py-8 space-y-6">
         <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <CourseCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     )
   }
@@ -42,7 +57,7 @@ function Favorites() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 space-y-8 animate-fade-up">
+    <div className="max-w-6xl mx-auto py-8 space-y-8 animate-fade-up">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
@@ -54,18 +69,8 @@ function Favorites() {
         </p>
       </div>
 
-      {COMING_SOON ? (
-        <ComingSoonPanel
-          emoji={t.comingSoon.emoji}
-          version={t.comingSoon.version}
-          title={t.comingSoon.title}
-          body={t.comingSoon.body}
-          bullets={t.comingSoon.bullets}
-          cta={t.comingSoon.cta}
-        />
-      ) : (
-        <>
-        {/* Empty State Card */}
+      {favoriteCourses.length === 0 ? (
+        /* Empty State Card */
         <div className="relative overflow-hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 shadow-xl rounded-3xl p-10 text-center">
           <div className="w-20 h-20 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-500 flex items-center justify-center mx-auto mb-5 shadow-sm">
             <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,9 +93,25 @@ function Favorites() {
             </svg>
           </Link>
         </div>
-        </>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {favoriteCourses.map((course) => {
+            const hasContent = (course.questionCount || 0) > 0
+            const disabled = !hasContent
+            const progress = progressMap[course.id]
+            return (
+              <CourseCard
+                key={course.id}
+                course={course}
+                hasContent={hasContent}
+                disabled={disabled}
+                isFavorite={true}
+                isPassed={Boolean(progress?.isPassed)}
+              />
+            )
+          })}
+        </div>
       )}
-
     </div>
   )
 }

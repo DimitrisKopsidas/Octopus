@@ -1,6 +1,6 @@
 // Courses listing page: search + semester filter + Show-More pagination. Route: /courses
 import { useEffect, useMemo, useState } from 'react'
-import { useCourses } from '../hooks/queries'
+import { useCourses, useCourseProgressList, useMe } from '../hooks/queries'
 import CourseCard from '../components/course/CourseCard'
 import CourseCardSkeleton from '../components/course/CourseCardSkeleton'
 import CoursesFilterModal from '../components/course/CoursesFilterModal'
@@ -35,11 +35,13 @@ function ChevronDownIcon() {
 }
 
 function Courses() {
+  const { user } = useMe()
   const { data: courses, error, isPending, refetch: refetchCourses } = useCourses(t.errorLoad)
+  const { progressMap, isPending: progressPending } = useCourseProgressList()
 
   // isPending is true only on the very first load, so a retry refetches in the
   // background with the ErrorState still on screen — no skeleton flash.
-  const loading = isPending && !error
+  const loading = (isPending || (user && progressPending)) && !error
 
   const [query, setQuery] = useState('')
 
@@ -85,10 +87,20 @@ function Courses() {
       s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
     const q = normalize(query.trim())
 
+    const getRank = (course) => {
+      const isFav = Boolean(progressMap[course.id]?.isFavorite)
+      const isPass = Boolean(progressMap[course.id]?.isPassed)
+      if (isPass) return isFav ? 2 : 3
+      return isFav ? 0 : 1
+    }
+
     const matched = courses
       .filter(c => semesters.length === 0 || semesters.includes(c.semester))
       .filter(c => !q || normalize(c.name).includes(q) || String(c.id).includes(q))
       .sort((a, b) => {
+        const rankA = getRank(a)
+        const rankB = getRank(b)
+        if (rankA !== rankB) return rankA - rankB
         if (a.semester !== b.semester) return a.semester - b.semester
         return a.name.localeCompare(b.name, 'el')
       })
@@ -105,7 +117,7 @@ function Courses() {
     }
 
     return { contentCourses: withContent, emptyCourses: withoutContent }
-  }, [courses, query, semesters])
+  }, [courses, query, semesters, progressMap])
 
   const initialEmptyCount =
     contentCourses.length > 0
@@ -189,8 +201,16 @@ function Courses() {
         {visibleCourses.map(course => {
           const hasContent = (course.questionCount || 0) > 0
           const disabled = !hasContent
+          const progress = progressMap[course.id]
           return (
-            <CourseCard key={course.id} course={course} hasContent={hasContent} disabled={disabled} />
+            <CourseCard
+              key={course.id}
+              course={course}
+              hasContent={hasContent}
+              disabled={disabled}
+              isFavorite={Boolean(progress?.isFavorite)}
+              isPassed={Boolean(progress?.isPassed)}
+            />
           )
         })}
       </div>

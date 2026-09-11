@@ -1,6 +1,9 @@
 // Course landing page: 3-step journey (study/systematic/sandbox). Logic in useCourseStart. Route: /courses/:courseId/start
 import { useParams } from 'react-router-dom'
+import { Heart, CheckCircle2, Loader2 } from 'lucide-react'
 import { useCourseStart } from '../hooks/useCourseStart'
+import { useMe, useCourseProgress, useToggleFavoriteCourse, useTogglePassedCourse } from '../hooks/queries'
+import { toast } from '../store/toastStore'
 import BackButton from '../components/ui/BackButton'
 import CourseStartSkeleton from '../components/course/CourseStartSkeleton'
 import CourseInfoCard from '../components/course/CourseInfoCard'
@@ -14,6 +17,32 @@ import t from '../content/courseStart.json'
 
 function CourseStart() {
   const { courseId } = useParams()
+  const { user } = useMe()
+  const { progress } = useCourseProgress(courseId)
+  const toggleFavorite = useToggleFavoriteCourse()
+  const togglePassed = useTogglePassedCourse()
+
+  const isFavorite = Boolean(progress?.isFavorite)
+  const isPassed = Boolean(progress?.isPassed)
+  const isFavoriteLoading = toggleFavorite.isPending
+  const isPassedLoading = togglePassed.isPending
+
+  const handleFavoriteClick = () => {
+    if (!user) {
+      toast.info('Συνδέσου για να προσθέσεις μαθήματα στα αγαπημένα.')
+      return
+    }
+    toggleFavorite.mutate(courseId)
+  }
+
+  const handlePassedClick = () => {
+    if (!user) {
+      toast.info('Συνδέσου για να σημειώσεις μαθήματα ως περασμένα.')
+      return
+    }
+    togglePassed.mutate(courseId)
+  }
+
   const {
     course, settings, loading, error, onRetry,
     activeTab, setActiveTab,
@@ -28,14 +57,66 @@ function CourseStart() {
         <BackButton to="/courses" label={t.backLabel} />
       </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-200">
-          {course ? course.name : t.fallbackTitle.replace('{courseId}', courseId)}
-        </h1>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-200">
+            {course ? course.name : t.fallbackTitle.replace('{courseId}', courseId)}
+          </h1>
+          {course && (
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              {t.subheader.replace('{id}', course.id).replace('{semester}', course.semester)}
+            </p>
+          )}
+        </div>
+
         {course && (
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            {t.subheader.replace('{id}', course.id).replace('{semester}', course.semester)}
-          </p>
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={handleFavoriteClick}
+              disabled={isFavoriteLoading}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border shadow-sm transition-all duration-150 cursor-pointer disabled:cursor-wait ${
+                isFavorite
+                  ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40'
+                  : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-rose-300 dark:hover:border-rose-800 hover:text-rose-600 dark:hover:text-rose-400'
+              }`}
+            >
+              {isFavoriteLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
+              ) : (
+                <Heart
+                  className={`w-4 h-4 transition-transform hover:scale-110 ${
+                    isFavorite ? 'fill-rose-500 text-rose-500' : ''
+                  }`}
+                />
+              )}
+              <span>{isFavorite ? 'Αγαπημένο' : 'Στα Αγαπημένα'}</span>
+            </button>
+
+            {user && (
+              <button
+                type="button"
+                onClick={handlePassedClick}
+                disabled={isPassedLoading}
+                className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border shadow-sm transition-all duration-150 cursor-pointer disabled:cursor-wait ${
+                  isPassed
+                    ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-900/60 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'
+                    : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-emerald-300 dark:hover:border-emerald-800 hover:text-emerald-600 dark:hover:text-emerald-400'
+                }`}
+              >
+                {isPassedLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+                ) : (
+                  <CheckCircle2
+                    className={`w-4 h-4 transition-transform hover:scale-110 ${
+                      isPassed ? 'text-emerald-500 fill-emerald-100 dark:fill-emerald-950' : ''
+                    }`}
+                  />
+                )}
+                <span>{isPassed ? 'Περασμένο' : 'Σήμανση ως Περασμένο'}</span>
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -91,7 +172,13 @@ function CourseStart() {
             </div>
 
             <aside className="space-y-4">
-              <CourseInfoCard course={course} questionCount={max} coverage={coveragePercentage} />
+              <CourseInfoCard
+                course={course}
+                questionCount={max}
+                coverage={coveragePercentage}
+                isFavorite={isFavorite}
+                isPassed={isPassed}
+              />
               <TipsCard />
             </aside>
           </div>

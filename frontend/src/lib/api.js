@@ -217,4 +217,13 @@ export const usersApi = {
   toggleStatus: (userId, active) => unwrap(http.patch(`/users/${userId}/status`, { active })),
 }
 
-export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi }
+export const courseProgressApi = {
+  getAll: () => unwrap(http.get('/course-progress')),
+  getByCourse: (courseId) => unwrap(http.get(`/course-progress/${courseId}`)),
+  update: (courseId, payload) => unwrap(http.put(`/course-progress/${courseId}`, payload)),
+  toggleFavorite: (courseId) => unwrap(http.patch(`/course-progress/${courseId}/favorite`)),
+  togglePassed: (courseId) => unwrap(http.patch(`/course-progress/${courseId}/passed`)),
+}
+
+export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi }
+

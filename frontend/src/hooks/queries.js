@@ -7,8 +7,9 @@
 //   which is what powers the old "retry without skeleton flash" behaviour.
 // - Errors are mapped to a plain Greek string via toMessage so ErrorState and
 //   the toast store keep working unchanged.
+import { useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, setAccessToken } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi, setAccessToken } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -210,6 +211,7 @@ export function useLogin() {
       // res is AuthResponseDto { accessToken, tokenType, expiresIn, user }
       setAccessToken(res.accessToken)
       qc.setQueryData(qk.auth.me(), res.user)
+      qc.invalidateQueries({ queryKey: qk.courseProgress.all })
     },
   })
 }
@@ -224,6 +226,8 @@ export function useLogout() {
       setAccessToken(null)
       qc.setQueryData(qk.auth.me(), null)
       qc.invalidateQueries({ queryKey: qk.auth.me() })
+      qc.setQueryData(qk.courseProgress.list(), [])
+      qc.invalidateQueries({ queryKey: qk.courseProgress.all })
     },
   })
 }
@@ -381,6 +385,135 @@ export function useToggleUserStatus() {
     },
   })
 }
+
+/* ----------------------------------------------------------- course-progress */
+
+export function useCourseProgressList() {
+  const { user } = useMe()
+  const q = useQuery({
+    queryKey: qk.courseProgress.list(),
+    queryFn: courseProgressApi.getAll,
+    enabled: !!user,
+  })
+
+  const rawList = q.data
+  const progressMap = useMemo(() => {
+    const map = {}
+    if (!rawList) return map
+    for (const item of rawList) {
+      if (item && item.courseId != null) {
+        map[item.courseId] = item
+      }
+    }
+    return map
+  }, [rawList])
+
+  return {
+    ...q,
+    progressList: rawList ?? [],
+    progressMap,
+  }
+}
+
+export function useCourseProgress(courseId) {
+  const { user } = useMe()
+  const q = useQuery({
+    queryKey: qk.courseProgress.byCourse(courseId),
+    queryFn: () => courseProgressApi.getByCourse(courseId),
+    enabled: !!user && courseId != null,
+  })
+  return {
+    ...q,
+    progress: q.data ?? null,
+  }
+}
+
+export function useToggleFavoriteCourse() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (courseId) => courseProgressApi.toggleFavorite(courseId),
+    onMutate: async (courseId) => {
+      await qc.cancelQueries({ queryKey: qk.courseProgress.list() })
+      const prevList = qc.getQueryData(qk.courseProgress.list()) || []
+
+      const exists = prevList.some((p) => String(p.courseId) === String(courseId))
+      let updatedList
+      if (exists) {
+        updatedList = prevList.map((p) =>
+          String(p.courseId) === String(courseId) ? { ...p, isFavorite: !p.isFavorite } : p
+        )
+      } else {
+        updatedList = [...prevList, { id: null, courseId: Number(courseId), isFavorite: true, isPassed: false }]
+      }
+      qc.setQueryData(qk.courseProgress.list(), updatedList)
+
+      return { prevList }
+    },
+    onError: (err, courseId, context) => {
+      if (context?.prevList) {
+        qc.setQueryData(qk.courseProgress.list(), context.prevList)
+      }
+    },
+    onSettled: (data, err, courseId) => {
+      qc.invalidateQueries({ queryKey: qk.courseProgress.list() })
+      if (courseId) {
+        qc.invalidateQueries({ queryKey: qk.courseProgress.byCourse(courseId) })
+      }
+    },
+  })
+}
+
+export function useTogglePassedCourse() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (courseId) => courseProgressApi.togglePassed(courseId),
+    onMutate: async (courseId) => {
+      await qc.cancelQueries({ queryKey: qk.courseProgress.list() })
+      const prevList = qc.getQueryData(qk.courseProgress.list()) || []
+
+      const exists = prevList.some((p) => String(p.courseId) === String(courseId))
+      let updatedList
+      if (exists) {
+        updatedList = prevList.map((p) =>
+          String(p.courseId) === String(courseId) ? { ...p, isPassed: !p.isPassed } : p
+        )
+      } else {
+        updatedList = [...prevList, { id: null, courseId: Number(courseId), isFavorite: false, isPassed: true }]
+      }
+      qc.setQueryData(qk.courseProgress.list(), updatedList)
+
+      return { prevList }
+    },
+    onError: (err, courseId, context) => {
+      if (context?.prevList) {
+        qc.setQueryData(qk.courseProgress.list(), context.prevList)
+      }
+    },
+    onSettled: (data, err, courseId) => {
+      qc.invalidateQueries({ queryKey: qk.courseProgress.list() })
+      if (courseId) {
+        qc.invalidateQueries({ queryKey: qk.courseProgress.byCourse(courseId) })
+      }
+    },
+  })
+}
+
+export function useUpdateCourseProgress() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ courseId, payload }) => courseProgressApi.update(courseId, payload),
+    onSuccess: (updated, { courseId }) => {
+      qc.setQueryData(qk.courseProgress.list(), (prev) => {
+        if (!prev) return [updated]
+        const exists = prev.some((p) => String(p.courseId) === String(courseId))
+        return exists ? prev.map((p) => (String(p.courseId) === String(courseId) ? updated : p)) : [...prev, updated]
+      })
+      qc.invalidateQueries({ queryKey: qk.courseProgress.list() })
+      qc.invalidateQueries({ queryKey: qk.courseProgress.byCourse(courseId) })
+    },
+  })
+}
+
 
 
 
