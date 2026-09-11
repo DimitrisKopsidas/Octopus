@@ -77,6 +77,33 @@ export function logClientEventOnUnload(payload) {
   }
 }
 
+const EXTENSION_SCHEMES = [
+  'chrome-extension://',
+  'moz-extension://',
+  'safari-extension://',
+  'safari-web-extension://',
+]
+
+function isIgnoredError({ message, stackTrace, filename }) {
+  const msg = typeof message === 'string' ? message : ''
+  const stack = typeof stackTrace === 'string' ? stackTrace : ''
+  const file = typeof filename === 'string' ? filename : ''
+
+  // 1. Generic cross-origin/browser-masked error without actionable stack trace
+  if ((msg === 'Script error.' || msg === 'Script error') && !stack) {
+    return true
+  }
+
+  // 2. Errors originating from browser extensions (e.g. Urban VPN, adblockers)
+  for (const scheme of EXTENSION_SCHEMES) {
+    if (msg.includes(scheme) || stack.includes(scheme) || file.includes(scheme)) {
+      return true
+    }
+  }
+
+  return false
+}
+
 /**
  * Σφάλμα του frontend. Καλείται από το ErrorBoundary και από τους καθολικούς
  * handlers -- δεν χρειάζεται να το καλέσεις χειροκίνητα από component.
@@ -84,6 +111,7 @@ export function logClientEventOnUnload(payload) {
 export function logCrash({ exceptionClass, message, stackTrace, requestUri, statusCode = null }) {
   try {
     if (crashesSent >= MAX_CRASHES_PER_PAGELOAD) return
+    if (isIgnoredError({ message, stackTrace })) return
 
     const key = `${exceptionClass}::${message}`
     const now = Date.now()
@@ -119,22 +147,31 @@ export function installGlobalErrorHandlers() {
   window.__octopusErrorHandlersInstalled = true
 
   window.addEventListener('error', (event) => {
+    const filename = event?.filename || ''
     const err = event?.error
+    const message = err?.message || event?.message || 'Unknown window error'
+    const stackTrace = err?.stack || null
+
+    if (isIgnoredError({ message, stackTrace, filename })) return
+
     logCrash({
       exceptionClass: err?.name || 'WindowError',
-      message: err?.message || event?.message || 'Unknown window error',
-      stackTrace: err?.stack || null,
+      message,
+      stackTrace,
     })
   })
 
   window.addEventListener('unhandledrejection', (event) => {
     const reason = event?.reason
+    const message = reason?.message || String(reason ?? 'Unknown rejection')
+    const stackTrace = reason?.stack || null
+
+    if (isIgnoredError({ message, stackTrace })) return
+
     logCrash({
       exceptionClass: reason?.name || 'UnhandledRejection',
-      // Ένα rejection μπορεί να είναι οτιδήποτε, όχι απαραίτητα Error.
-      message: reason?.message || String(reason ?? 'Unknown rejection'),
-      stackTrace: reason?.stack || null,
-      // Τα axios errors κουβαλάνε το HTTP status· κρίμα να χαθεί.
+      message,
+      stackTrace,
       statusCode: reason?.response?.status ?? null,
     })
   })
