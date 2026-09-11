@@ -1,5 +1,5 @@
 // Active test page: one question at a time, answer select, navigator, timer. Route: /test/:courseId
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import { logClientEvent, logClientEventOnUnload } from '../lib/clientLog'
@@ -59,10 +59,10 @@ function Test() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentIndex])
 
-  function onTimerZero() {
+  const onTimerZero = useCallback(() => {
     finish()
     navigate(`/test/${courseId}/results`)
-  }
+  }, [finish, navigate, courseId])
   const remaining = useCountdown(hasSession ? durationSeconds : null, startedAt, onTimerZero)
 
   const total = questions.length
@@ -124,6 +124,11 @@ function Test() {
   }
 
 
+  const describeAbandonRef = useRef(describeAbandon)
+  useEffect(() => {
+    describeAbandonRef.current = describeAbandon
+  })
+
   // Κλείσιμο καρτέλας με το quiz ανοιχτό. Το axios request θα ακυρωνόταν μαζί
   // με τη σελίδα, γι' αυτό εδώ φεύγει με sendBeacon.
   useEffect(() => {
@@ -133,12 +138,12 @@ function Test() {
       logClientEventOnUnload({
         resourceType: 'BUNDLE',
         resourceId: String(courseId),
-        details: describeAbandon('left open'),
+        details: describeAbandonRef.current('left open'),
       })
     }
     window.addEventListener('beforeunload', onBeforeUnload)
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
-  })
+  }, [hasSession, endedAt, courseId])
 
   useTestKeyboard({
     enabled: hasSession,
