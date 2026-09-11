@@ -24,8 +24,8 @@ function CourseStart() {
 
   const isFavorite = Boolean(progress?.isFavorite)
   const isPassed = Boolean(progress?.isPassed)
-  const isFavoriteLoading = toggleFavorite.isPending
-  const isPassedLoading = togglePassed.isPending
+  const isFavoriteLoading = toggleFavorite.isPending && String(toggleFavorite.variables) === String(courseId)
+  const isPassedLoading = togglePassed.isPending && String(togglePassed.variables) === String(courseId)
 
   const handleFavoriteClick = () => {
     if (!user) {

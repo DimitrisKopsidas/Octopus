@@ -6,13 +6,29 @@ import { toast } from '../../store/toastStore'
 import { formatLastUpdated } from '../../lib/dates'
 import t from '../../content/courses.json'
 
-function CourseCard({ course, disabled, isFavorite = false, isPassed = false }) {
+function CourseCard({
+  course,
+  disabled,
+  isFavorite = false,
+  isPassed = false,
+  onToggleFavorite,
+  onTogglePassed,
+  isFavoriteLoading: isFavLoadingProp,
+  isPassedLoading: isPassLoadingProp,
+}) {
   const { user } = useMe()
-  const toggleFavorite = useToggleFavoriteCourse()
-  const togglePassed = useTogglePassedCourse()
+  const localToggleFavorite = useToggleFavoriteCourse()
+  const localTogglePassed = useTogglePassedCourse()
 
-  const isFavoriteLoading = toggleFavorite.isPending && String(toggleFavorite.variables) === String(course.id)
-  const isPassedLoading = togglePassed.isPending && String(togglePassed.variables) === String(course.id)
+  const isFavoriteLoading =
+    isFavLoadingProp !== undefined
+      ? isFavLoadingProp
+      : localToggleFavorite.isPending && String(localToggleFavorite.variables) === String(course.id)
+
+  const isPassedLoading =
+    isPassLoadingProp !== undefined
+      ? isPassLoadingProp
+      : localTogglePassed.isPending && String(localTogglePassed.variables) === String(course.id)
 
   const questionCount = course.questionCount ?? 0
   const lastUpdatedText = formatLastUpdated(course.lastUpdated)
@@ -24,7 +40,11 @@ function CourseCard({ course, disabled, isFavorite = false, isPassed = false }) 
       toast.info('Συνδέσου για να προσθέσεις μαθήματα στα αγαπημένα.')
       return
     }
-    toggleFavorite.mutate(course.id)
+    if (onToggleFavorite) {
+      onToggleFavorite(course.id)
+    } else {
+      localToggleFavorite.mutate(course.id)
+    }
   }
 
   const handlePassedClick = (e) => {
@@ -34,7 +54,11 @@ function CourseCard({ course, disabled, isFavorite = false, isPassed = false }) 
       toast.info('Συνδέσου για να σημειώσεις μαθήματα ως περασμένα.')
       return
     }
-    togglePassed.mutate(course.id)
+    if (onTogglePassed) {
+      onTogglePassed(course.id)
+    } else {
+      localTogglePassed.mutate(course.id)
+    }
   }
 
   const inner = (

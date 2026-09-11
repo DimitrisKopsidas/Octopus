@@ -1,7 +1,7 @@
 // Favorites page. Route: /favorites
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { useMe, useCourses, useCourseProgressList } from '../hooks/queries'
+import { useMe, useCourses, useCourseProgressList, useToggleFavoriteCourse, useTogglePassedCourse } from '../hooks/queries'
 import CourseCard from '../components/course/CourseCard'
 import CourseCardSkeleton from '../components/course/CourseCardSkeleton'
 import Skeleton from '../components/ui/Skeleton'
@@ -11,6 +11,11 @@ function Favorites() {
   const { user, isLoading: loadingUser } = useMe()
   const { data: courses, isLoading: loadingCourses } = useCourses(t.errorLoad)
   const { progressMap, isLoading: loadingProgress } = useCourseProgressList()
+  const toggleFavoriteMutation = useToggleFavoriteCourse()
+  const togglePassedMutation = useTogglePassedCourse()
+
+  const pendingFavoriteId = toggleFavoriteMutation.isPending ? toggleFavoriteMutation.variables : null
+  const pendingPassedId = togglePassedMutation.isPending ? togglePassedMutation.variables : null
 
   const loading = loadingUser || (user && (loadingCourses || loadingProgress))
 
@@ -107,6 +112,10 @@ function Favorites() {
                 disabled={disabled}
                 isFavorite={true}
                 isPassed={Boolean(progress?.isPassed)}
+                onToggleFavorite={(id) => toggleFavoriteMutation.mutate(id)}
+                onTogglePassed={(id) => togglePassedMutation.mutate(id)}
+                isFavoriteLoading={String(pendingFavoriteId) === String(course.id)}
+                isPassedLoading={String(pendingPassedId) === String(course.id)}
               />
             )
           })}

@@ -24,6 +24,9 @@ export const AUDIT_ACTIONS = [
   { value: 'QUESTION_IMAGE_DELETED', label: 'Διαγραφή εικόνας', tone: 'danger' },
   { value: 'BUNDLE_CREATED', label: 'Ολοκλήρωση quiz', tone: 'brand' },
   { value: 'CLIENT_AUDIT_EVENT', label: 'Συμβάν από το frontend', tone: 'neutral' },
+  { value: 'COURSE_FAVORITE_TOGGLED', label: 'Αλλαγή αγαπημένου μαθήματος', tone: 'brand' },
+  { value: 'COURSE_PASSED_TOGGLED', label: 'Αλλαγή περασμένου μαθήματος', tone: 'brand' },
+  { value: 'COURSE_PROGRESS_UPDATED', label: 'Ενημέρωση προόδου μαθήματος', tone: 'warning' },
 ]
 
 const BY_VALUE = Object.fromEntries(AUDIT_ACTIONS.map((a) => [a.value, a]))

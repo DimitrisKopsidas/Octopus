@@ -434,7 +434,11 @@ export function useToggleFavoriteCourse() {
     mutationFn: (courseId) => courseProgressApi.toggleFavorite(courseId),
     onMutate: async (courseId) => {
       await qc.cancelQueries({ queryKey: qk.courseProgress.list() })
+      if (courseId) {
+        await qc.cancelQueries({ queryKey: qk.courseProgress.byCourse(courseId) })
+      }
       const prevList = qc.getQueryData(qk.courseProgress.list()) || []
+      const prevCourse = courseId ? qc.getQueryData(qk.courseProgress.byCourse(courseId)) : null
 
       const exists = prevList.some((p) => String(p.courseId) === String(courseId))
       let updatedList
@@ -447,11 +451,33 @@ export function useToggleFavoriteCourse() {
       }
       qc.setQueryData(qk.courseProgress.list(), updatedList)
 
-      return { prevList }
+      if (courseId && prevCourse) {
+        qc.setQueryData(qk.courseProgress.byCourse(courseId), {
+          ...prevCourse,
+          isFavorite: !prevCourse.isFavorite,
+        })
+      }
+
+      return { prevList, prevCourse }
+    },
+    onSuccess: (data, courseId) => {
+      if (data) {
+        qc.setQueryData(qk.courseProgress.list(), (prev = []) => {
+          const exists = prev.some((p) => String(p.courseId) === String(data.courseId))
+          if (exists) {
+            return prev.map((p) => (String(p.courseId) === String(data.courseId) ? data : p))
+          }
+          return [...prev, data]
+        })
+        qc.setQueryData(qk.courseProgress.byCourse(courseId), data)
+      }
     },
     onError: (err, courseId, context) => {
       if (context?.prevList) {
         qc.setQueryData(qk.courseProgress.list(), context.prevList)
+      }
+      if (courseId && context?.prevCourse) {
+        qc.setQueryData(qk.courseProgress.byCourse(courseId), context.prevCourse)
       }
     },
     onSettled: (data, err, courseId) => {
@@ -469,7 +495,11 @@ export function useTogglePassedCourse() {
     mutationFn: (courseId) => courseProgressApi.togglePassed(courseId),
     onMutate: async (courseId) => {
       await qc.cancelQueries({ queryKey: qk.courseProgress.list() })
+      if (courseId) {
+        await qc.cancelQueries({ queryKey: qk.courseProgress.byCourse(courseId) })
+      }
       const prevList = qc.getQueryData(qk.courseProgress.list()) || []
+      const prevCourse = courseId ? qc.getQueryData(qk.courseProgress.byCourse(courseId)) : null
 
       const exists = prevList.some((p) => String(p.courseId) === String(courseId))
       let updatedList
@@ -482,11 +512,33 @@ export function useTogglePassedCourse() {
       }
       qc.setQueryData(qk.courseProgress.list(), updatedList)
 
-      return { prevList }
+      if (courseId && prevCourse) {
+        qc.setQueryData(qk.courseProgress.byCourse(courseId), {
+          ...prevCourse,
+          isPassed: !prevCourse.isPassed,
+        })
+      }
+
+      return { prevList, prevCourse }
+    },
+    onSuccess: (data, courseId) => {
+      if (data) {
+        qc.setQueryData(qk.courseProgress.list(), (prev = []) => {
+          const exists = prev.some((p) => String(p.courseId) === String(data.courseId))
+          if (exists) {
+            return prev.map((p) => (String(p.courseId) === String(data.courseId) ? data : p))
+          }
+          return [...prev, data]
+        })
+        qc.setQueryData(qk.courseProgress.byCourse(courseId), data)
+      }
     },
     onError: (err, courseId, context) => {
       if (context?.prevList) {
         qc.setQueryData(qk.courseProgress.list(), context.prevList)
+      }
+      if (courseId && context?.prevCourse) {
+        qc.setQueryData(qk.courseProgress.byCourse(courseId), context.prevCourse)
       }
     },
     onSettled: (data, err, courseId) => {

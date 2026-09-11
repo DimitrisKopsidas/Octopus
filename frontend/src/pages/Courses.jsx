@@ -1,6 +1,6 @@
 // Courses listing page: search + semester filter + Show-More pagination. Route: /courses
 import { useEffect, useMemo, useState } from 'react'
-import { useCourses, useCourseProgressList, useMe } from '../hooks/queries'
+import { useCourses, useCourseProgressList, useMe, useToggleFavoriteCourse, useTogglePassedCourse } from '../hooks/queries'
 import CourseCard from '../components/course/CourseCard'
 import CourseCardSkeleton from '../components/course/CourseCardSkeleton'
 import CoursesFilterModal from '../components/course/CoursesFilterModal'
@@ -38,6 +38,11 @@ function Courses() {
   const { user } = useMe()
   const { data: courses, error, isPending, refetch: refetchCourses } = useCourses(t.errorLoad)
   const { progressMap, isPending: progressPending } = useCourseProgressList()
+  const toggleFavoriteMutation = useToggleFavoriteCourse()
+  const togglePassedMutation = useTogglePassedCourse()
+
+  const pendingFavoriteId = toggleFavoriteMutation.isPending ? toggleFavoriteMutation.variables : null
+  const pendingPassedId = togglePassedMutation.isPending ? togglePassedMutation.variables : null
 
   // isPending is true only on the very first load, so a retry refetches in the
   // background with the ErrorState still on screen — no skeleton flash.
@@ -197,23 +202,29 @@ function Courses() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {visibleCourses.map(course => {
-          const hasContent = (course.questionCount || 0) > 0
-          const disabled = !hasContent
-          const progress = progressMap[course.id]
-          return (
-            <CourseCard
-              key={course.id}
-              course={course}
-              hasContent={hasContent}
-              disabled={disabled}
-              isFavorite={Boolean(progress?.isFavorite)}
-              isPassed={Boolean(progress?.isPassed)}
-            />
-          )
-        })}
-      </div>
+      {!loading && !error && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {visibleCourses.map(course => {
+            const hasContent = (course.questionCount || 0) > 0
+            const disabled = !hasContent
+            const progress = progressMap[course.id]
+            return (
+              <CourseCard
+                key={course.id}
+                course={course}
+                hasContent={hasContent}
+                disabled={disabled}
+                isFavorite={Boolean(progress?.isFavorite)}
+                isPassed={Boolean(progress?.isPassed)}
+                onToggleFavorite={(id) => toggleFavoriteMutation.mutate(id)}
+                onTogglePassed={(id) => togglePassedMutation.mutate(id)}
+                isFavoriteLoading={String(pendingFavoriteId) === String(course.id)}
+                isPassedLoading={String(pendingPassedId) === String(course.id)}
+              />
+            )
+          })}
+        </div>
+      )}
 
       {hasMoreEmpty && (
         <div className="mt-8 flex justify-center">

@@ -41,6 +41,9 @@ class CourseProgressServiceTest {
     @Mock
     private CourseProgressMapper courseProgressMapper;
 
+    @Mock
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
     private CourseProgressServiceImpl courseProgressService;
 
     private UUID userId;
@@ -54,7 +57,8 @@ class CourseProgressServiceTest {
                 courseProgressRepository,
                 userRepository,
                 courseRepository,
-                courseProgressMapper
+                courseProgressMapper,
+                eventPublisher
         );
         userId = UUID.randomUUID();
         courseId = 1101L;
