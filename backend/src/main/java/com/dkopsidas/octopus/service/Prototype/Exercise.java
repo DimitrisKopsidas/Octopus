@@ -10,9 +10,9 @@ public class Exercise {
 
     private List<ExerciseVariable> variables;
 
-    private List<String> steps;
+    private List<Step> steps;
 
-    public Exercise(String title, String promnt, String imageUrl, List<ExerciseVariable> variables, List<String> steps) {
+    public Exercise(String title, String promnt, String imageUrl, List<ExerciseVariable> variables, List<Step> steps) {
         this.title = title;
         this.promnt = promnt;
         this.imageUrl = imageUrl;
@@ -28,16 +28,7 @@ public class Exercise {
         return title;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public List<ExerciseVariable> getVariables() {
-        return variables;
-    }
-
-
-    public List<String> getSteps() {
+    public List<Step> getSteps() {
         return steps;
     }
 }

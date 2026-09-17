@@ -16,32 +16,52 @@ public class Engine {
 
 
         //Dedomena
-        variables.add(new ExerciseVariable("VBB", 4.0, 0, null, null));
-        variables.add(new ExerciseVariable("RB", 91000.0, 0, null, null));
-        variables.add(new ExerciseVariable("RC", 4500.0, 0, null, null));
-        variables.add(new ExerciseVariable("VCC", 9.0, 0, null, null));
-        variables.add(new ExerciseVariable("VBE", 0.7, 0, null, null));
-        variables.add(new ExerciseVariable("β", 209.0, 0, null, null));
-        variables.add(new ExerciseVariable("VE", 0.0, 0, null, null));
-        variables.add(new ExerciseVariable("VCEsat", 0.3, 0, null, null));
+        variables.add(new ExerciseVariable("VBB", 4.0, 0));
+        variables.add(new ExerciseVariable("RB", 91000.0, 0));
+        variables.add(new ExerciseVariable("RC", 4500.0, 0));
+        variables.add(new ExerciseVariable("VCC", 9.0, 0));
+        variables.add(new ExerciseVariable("VBE", 0.7, 0));
+        variables.add(new ExerciseVariable("β", 209.0, 0));
+        variables.add(new ExerciseVariable("VE", 0.0, 0));
+        variables.add(new ExerciseVariable("VCEsat", 0.3, 0));
 
         //goals
-        variables.add(new ExerciseVariable("VB", null, 1, null, null));
-        variables.add(new ExerciseVariable("IB", null, 2, "IB <= 0", List.of("Αποκοπή", "Ενεργός ή Κορεσμού")));
-        variables.add(new ExerciseVariable("IC", null, 3, null, null));
-        variables.add(new ExerciseVariable("VC", null, 4, "VC > VB > VE", List.of("Ενεργός", "Κορεσμού")));
-        variables.add(new ExerciseVariable("VCE", null, 5, null, null));
-        variables.add(new ExerciseVariable("IE", null, 6, null, null));
+        variables.add(new ExerciseVariable("VB", null, 1));
+        variables.add(new ExerciseVariable("IB", null, 2));
+        variables.add(new ExerciseVariable("IC", null, 3));
+        variables.add(new ExerciseVariable("VC", null, 4));
+        variables.add(new ExerciseVariable("VCE", null,5));
+        variables.add(new ExerciseVariable("IE", null, 6));
 
 
-        List<String> steps = List.of("VB = VBE + VE", "IB = (VBB - VB)/ RB", "IC = β * IB","VC = VCC - (IC * RC)", "VCE = VCEsat", "VC = VCE + VE", "IC = (VCC - VC)/RC", "IE = IC + IB"); //,"IC = beta * IB", "VCE = VCEsat", "VC = VCE + VE", "IC = (VCC - VC)/RC", "IE = IC + IB");
+        List<Step> steps = new ArrayList<>();
+
+        steps.add(new Step(1L,0,"find VB", null, "VB = VBE + VE", null, null, false, null));
+        steps.add(new Step(2L,1,"find IB", null, "IB = (VBB - VB)/ RB", null, null, false, null));
+
+        steps.add(new Step(3L, 2, "Check Cutoff", null, null, "IB < 0", "Αποκοπή", true, null));
+
+        steps.add(new Step(4L,3,"find IC", null, "IC = β * IB", null, null, false, null));
+        steps.add(new Step(5L,4,"find VC",null ,"VC = VCC - (IC * RC)" ,null, null, false, null));
+
+        steps.add(new Step(6L,5,"Check Active",null ,null , "VC > VB > VE", "Ενεργός", false, 9));
+
+        steps.add(new Step(7L, 6, "Saturation Info", null, null, null, "Κορεσμός", false, null));
+
+        steps.add(new Step(8L,6,"find VCE", null, "VCE = VCEsat", null, null, false, null));
+        steps.add(new Step(9L,7,"find VC", null, "VC = VCE + VE", null, null, false, null));
+        steps.add(new Step(10L,8,"find IC", null, "IC = (VCC - VC)/RC", null, null, false, null));
+        steps.add(new Step(11L,7,"find IE", null, "IE = IC + IB", null, null, false, null));
+
+
+       // List<String> steps = List.of("VB = VBE + VE", "IB = (VBB - VB)/ RB", "IC = β * IB","VC = VCC - (IC * RC)", "VCE = VCEsat", "VC = VCE + VE", "IC = (VCC - VC)/RC", "IE = IC + IB"); //,"IC = beta * IB", "VCE = VCEsat", "VC = VCE + VE", "IC = (VCC - VC)/RC", "IE = IC + IB");
 
 
         //Convert to hashmap for easy access
         Map<String, Double> toHash = new HashMap<>();
         for (ExerciseVariable n: variables) {
             if (n.getValue() != null) {
-                toHash.put(n.getTitle(), n.getValue());
+                toHash.put(n.getName(), n.getValue());
             }
         }
 
@@ -58,45 +78,48 @@ public class Engine {
         System.out.println(test.getPromnt());
 
 
-        List<String> checkedBranches = new ArrayList<>(); //List to check if a branch has already been checked
-
-
         for (int i = 0; i < steps.size(); i++){
-            String step = test.getSteps().get(i);
+            Step currentstep = test.getSteps().get(i);
 
-            String target = step.split("=")[0].trim();
+            if (currentstep.getCalculation() != null){
 
-            Double answer = solveStep(toHash, step);
-            toHash.put(target, answer);
+                String target = currentstep.getCalculation().split("=")[0].trim();
 
-            System.out.println("Step "+ i + ": " + target + "=" + answer);
+                Double answer = solveStep(toHash, currentstep.getCalculation());
+                toHash.put(target, answer);
 
-            ExerciseVariable targetVariable = findVariable(variables, target); //Reference
-            if (targetVariable != null){
-                targetVariable.setValue(answer);
-            }
+                System.out.println("Step "+ i + ": " + target + "=" + answer);
 
-            if (targetVariable.getBranch() != null && !checkedBranches.contains(target)){
-
-                checkedBranches.add(target);
-
-                System.out.println(target + " has a branch: " + targetVariable.getBranch());
-
-                if (isTrue(toHash, targetVariable.getBranch())){
-                    System.out.println("Branch true");
-                    String textOut = targetVariable.getConditions().get(0);
-                    System.out.println(textOut);
-                }
-                else{
-                    System.out.println("Branch false");
-                    String textOut = targetVariable.getConditions().get(1);
-                    System.out.println(textOut);
+                ExerciseVariable targetVariable = findVariable(variables, target); //Reference
+                if (targetVariable != null){
+                    targetVariable.setValue(answer);
                 }
 
-            }
+            } else if (currentstep.getCondition() != null) {
 
+                if (isTrue(toHash, currentstep.getCondition())){
+
+                    System.out.println("Step "+ i + ": " + currentstep.getCondition() + " is true");
+                    if (currentstep.getConclusion() != null){
+                        System.out.println("Conclusion: " + currentstep.getConclusion());
+                    }
+                    if (currentstep.isTerminate()){
+                        System.out.println("Terminating");
+                        break;
+                    } else if (currentstep.getJumpTo() != null) {
+                        System.out.println("Jumping to step " + currentstep.getJumpTo());
+                        i = currentstep.getJumpTo() - 1;
+                    }
+
+                } else {
+                    System.out.println("Step "+ i + ": " + currentstep.getCondition() + " is false moving to next step");
+                }
+
+            } else if (currentstep.getConclusion() != null) {
+
+                System.out.println("Conclusion (Info Step): " + currentstep.getConclusion());
+            }
         }
-
     }
 
     private static Double solveStep(Map<String, Double> calc, String step){
@@ -175,7 +198,7 @@ public class Engine {
 
     private static ExerciseVariable findVariable(List<ExerciseVariable> variables, String title){
         for (ExerciseVariable n : variables) {
-            if (n.getTitle().equals(title)) {
+            if (n.getName().equals(title)) {
                 return n;
             }
         }
