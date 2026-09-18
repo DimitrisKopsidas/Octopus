@@ -9,6 +9,8 @@ import java.util.List;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface BundleRepository extends JpaRepository<Bundle, Long> {
 
     @Query("SELECT COUNT(DISTINCT b) FROM Bundle b JOIN b.answers a WHERE a.question.course.id = :courseId")
