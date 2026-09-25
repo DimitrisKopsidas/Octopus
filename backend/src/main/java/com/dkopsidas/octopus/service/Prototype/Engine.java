@@ -14,48 +14,34 @@ public class Engine {
 
         List<ExerciseVariable> variables = new ArrayList<>();
 
-
-        //Dedomena
-        variables.add(new ExerciseVariable("VBB", 4.0, 0));
-        variables.add(new ExerciseVariable("RB", 91000.0, 0));
-        variables.add(new ExerciseVariable("RC", 4500.0, 0));
-        variables.add(new ExerciseVariable("VCC", 9.0, 0));
-        variables.add(new ExerciseVariable("VBE", 0.7, 0));
-        variables.add(new ExerciseVariable("β", 209.0, 0));
-        variables.add(new ExerciseVariable("VE", 0.0, 0));
-        variables.add(new ExerciseVariable("VCEsat", 0.3, 0));
-
-        //goals
-        variables.add(new ExerciseVariable("VB", null, 1));
-        variables.add(new ExerciseVariable("IB", null, 2));
-        variables.add(new ExerciseVariable("IC", null, 3));
-        variables.add(new ExerciseVariable("VC", null, 4));
-        variables.add(new ExerciseVariable("VCE", null,5));
-        variables.add(new ExerciseVariable("IE", null, 6));
-
+        variables.add(new ExerciseVariable("VBB",       4.0,        0));
+        variables.add(new ExerciseVariable("RB",        91000.0,    0));
+        variables.add(new ExerciseVariable("RC",        4500.0,     0));
+        variables.add(new ExerciseVariable("VCC",       9.0,        0));
+        variables.add(new ExerciseVariable("VBE",       0.7,        0));
+        variables.add(new ExerciseVariable("β",         209.0,      0));
+        variables.add(new ExerciseVariable("VE",        0.0,        0));
+        variables.add(new ExerciseVariable("VCEsat",    0.3,        0));
+        variables.add(new ExerciseVariable("VB",        null,       1));
+        variables.add(new ExerciseVariable("IB",        null,       2));
+        variables.add(new ExerciseVariable("IC",        null,       3));
+        variables.add(new ExerciseVariable("VC",        null,       4));
+        variables.add(new ExerciseVariable("VCE",       null,       5));
+        variables.add(new ExerciseVariable("IE",        null,       6));
 
         List<Step> steps = new ArrayList<>();
 
-        steps.add(new Step(1L,0,"find VB", null, "VB = VBE + VE", null, null, false, null));
-        steps.add(new Step(2L,1,"find IB", null, "IB = (VBB - VB)/ RB", null, null, false, null));
-
-        steps.add(new Step(3L, 2, "Check Cutoff", null, null, "IB < 0", "Αποκοπή", true, null));
-
-        steps.add(new Step(4L,3,"find IC", null, "IC = β * IB", null, null, false, null));
-        steps.add(new Step(5L,4,"find VC",null ,"VC = VCC - (IC * RC)" ,null, null, false, null));
-
-        steps.add(new Step(6L,5,"Check Active",null ,null , "VC > VB > VE", "Ενεργός", false, 9));
-
-        steps.add(new Step(7L, 6, "Saturation Info", null, null, null, "Κορεσμός", false, null));
-
-        steps.add(new Step(8L,6,"find VCE", null, "VCE = VCEsat", null, null, false, null));
-        steps.add(new Step(9L,7,"find VC", null, "VC = VCE + VE", null, null, false, null));
-        steps.add(new Step(10L,8,"find IC", null, "IC = (VCC - VC)/RC", null, null, false, null));
-        steps.add(new Step(11L,7,"find IE", null, "IE = IC + IB", null, null, false, null));
-
-
-       // List<String> steps = List.of("VB = VBE + VE", "IB = (VBB - VB)/ RB", "IC = β * IB","VC = VCC - (IC * RC)", "VCE = VCEsat", "VC = VCE + VE", "IC = (VCC - VC)/RC", "IE = IC + IB"); //,"IC = beta * IB", "VCE = VCEsat", "VC = VCE + VE", "IC = (VCC - VC)/RC", "IE = IC + IB");
-
+        steps.add(new Step(1L,  0,  "find VB",          null, "VB = VBE + VE",          null,               null,           false,  null));
+        steps.add(new Step(2L,  1,  "find IB",          null, "IB = (VBB - VB)/ RB",    null,               null,           false,  null));
+        steps.add(new Step(3L,  2,  "Check Cutoff",     null, null,                     "IB < 0",           "Αποκοπή",      true,   null));
+        steps.add(new Step(4L,  3,  "find IC",          null, "IC = β * IB",            null,               null,           false,  null));
+        steps.add(new Step(5L,  4,  "find VC",          null, "VC = VCC - (IC * RC)" ,  null,               null,           false,  null));
+        steps.add(new Step(6L,  5,  "Check Active",     null, null,                     "VC > VB > VE",     "Ενεργός",      false,  9));
+        steps.add(new Step(7L,  6,  "Saturation Info",  null, null,                     null,               "Κορεσμός",     false,  null));
+        steps.add(new Step(8L,  6,  "find VCE",         null, "VCE = VCEsat",           null,               null,           false,  null));
+        steps.add(new Step(9L,  7,  "find VC",          null, "VC = VCE + VE",          null,               null,           false,  null));
+        steps.add(new Step(10L, 8,  "find IC",          null, "IC = (VCC - VC)/RC",     null,               null,           false,  null));
+        steps.add(new Step(11L, 7,  "find IE",          null, "IE = IC + IB",           null,               null,           false,  null));
 
         //Convert to hashmap for easy access
         Map<String, Double> toHash = new HashMap<>();
@@ -65,18 +51,16 @@ public class Engine {
             }
         }
 
-
         Exercise test = new Exercise(
-                "Askisi test",
-                "Vreite to IB, IC, VC, VCE, IE",
+                "Test exercise",
+                "Calculate for IB, IC, VC, VCE, IE",
                 "imageUrl",
                 variables,
                 steps
         );
 
         System.out.println(test.getTitle());
-        System.out.println(test.getPromnt());
-
+        System.out.println(test.getPrompt());
 
         for (int i = 0; i < steps.size(); i++){
             Step currentstep = test.getSteps().get(i);
