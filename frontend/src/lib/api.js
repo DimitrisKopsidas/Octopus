@@ -225,5 +225,13 @@ export const courseProgressApi = {
   togglePassed: (courseId) => unwrap(http.patch(`/course-progress/${courseId}/passed`)),
 }
 
-export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi }
+export const leaderboardApi = {
+  getUsersAvg: () => unwrap(http.get('/leaderboard/users/avg')),
+  getByCourse: (courseId) => unwrap(http.get(`/leaderboard/courses/${courseId}`)),
+  getPopularCourses: () => unwrap(http.get('/leaderboard/courses/popular')),
+  getCoursesAvg: () => unwrap(http.get('/leaderboard/courses/avg')),
+  getHelpersTotalQuestions: () => unwrap(http.get('/leaderboard/helpers/total_questions')),
+}
+
+export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi, leaderboardApi }
 
