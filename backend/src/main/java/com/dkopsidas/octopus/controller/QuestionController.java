@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,6 +50,21 @@ public class QuestionController {
             @PathVariable Integer randomCount
     ) {
         List<QuestionResponseDto> questionResponseDtos = questionService.listQuestionsByRandomCount(courseId, randomCount);
+        return ResponseEntity.ok(questionResponseDtos);
+    }
+
+    @GetMapping(path = "/{courseId}/unsolved")
+    public ResponseEntity<List<QuestionResponseDto>> getUnsolvedQuestions(
+            @PathVariable Long courseId,
+            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt
+    ) {
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        java.util.UUID userId = java.util.UUID.fromString(jwt.getSubject());
+
+        List<QuestionResponseDto> questionResponseDtos = questionService.getUnsolvedQuestions(courseId, userId);
         return ResponseEntity.ok(questionResponseDtos);
     }
 

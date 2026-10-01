@@ -18,6 +18,7 @@ import com.dkopsidas.octopus.exception.QuestionImportException;
 import com.dkopsidas.octopus.exception.QuestionNotFoundException;
 import com.dkopsidas.octopus.exception.SimpleException;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
+import com.dkopsidas.octopus.repository.BundleRepository;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.QuestionRepository;
 import com.dkopsidas.octopus.repository.UserRepository;
@@ -57,6 +58,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionMapper questionMapper;
     private final ImageService imageService;
     private final ApplicationEventPublisher eventPublisher;
+    private final BundleRepository bundleRepository;
 
     @Override
     public QuestionResponseDto createQuestion(CreateQuestionRequestDto createRequest) {
@@ -313,6 +315,22 @@ public class QuestionServiceImpl implements QuestionService {
         return questionMapper.toDto(saved);
     }
 
+    @Override
+    public List<QuestionResponseDto> getUnsolvedQuestions(Long courseId, UUID userId) {
+        List<Long> solvedQuestionIds = bundleRepository.findCorrectlyAnsweredQuestionIds(userId, courseId);
+        List<Question> allCourseQuestions = questionRepository.findAllByCourseIdAndIsActiveTrue(courseId);
+
+        List<QuestionResponseDto> unsolvedQuestions = new ArrayList<>();
+        for (Question question : allCourseQuestions) {
+            if (!solvedQuestionIds.contains(question.getId())) {
+                QuestionResponseDto dto = questionMapper.toDto(question);
+                unsolvedQuestions.add(dto);
+            }
+        }
+
+        return unsolvedQuestions;
+
+    }
     /**
      * Η ταυτότητα μιας ερώτησης όπως θέλει να τη δει ο admin στο audit log:
      * τίτλος + σε ποιο μάθημα ανήκει. Χωρίς αυτό, ένα "Updated question"
