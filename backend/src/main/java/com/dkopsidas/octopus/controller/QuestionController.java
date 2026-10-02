@@ -14,11 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -53,17 +55,13 @@ public class QuestionController {
         return ResponseEntity.ok(questionResponseDtos);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(path = "/{courseId}/unsolved")
     public ResponseEntity<List<QuestionResponseDto>> getUnsolvedQuestions(
             @PathVariable Long courseId,
-            @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        if (jwt == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        java.util.UUID userId = java.util.UUID.fromString(jwt.getSubject());
-
+        UUID userId = UUID.fromString(jwt.getSubject());
         List<QuestionResponseDto> questionResponseDtos = questionService.getUnsolvedQuestions(courseId, userId);
         return ResponseEntity.ok(questionResponseDtos);
     }

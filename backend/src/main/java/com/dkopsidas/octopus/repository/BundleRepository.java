@@ -12,6 +12,6 @@ public interface BundleRepository extends JpaRepository<Bundle, Long> {
     @Query("SELECT COUNT(DISTINCT b) FROM Bundle b JOIN b.answers a WHERE a.question.course.id = :courseId")
     Long countByCourseId(@Param("courseId") Long courseId);
 
-    @Query("SELECT DISTINCT a.question.id FROM Bundle b JOIN b.answers a WHERE b.createdBy.id = :userId AND a.question.course.id = :courseId AND a.isCorrect = true")
-    List<Long> findCorrectlyAnsweredQuestionIds(@Param("userId") java.util.UUID userId, @Param("courseId") Long courseId);
+    @Query("SELECT DISTINCT b FROM Bundle b JOIN b.answers a WHERE b.createdBy.id = :userId AND a.question.course.id = :courseId")
+    List<Bundle> findAllByUserIdAndCourseId(@Param("userId") java.util.UUID userId, @Param("courseId") Long courseId);
 }
