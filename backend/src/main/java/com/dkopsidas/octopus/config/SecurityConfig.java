@@ -106,6 +106,10 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(authorize -> authorize
+                        // Per-user question pool. Must come before the open GET on
+                        // /api/v1/questions/**: there the anonymous caller only fails at
+                        // @PreAuthorize, which GlobalExceptionHandler turns into a 500.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/questions/*/unsolved").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login",
