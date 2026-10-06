@@ -1,4 +1,4 @@
-// Timer preset toggle button. Used by SandboxPanel.
+// Timer preset toggle button. Used by TimerPicker.
 function TimerOption({ label, active, onClick, className = '' }) {
   return (
     <button
