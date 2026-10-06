@@ -15,23 +15,22 @@ public interface BundleRepository extends JpaRepository<Bundle, Long> {
 
     //Methods for leaderboard implementation
     @Query(value = """
-        WITH bundle_scores AS (
-            SELECT b.id, b.created_by, b.score::numeric / COUNT(a.id) * 100 AS normalized_score
-            FROM bundles b
-                JOIN bundle_answers ba ON ba.bundle_id = b.id
-                JOIN answers a ON a.id = ba.answer_id
-                JOIN questions q ON a.question_id = q.id
-            WHERE q.course_id = :courseId
-            GROUP BY b.id, b.created_by
-            ORDER BY normalized_score DESC
-            LIMIT 100
-        )
-        SELECT u.display_name AS name, MAX(bs.normalized_score)::double precision AS value
-        FROM bundle_scores bs
-        LEFT JOIN users u ON u.id = bs.created_by
-        GROUP BY u.display_name
-        ORDER BY value DESC
-        """, nativeQuery = true)
+    WITH bundle_scores AS (
+        SELECT b.id, b.created_by, b.score
+        FROM bundles b
+            JOIN bundle_answers ba ON ba.bundle_id = b.id
+            JOIN answers a ON a.id = ba.answer_id
+            JOIN questions q ON a.question_id = q.id
+        WHERE q.course_id = :courseId
+        GROUP BY b.id, b.created_by
+    )
+    SELECT u.display_name AS name,
+        SUM(bs.score)::double precision AS value
+    FROM bundle_scores bs
+        JOIN users u ON u.id = bs.created_by
+    GROUP BY u.id, u.display_name
+    ORDER BY value DESC;
+    """, nativeQuery = true)
     List<LeaderboardRowDto> findLeaderboardByCourse(@Param("courseId") Long courseId);
 
     @Query(value = """
