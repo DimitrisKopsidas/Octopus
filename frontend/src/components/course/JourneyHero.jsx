@@ -1,21 +1,21 @@
-// Hero band with the 3-step journey cards that act as tabs. Used by CourseStart.
+// Hero band with the 4-step journey cards that act as tabs. Used by CourseStart.
 import t from '../../content/courseStart.json'
 
-const JOURNEY_STEPS = ['study', 'systematic', 'sandbox']
+const JOURNEY_STEPS = ['study', 'systematic', 'sandbox', 'mistakes']
 
-// Hero band introducing the 3-step learning journey. The step cards double as
-// the tab switcher: Study → Systematic → Practice.
+// Hero band introducing the 4-step learning journey. The step cards double as
+// the tab switcher: Study → Systematic → Practice → Mistakes.
 function JourneyHero({ activeTab, onSelect }) {
   return (
     <section className="mb-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-brand-50 to-white dark:from-brand-950/30 dark:to-slate-900 p-6 sm:p-8">
       <span className="inline-block text-xs font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 bg-brand-100/70 dark:bg-brand-900/40 px-2.5 py-1 rounded-full">
         {t.hero.badge}
       </span>
-      <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+      <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w">
         {t.hero.subtitle}
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
         {JOURNEY_STEPS.map((key, i) => {
           const active = activeTab === key
           const step = t.hero.steps[i]

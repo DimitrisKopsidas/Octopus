@@ -2,6 +2,7 @@
   "questionLabelTemplate": "Ερώτηση {current} από {total}",
   "answeredTemplate": "· απαντημένες {count}/{total}",
   "setLabel": "Σετ {n}",
+  "unsolvedLabel": "Quiz Λαθών",
   "cancelButton": "Ακύρωση",
   "prevButton": "← Προηγούμενη",
   "nextButton": "Επόμενη →",

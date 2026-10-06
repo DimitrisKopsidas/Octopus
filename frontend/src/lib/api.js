@@ -150,6 +150,8 @@ export const questionsApi = {
     unwrap(http.get(`/questions/${courseId}/setNum=${setNum}`)),
   byRandomCount: (courseId, count) =>
     unwrap(http.get(`/questions/${courseId}/randomCount=${count}`)),
+  // Logged-in only: the course's questions the user answered wrongly and has not fixed yet, shuffled.
+  unsolved: (courseId) => unwrap(http.get(`/questions/${courseId}/unsolved`)),
   create: (payload) => unwrap(http.post('/questions', payload)),
   importToCourse: (courseId, payload) =>
     unwrap(http.post(`/questions/${courseId}/import`, payload, { timeout: UPLOAD_TIMEOUT })),

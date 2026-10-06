@@ -1,4 +1,4 @@
-// Course landing page: 3-step journey (study/systematic/sandbox). Logic in useCourseStart. Route: /courses/:courseId/start
+// Course landing page: 4-step journey (study/systematic/sandbox/mistakes). Logic in useCourseStart. Route: /courses/:courseId/start
 import { useParams } from 'react-router-dom'
 import { Heart, CheckCircle2, Loader2 } from 'lucide-react'
 import { useCourseStart } from '../hooks/useCourseStart'
@@ -12,6 +12,7 @@ import ErrorState from '../components/ui/ErrorState'
 import JourneyHero from '../components/course/JourneyHero'
 import SystematicStudyPanel from '../components/course/SystematicStudyPanel'
 import SandboxPanel from '../components/course/SandboxPanel'
+import UnsolvedQuizPanel from '../components/course/UnsolvedQuizPanel'
 import StudyMaterialPanel from '../components/course/StudyMaterialPanel'
 import t from '../content/courseStart.json'
 
@@ -49,6 +50,7 @@ function CourseStart() {
     max, SET_SIZE, totalSets, sets, coveragePercentage, completedSets,
     count, setCount, durationSeconds, setDurationSeconds, timerOptions,
     canStart, starting, handleStart, handleStartSet,
+    unsolved, unsolvedDurationSeconds, setUnsolvedDurationSeconds, handleStartUnsolved,
   } = useCourseStart(courseId)
 
   return (
@@ -167,6 +169,18 @@ function CourseStart() {
                   starting={starting}
                   canStart={canStart}
                   onStart={handleStart}
+                />
+              )}
+
+              {activeTab === 'mistakes' && (
+                <UnsolvedQuizPanel
+                  {...unsolved}
+                  durationSeconds={unsolvedDurationSeconds}
+                  setDurationSeconds={setUnsolvedDurationSeconds}
+                  timerOptions={timerOptions}
+                  starting={starting}
+                  onStart={handleStartUnsolved}
+                  onGoToQuizzes={() => setActiveTab('systematic')}
                 />
               )}
             </div>
