@@ -36,6 +36,10 @@ export const qk = {
     all: ['questions'],
     byCourse: (courseId) => ['questions', 'byCourse', String(courseId)],
     settings: (courseId) => ['questions', 'settings', String(courseId)],
+    // Per user as well as per course, so a different login in the same tab never
+    // sees the previous user's pool. Invalidate ['questions','unsolved'] after a bundle save.
+    unsolvedAll: ['questions', 'unsolved'],
+    unsolved: (courseId, userId) => ['questions', 'unsolved', String(courseId), String(userId)],
   },
   bundles: {
     count: () => ['bundles', 'count'],
