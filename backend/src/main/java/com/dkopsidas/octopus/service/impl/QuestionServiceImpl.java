@@ -313,13 +313,19 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<QuestionResponseDto> getUnsolvedQuestions(Long courseId, UUID userId) {
+        if (!courseRepository.existsById(courseId)) {
+            throw new CourseNotFoundException(courseId);
+        }
+
         List<Question> allCourseQuestions = questionRepository.findAllByCourseIdAndIsActiveTrue(courseId);
         List<Bundle> userBundles = bundleRepository.findAllByUserIdAndCourseId(userId, courseId);
 
         List<Question> unsolvedQuestions = new ArrayList<>();
 
         for (Question question : allCourseQuestions) {
-            if (!isQuestionSolvedInAnyBundle(question, userBundles )) {
+            // Only questions the user got wrong: never-answered ones are not mistakes.
+            if (isQuestionAnsweredInAnyBundle(question, userBundles)
+                    && !isQuestionSolvedInAnyBundle(question, userBundles)) {
                 unsolvedQuestions.add(question);
             }
         }
@@ -368,6 +374,17 @@ public class QuestionServiceImpl implements QuestionService {
         List<Question> scrambled = new ArrayList<>(questions);
         Collections.shuffle(scrambled);
         return scrambled;
+    }
+
+    private boolean isQuestionAnsweredInAnyBundle(Question question, List<Bundle> userBundles) {
+        for (Bundle bundle : userBundles) {
+            for (Answer answer : bundle.getAnswers()) {
+                if (answer.getQuestion().getId().equals(question.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private boolean isQuestionSolvedInAnyBundle(Question question, List<Bundle> userBundles) {
