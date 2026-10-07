@@ -33,5 +33,5 @@ public interface QuestionService {
 
     QuestionResponseDto deleteImage(Long questionId) throws IOException;
 
-    List<QuestionResponseDto> getUnsolvedQuestions(Long courseId, java.util.UUID questionIds);
+    List<QuestionResponseDto> getUnsolvedQuestions(Long courseId, java.util.UUID userId);
 }
