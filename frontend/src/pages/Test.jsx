@@ -29,6 +29,7 @@ function Test() {
   const endedAt = useTestStore((s) => s.endedAt)
   const courseName = useTestStore((s) => s.courseName)
   const setIndex = useTestStore((s) => s.setIndex)
+  const mode = useTestStore((s) => s.mode)
   const selectAnswer = useTestStore((s) => s.selectAnswer)
   const toggleAnswer = useTestStore((s) => s.toggleAnswer)
   const clearAnswer = useTestStore((s) => s.clearAnswer)
@@ -180,6 +181,11 @@ function Test() {
         {setIndex != null && (
           <span className="normal-case tracking-normal text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded">
             {t.setLabel.replace('{n}', setIndex + 1)}
+          </span>
+        )}
+        {mode === 'unsolved' && (
+          <span className="normal-case tracking-normal text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded">
+            {t.unsolvedLabel}
           </span>
         )}
       </p>
@@ -347,6 +353,11 @@ function Test() {
               {setIndex != null && (
                 <span className="normal-case tracking-normal text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded">
                   {t.setLabel.replace('{n}', setIndex + 1)}
+                </span>
+              )}
+              {mode === 'unsolved' && (
+                <span className="normal-case tracking-normal text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded">
+                  {t.unsolvedLabel}
                 </span>
               )}
             </p>

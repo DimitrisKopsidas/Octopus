@@ -70,6 +70,19 @@ export function useCourseQuestions(courseId, fallbackError = 'Σφάλμα φό�
   return { ...q, questions: q.data ?? [], error: q.error ? toMessage(q.error, fallbackError) : null }
 }
 
+// Questions of the course the logged-in user answered wrongly and has not fixed yet.
+// Drives the count on the mistakes quiz panel. staleTime 0 because
+// the pool shrinks after every finished quiz, unlike the rest of the content.
+export function useUnsolvedQuestions(courseId, userId, fallbackError = 'Σφάλμα φόρτωσης') {
+  const q = useQuery({
+    queryKey: qk.questions.unsolved(courseId, userId),
+    queryFn: () => questionsApi.unsolved(courseId),
+    enabled: courseId != null && userId != null,
+    staleTime: 0,
+  })
+  return { ...q, questions: q.data ?? null, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
 
 
 export function useHomeStats() {

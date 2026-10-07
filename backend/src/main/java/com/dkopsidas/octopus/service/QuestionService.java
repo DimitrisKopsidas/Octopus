@@ -32,4 +32,6 @@ public interface QuestionService {
     QuestionResponseDto uploadImage(Long questionId, MultipartFile file) throws IOException;
 
     QuestionResponseDto deleteImage(Long questionId) throws IOException;
+
+    List<QuestionResponseDto> getUnsolvedQuestions(Long courseId, java.util.UUID userId);
 }

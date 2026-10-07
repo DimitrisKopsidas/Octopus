@@ -1,9 +1,11 @@
 // Test results page: score stats + per-question review + bundle submit. Route: /test/:courseId/results
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTestStore } from '../store/testStore'
 import { bundlesApi, questionsApi, extractErrorMessage } from '../lib/api'
 import { isQuestionCorrect, flattenAnswerIds } from '../lib/scoring'
+import { qk } from '../lib/queryClient'
 import { toast } from '../store/toastStore'
 import BackButton from '../components/ui/BackButton'
 import StatCard from '../components/ui/StatCard'
@@ -29,10 +31,13 @@ function Results() {
   const courseName = useTestStore((s) => s.courseName)
   const setIndex = useTestStore((s) => s.setIndex)
   const totalSets = useTestStore((s) => s.totalSets)
+  const mode = useTestStore((s) => s.mode)
   const startSession = useTestStore((s) => s.startSession)
   const reset = useTestStore((s) => s.reset)
 
+  const queryClient = useQueryClient()
   const submittedRef = useRef(false)
+  const submitPromiseRef = useRef(null) // the bundle save, awaited before fetching the shrunk unsolved pool
   const restartingRef = useRef(false) // suppresses the redirect guard during an intentional set restart
   const [setActionLoading, setSetActionLoading] = useState(false)
 
@@ -54,10 +59,15 @@ function Results() {
     const timeForCompletion = endedAt && startedAt
       ? Math.round((endedAt - startedAt) / 1000)
       : null
-    bundlesApi
+    submitPromiseRef.current = bundlesApi
       .create({ setNum: setIndex, answerIds, timeForCompletion })
-      .catch((err) => console.warn('Bundle submit failed', err))
-  }, [hasResults, answers, setIndex, startedAt, endedAt])
+      // Any finished quiz can shrink (or grow) the mistakes pool.
+      .then(() => queryClient.invalidateQueries({ queryKey: qk.questions.unsolvedAll }))
+      .catch((err) => {
+        console.warn('Bundle submit failed', err)
+        if (mode === 'unsolved') toast.error(t.unsolved.saveFailed)
+      })
+  }, [hasResults, answers, setIndex, startedAt, endedAt, mode, queryClient])
 
   const { correctCount, total, durationMs } = useMemo(() => {
     let correct = 0
@@ -99,6 +109,39 @@ function Results() {
     } catch (err) {
       restartingRef.current = false
       toast.error(extractErrorMessage(err, 'Σφάλμα έναρξης'))
+      setSetActionLoading(false)
+    }
+  }
+
+  // Mistakes quiz: start the next round with whatever is still wrong. Waits
+  // for this quiz's bundle to be saved first, or the pool would still contain
+  // the questions just answered correctly.
+  async function continueUnsolved() {
+    if (setActionLoading) return
+    setSetActionLoading(true)
+    try {
+      await submitPromiseRef.current
+      const questions = await questionsApi.unsolved(courseId)
+      if (questions.length === 0) {
+        reset()
+        navigate(`/courses/${courseId}/start`)
+        return
+      }
+      restartingRef.current = true
+      startSession({
+        courseId: Number(courseId),
+        courseName,
+        count: questions.length,
+        durationSeconds: null,
+        order: 'random',
+        questions,
+        setIndex: null,
+        mode: 'unsolved',
+      })
+      navigate(`/test/${courseId}`)
+    } catch (err) {
+      restartingRef.current = false
+      toast.error(extractErrorMessage(err, t.unsolved.errorContinue))
       setSetActionLoading(false)
     }
   }
@@ -161,6 +204,11 @@ function Results() {
   if (!hasResults) return null
 
   const percent = total > 0 ? Math.round((correctCount / total) * 100) : 0
+  // Every question in a mistakes quiz was still wrong going in, so the ones
+  // answered correctly now are exactly what leaves the pool. Ones left
+  // unanswered stay in it.
+  const isUnsolved = mode === 'unsolved'
+  const remainingAfter = total - correctCount
   const scoreTone =
     percent >= 80
       ? 'text-emerald-600 dark:text-emerald-400'
@@ -182,11 +230,16 @@ function Results() {
               {t.setLabel.replace('{n}', setIndex + 1)}
             </span>
           )}
+          {isUnsolved && (
+            <span className="normal-case tracking-normal text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-1.5 py-0.5 rounded">
+              {t.unsolvedLabel}
+            </span>
+          )}
         </p>
         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-200">{t.title}</h1>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div className={`grid grid-cols-1 gap-4 mb-8 ${isUnsolved ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}>
         <StatCard label={t.stats.correct}>
           <span className={`text-3xl font-bold ${scoreTone}`}>{correctCount}/{total}</span>
         </StatCard>
@@ -198,7 +251,25 @@ function Results() {
             {formatDuration(durationMs)}
           </span>
         </StatCard>
+        {isUnsolved && (
+          <StatCard label={t.unsolved.remainingLabel}>
+            <span className="text-3xl font-bold text-slate-900 dark:text-slate-200">
+              {remainingAfter}
+            </span>
+            {correctCount > 0 && (
+              <span className="ml-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                −{correctCount}
+              </span>
+            )}
+          </StatCard>
+        )}
       </div>
+
+      {isUnsolved && remainingAfter === 0 && (
+        <div className="mb-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 p-4 text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+          {t.unsolved.allDone}
+        </div>
+      )}
 
       <div className="mb-6 flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-200">{t.reviewTitle}</h2>
@@ -221,6 +292,27 @@ function Results() {
                   className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors"
                 >
                   {setActionLoading ? 'Φόρτωση…' : t.nextChapter}
+                </button>
+              )}
+            </>
+          ) : isUnsolved ? (
+            <>
+              <button
+                type="button"
+                onClick={tryAgain}
+                disabled={setActionLoading}
+                className="px-4 py-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {t.unsolved.backToCourse}
+              </button>
+              {remainingAfter > 0 && (
+                <button
+                  type="button"
+                  onClick={continueUnsolved}
+                  disabled={setActionLoading}
+                  className="px-4 py-2 rounded-md bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium shadow-sm transition-colors"
+                >
+                  {setActionLoading ? 'Φόρτωση…' : t.unsolved.continue.replace('{remaining}', remainingAfter)}
                 </button>
               )}
             </>

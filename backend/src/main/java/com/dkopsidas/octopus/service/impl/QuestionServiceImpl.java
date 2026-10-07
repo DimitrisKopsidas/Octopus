@@ -1,11 +1,7 @@
 package com.dkopsidas.octopus.service.impl;
 
 import com.dkopsidas.octopus.domain.dto.SettingsInfoResponseDto;
-import com.dkopsidas.octopus.domain.entity.Answer;
-import com.dkopsidas.octopus.domain.entity.AuditAction;
-import com.dkopsidas.octopus.domain.entity.Course;
-import com.dkopsidas.octopus.domain.entity.Question;
-import com.dkopsidas.octopus.domain.entity.User;
+import com.dkopsidas.octopus.domain.entity.*;
 import com.dkopsidas.octopus.domain.dto.AnswerRequestDto;
 import com.dkopsidas.octopus.domain.dto.CreateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.dto.ImportQuestionsRequestDto;
@@ -18,6 +14,7 @@ import com.dkopsidas.octopus.exception.QuestionImportException;
 import com.dkopsidas.octopus.exception.QuestionNotFoundException;
 import com.dkopsidas.octopus.exception.SimpleException;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
+import com.dkopsidas.octopus.repository.BundleRepository;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.QuestionRepository;
 import com.dkopsidas.octopus.repository.UserRepository;
@@ -57,6 +54,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionMapper questionMapper;
     private final ImageService imageService;
     private final ApplicationEventPublisher eventPublisher;
+    private final BundleRepository bundleRepository;
 
     @Override
     public QuestionResponseDto createQuestion(CreateQuestionRequestDto createRequest) {
@@ -313,6 +311,35 @@ public class QuestionServiceImpl implements QuestionService {
         return questionMapper.toDto(saved);
     }
 
+    @Override
+    public List<QuestionResponseDto> getUnsolvedQuestions(Long courseId, UUID userId) {
+        if (!courseRepository.existsById(courseId)) {
+            throw new CourseNotFoundException(courseId);
+        }
+
+        List<Question> allCourseQuestions = questionRepository.findAllByCourseIdAndIsActiveTrue(courseId);
+        List<Bundle> userBundles = bundleRepository.findAllByUserIdAndCourseId(userId, courseId);
+
+        List<Question> unsolvedQuestions = new ArrayList<>();
+
+        for (Question question : allCourseQuestions) {
+            // Only questions the user got wrong: never-answered ones are not mistakes.
+            if (isQuestionAnsweredInAnyBundle(question, userBundles)
+                    && !isQuestionSolvedInAnyBundle(question, userBundles)) {
+                unsolvedQuestions.add(question);
+            }
+        }
+
+        unsolvedQuestions = scrambleQuestions(unsolvedQuestions);
+
+        List<QuestionResponseDto> finalDtos = new ArrayList<>();
+        for (Question question : unsolvedQuestions) {
+            finalDtos.add(questionMapper.toDto(question));
+        }
+
+        return finalDtos;
+
+    }
     /**
      * Η ταυτότητα μιας ερώτησης όπως θέλει να τη δει ο admin στο audit log:
      * τίτλος + σε ποιο μάθημα ανήκει. Χωρίς αυτό, ένα "Updated question"
@@ -348,4 +375,44 @@ public class QuestionServiceImpl implements QuestionService {
         Collections.shuffle(scrambled);
         return scrambled;
     }
-}
+
+    private boolean isQuestionAnsweredInAnyBundle(Question question, List<Bundle> userBundles) {
+        for (Bundle bundle : userBundles) {
+            for (Answer answer : bundle.getAnswers()) {
+                if (answer.getQuestion().getId().equals(question.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isQuestionSolvedInAnyBundle(Question question, List<Bundle> userBundles) {
+        long totalCorrectAnswersForQuestion = 0;
+        for (Answer answer : question.getAnswers()) {
+            if (answer.getIsCorrect()) {
+                totalCorrectAnswersForQuestion++;
+            }
+        }
+
+        for (Bundle bundle : userBundles) {
+            long correctChoicesInBundle = 0;
+            long wrongChoicesInBundle = 0;
+
+            for (Answer answer : bundle.getAnswers()) {
+                if (answer.getQuestion().getId().equals(question.getId())) {
+                    if (answer.getIsCorrect()) {
+                        correctChoicesInBundle++;
+                    } else {
+                        wrongChoicesInBundle++;
+                    }
+                }
+            }
+
+            if (correctChoicesInBundle == totalCorrectAnswersForQuestion && wrongChoicesInBundle == 0) {
+                return true;
+            }
+        }
+        return false;
+        }
+    }

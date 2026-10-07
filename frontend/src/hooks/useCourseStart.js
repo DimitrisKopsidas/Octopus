@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { questionsApi, extractErrorMessage } from '../lib/api'
 import { useTestStore } from '../store/testStore'
-import { useCourse, useCourseSettings } from './queries'
+import { useCourse, useCourseSettings, useMe, useUnsolvedQuestions } from './queries'
 import { toast } from '../store/toastStore'
 import t from '../content/courseStart.json'
 
@@ -29,9 +29,24 @@ export function useCourseStart(courseId) {
     refetch: refetchSettings,
   } = useCourseSettings(courseId, t.errorLoad)
 
+  // Mistakes quiz: needs a logged-in user, since the pool is built from their
+  // saved bundles. Its failures stay on its own panel instead of taking the
+  // whole page down.
+  const { user, isLoading: userLoading } = useMe()
+  const unsolvedQuery = useUnsolvedQuestions(courseId, user?.id)
+  const unsolved = {
+    isLoggedIn: user != null,
+    loading: userLoading || (user != null && unsolvedQuery.isPending),
+    error: unsolvedQuery.error,
+    remaining: unsolvedQuery.questions?.length ?? null,
+    onRetry: unsolvedQuery.refetch,
+  }
+
   const [activeTab, setActiveTab] = useState('study')
   const [count, setCount] = useState(10)
   const [durationSeconds, setDurationSeconds] = useState(null)
+  // Separate from the simulation's timer; starts with no limit since the pool size varies.
+  const [unsolvedDurationSeconds, setUnsolvedDurationSeconds] = useState(null)
   const [starting, setStarting] = useState(false)
 
   // Completed sets will come from the user model (backend) — interface only for now.
@@ -133,6 +148,36 @@ export function useCourseStart(courseId) {
     }
   }
 
+  // Fetched fresh rather than reusing the card's cached list: the pool may have
+  // shrunk since (a quiz finished in another tab).
+  async function handleStartUnsolved() {
+    if (starting || !user) return
+    setStarting(true)
+    try {
+      const questions = await questionsApi.unsolved(courseId)
+      if (questions.length === 0) {
+        toast.info(t.unsolved.allDoneToast)
+        unsolvedQuery.refetch()
+        setStarting(false)
+        return
+      }
+      startSession({
+        courseId: Number(courseId),
+        courseName: course?.name || t.fallbackTitle.replace('{courseId}', courseId),
+        count: questions.length,
+        durationSeconds: unsolvedDurationSeconds,
+        order: 'random',
+        questions,
+        setIndex: null,
+        mode: 'unsolved',
+      })
+      navigate(`/test/${courseId}`)
+    } catch (err) {
+      toast.error(extractErrorMessage(err, t.errorStartUnsolved))
+      setStarting(false)
+    }
+  }
+
   // Background refetch: ErrorState stays mounted (spinner on its button) instead
   // of collapsing back to skeletons.
   function onRetry() {
@@ -163,5 +208,9 @@ export function useCourseStart(courseId) {
     starting,
     handleStart,
     handleStartSet,
+    unsolved,
+    unsolvedDurationSeconds,
+    setUnsolvedDurationSeconds,
+    handleStartUnsolved,
   }
 }
