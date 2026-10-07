@@ -40,6 +40,9 @@ function Layout() {
             <NavLink to="/courses" className={navLinkClass}>
               {t.nav.courses}
             </NavLink>
+            <NavLink to="/leaderboard" className={navLinkClass}>
+              {t.nav.leaderboard}
+            </NavLink>
             <NavLink to="/info" className={navLinkClass}>
               {t.nav.info}
             </NavLink>
