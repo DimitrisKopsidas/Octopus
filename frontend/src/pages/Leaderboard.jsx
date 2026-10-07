@@ -73,10 +73,6 @@ function Leaderboard() {
     <div className="max-w-5xl mx-auto py-8 sm:py-10 px-4 sm:px-6 space-y-8 animate-fade-up">
       {/* Header */}
       <div className="text-center sm:text-left space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800 text-brand-600 dark:text-brand-400 text-xs font-semibold">
-          <Trophy className="w-3.5 h-3.5" />
-          <span>Leaderboard & Analytics</span>
-        </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
           {t.title}
         </h1>
