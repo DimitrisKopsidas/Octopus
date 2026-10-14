@@ -264,7 +264,7 @@ export default function AuditLogsViewer() {
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap font-semibold text-slate-900 dark:text-slate-100">
-                      @{log.actorUsername || 'system'}
+                      {log.actorUsername ? `@${log.actorUsername}` : 'N/A'}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'SUCCESS' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 text-rose-600'}`}>
@@ -364,7 +364,7 @@ export default function AuditLogsViewer() {
 
               <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-4">
                 <DetailField label={t.modal.fields.actor}>
-                  <span className="font-semibold">@{selectedLog.actorUsername || 'system'}</span>
+                  <span className="font-semibold">{selectedLog.actorUsername ? `@${selectedLog.actorUsername}` : 'N/A'}</span>
                   {selectedLog.actorId && (
                     <span className="block font-mono text-[10px] text-slate-400 dark:text-slate-500 break-all mt-0.5">
                       {selectedLog.actorId}
