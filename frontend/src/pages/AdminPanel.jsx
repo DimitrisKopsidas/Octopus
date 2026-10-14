@@ -161,7 +161,7 @@ export default function AdminPanel() {
                     {log.action}
                   </span>
                   <span className="font-semibold text-slate-900 dark:text-slate-100">
-                    @{log.actorUsername || 'system'}
+                    {log.actorUsername ? `@${log.actorUsername}` : 'N/A'}
                   </span>
                 </div>
 
