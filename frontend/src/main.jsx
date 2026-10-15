@@ -32,6 +32,7 @@ import Profile from './pages/Profile.jsx'
 import Settings from './pages/Settings.jsx'
 import Favorites from './pages/Favorites.jsx'
 import Quizzes from './pages/Quizzes.jsx'
+import Leaderboard from './pages/Leaderboard.jsx'
 import Info from './pages/Info.jsx'
 import NotFound from './pages/NotFound.jsx'
 
@@ -85,6 +86,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/quizzes" element={<Quizzes />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/info" element={<Info />} />
           <Route path="*" element={<NotFound />} />
         </Route>

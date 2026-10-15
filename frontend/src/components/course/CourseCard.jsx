@@ -1,6 +1,7 @@
 // Course card in the Courses grid matching custom design system. Used by Courses page.
 import { Link } from 'react-router-dom'
-import { Heart, CheckCircle2, BookOpen, History, Loader2 } from 'lucide-react'
+import { Heart, CheckCircle2, BookOpen, History } from 'lucide-react'
+import CourseToggleButton from './CourseToggleButton'
 import { useMe, useToggleFavoriteCourse, useTogglePassedCourse } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
 import { formatLastUpdated } from '../../lib/dates'
@@ -83,53 +84,25 @@ function CourseCard({
         )}
 
         {!disabled && (
-          <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
+          <div className="flex items-center gap-0.5 -mr-1.5 shrink-0">
+            <CourseToggleButton
+              icon={Heart}
+              tone="red"
+              active={isFavorite}
+              pending={isFavoriteLoading}
               onClick={handleFavoriteClick}
-              disabled={isFavoriteLoading}
-              title={isFavorite ? 'Αφαίρεση από τα αγαπημένα' : 'Προσθήκη στα αγαπημένα'}
-              aria-label={isFavorite ? 'Αφαίρεση από τα αγαπημένα' : 'Προσθήκη στα αγαπημένα'}
-              className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-150 border cursor-pointer disabled:cursor-wait ${
-                isFavorite
-                  ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60 text-rose-500 hover:scale-105'
-                  : 'bg-slate-100/80 dark:bg-slate-800/80 border-slate-200/60 dark:border-slate-700/60 text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:border-rose-300 dark:hover:border-rose-800 hover:scale-105'
-              }`}
-            >
-              {isFavoriteLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-rose-500" />
-              ) : (
-                <Heart
-                  className={`w-4 h-4 transition-all ${
-                    isFavorite ? 'fill-rose-500 text-rose-500' : ''
-                  }`}
-                />
-              )}
-            </button>
+              label={isFavorite ? 'Αφαίρεση από τα αγαπημένα' : 'Προσθήκη στα αγαπημένα'}
+            />
 
             {user && (
-              <button
-                type="button"
+              <CourseToggleButton
+                icon={CheckCircle2}
+                tone="brand"
+                active={isPassed}
+                pending={isPassedLoading}
                 onClick={handlePassedClick}
-                disabled={isPassedLoading}
-                title={isPassed ? 'Σήμανση ως μη περασμένο' : 'Σήμανση ως περασμένο'}
-                aria-label={isPassed ? 'Σήμανση ως μη περασμένο' : 'Σήμανση ως περασμένο'}
-                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-150 border cursor-pointer disabled:cursor-wait ${
-                  isPassed
-                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/60 text-emerald-500 hover:scale-105'
-                    : 'bg-slate-100/80 dark:bg-slate-800/80 border-slate-200/60 dark:border-slate-700/60 text-slate-400 dark:text-slate-500 hover:text-emerald-500 hover:border-emerald-300 dark:hover:border-emerald-800 hover:scale-105'
-                }`}
-              >
-                {isPassedLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
-                ) : (
-                  <CheckCircle2
-                    className={`w-4 h-4 transition-all ${
-                      isPassed ? 'text-emerald-500 fill-emerald-100 dark:fill-emerald-950' : ''
-                    }`}
-                  />
-                )}
-              </button>
+                label={isPassed ? 'Σήμανση ως μη περασμένο' : 'Σήμανση ως περασμένο'}
+              />
             )}
           </div>
         )}
