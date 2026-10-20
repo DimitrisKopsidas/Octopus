@@ -82,6 +82,7 @@ public class Question {
     }
 
     public void replaceAnswers(List<Answer> newAnswers) {
+        // Task 54 note, afteer DB update, answers should be soft deleted so user quiz history is kept.
         this.answers.clear(); // orphanRemoval deletes removed answers from DB
         newAnswers.forEach(this::addAnswer); // sets back-reference on each
     }
