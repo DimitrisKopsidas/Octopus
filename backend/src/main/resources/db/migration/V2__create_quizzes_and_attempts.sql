@@ -17,7 +17,9 @@ CREATE TABLE quiz_questions (
     quiz_id     bigint  NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
     question_id bigint  NOT NULL REFERENCES questions(id),
     position    integer NOT NULL,
-    PRIMARY KEY (quiz_id, position)
+    PRIMARY KEY (quiz_id, position),
+    -- deferred: shifting positions after removing a question briefly puts one question at two positions
+    CONSTRAINT uk_quiz_questions_quiz_question UNIQUE (quiz_id, question_id) DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE quiz_attempts (
@@ -41,7 +43,8 @@ CREATE TABLE attempt_questions (
     question_id bigint  NOT NULL REFERENCES questions(id),
     position    integer NOT NULL,
     is_correct  boolean,                            -- null until submitted
-    CONSTRAINT uk_attempt_questions_attempt_question UNIQUE (attempt_id, question_id)
+    CONSTRAINT uk_attempt_questions_attempt_question UNIQUE (attempt_id, question_id),
+    CONSTRAINT uk_attempt_questions_attempt_position UNIQUE (attempt_id, position)
 );
 CREATE SEQUENCE attempt_questions_seq START WITH 1 INCREMENT BY 50;
 CREATE INDEX idx_attempt_questions_question_id ON attempt_questions(question_id);
@@ -53,5 +56,5 @@ CREATE TABLE attempt_answers (
     PRIMARY KEY (attempt_question_id, answer_id)
 );
 
--- When a question is inactive, it's answers should also become inactive
+-- false = answer replaced by an edit; kept so attempt history still points at it
 ALTER TABLE answers ADD COLUMN is_active boolean NOT NULL DEFAULT true;
