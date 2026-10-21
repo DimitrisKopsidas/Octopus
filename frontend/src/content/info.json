@@ -43,7 +43,7 @@
   },
   "howToHelp": {
     "title": "Πώς να βοηθήσεις",
-    "subtitle": "Τρεις τρόποι για να συνεισφέρεις στο project.",
+    "subtitle": "Δύο τρόποι για να στηρίξεις το project.",
     "cards": [
       {
         "emoji": "☕",
@@ -61,14 +61,6 @@
         "cta": "Octopus Discord Κανάλι",
         "kind": "external",
         "target": "https://discord.gg/GV6nFxU96W"
-      },
-      {
-        "emoji": "🛠️",
-        "title": "Γινε μέλος της ομαδας",
-        "description": "Γίνε μέλος του development team και συνείσφερε σε ένα open-source project.",
-        "cta": "Github Repo",
-        "kind": "external",
-        "target": "https://github.com/DimitrisKopsidas/Octopus"
       }
     ]
   },
