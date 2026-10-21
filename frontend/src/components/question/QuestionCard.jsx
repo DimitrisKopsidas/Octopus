@@ -12,7 +12,7 @@ function QuestionCard({ index, question, onEdit, onDelete, deleting }) {
           {question.title}
         </h3>
         <div className="mt-2 flex items-center justify-between gap-3">
-          <QuestionAuthor name={question.createdByName} />
+          <QuestionAuthor name={question.createdByName} username={question.createdByUsername} />
           <div className="flex items-center gap-1">
             <button
               type="button"

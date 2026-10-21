@@ -1,24 +1,17 @@
-// Profile page. Route: /profile
+// Profile page. Route: /profile (own). Others live at /profile/:username (PublicProfile).
 import { Link, useNavigate } from 'react-router-dom'
-import {
-  AtSign,
-  GraduationCap,
-  Shield,
-  Calendar,
-  LogOut,
-  MessageSquare,
-} from 'lucide-react'
-import { useMe, useLogout } from '../hooks/queries'
-import { roleLabel, userInitial } from '../lib/roles'
+import { useMe, useLogout, usePublicProfile } from '../hooks/queries'
 import { toast } from '../store/toastStore'
-import Skeleton from '../components/ui/Skeleton'
-import { formatEnrollmentYear } from '../lib/years'
+import ErrorState from '../components/ui/ErrorState'
+import ProfileView, { ProfileViewSkeleton } from '../components/profile/ProfileView'
 import t from '../content/profile.json'
 
 function Profile() {
   const navigate = useNavigate()
   const { user, isLoading } = useMe()
   const logoutMutation = useLogout()
+  // Stats and badges come from the public profile of our own username.
+  const profileQuery = usePublicProfile(user?.username)
 
   async function handleLogout() {
     await logoutMutation.mutateAsync().catch(() => { })
@@ -27,36 +20,7 @@ function Profile() {
   }
 
   if (isLoading) {
-    return (
-      <div className="max-w-3xl mx-auto py-8 space-y-6 animate-pulse">
-        {/* Header Card Skeleton */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6">
-          <Skeleton className="w-20 h-20 rounded-2xl shrink-0" />
-          <div className="text-center md:text-left flex-1 space-y-2.5 w-full">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <Skeleton className="h-7 w-44 rounded-lg" />
-              <Skeleton className="h-6 w-20 rounded-full" />
-            </div>
-            <Skeleton className="h-4 w-48 rounded-md mx-auto md:mx-0" />
-          </div>
-          <div className="flex flex-col items-center md:items-end gap-2 shrink-0">
-            <Skeleton className="h-4 w-36 rounded-md" />
-            <Skeleton className="h-8 w-24 rounded-lg" />
-          </div>
-        </div>
-
-        {/* Account Info Card Skeleton */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm space-y-4">
-          <Skeleton className="h-6 w-44 rounded-lg" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Skeleton className="h-20 w-full rounded-2xl" />
-            <Skeleton className="h-20 w-full rounded-2xl" />
-            <Skeleton className="h-20 w-full rounded-2xl" />
-            <Skeleton className="h-20 w-full rounded-2xl" />
-          </div>
-        </div>
-      </div>
-    )
+    return <ProfileViewSkeleton />
   }
 
   if (!user) {
@@ -151,126 +115,37 @@ function Profile() {
     )
   }
 
-  const initial = userInitial(user)
-  const label = roleLabel(user)
+  if (profileQuery.isPending) {
+    return <ProfileViewSkeleton />
+  }
 
-  const formattedJoinedDate = user.created
-    ? new Date(user.created).toLocaleDateString('el-GR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      })
-    : '29 Αυγούστου 2026'
+  // If the stats fail to load, still show the account (logout, Settings) from
+  // /auth/me with zeroed stats, plus a retry banner.
+  const profile = profileQuery.data ?? {
+    username: user.username,
+    name: user.displayName || user.username,
+    role: user.role,
+    year: user.year,
+    memberSince: user.created,
+    og: false,
+    stats: {},
+  }
 
   return (
-    <div className="max-w-3xl mx-auto py-8 space-y-6">
-      {/* Header Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-6">
-        {/* Avatar */}
-        <div className="w-20 h-20 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border-2 border-teal-500/60 text-teal-600 dark:text-teal-400 text-3xl font-bold flex items-center justify-center shadow-lg shadow-teal-500/10 shrink-0">
-          {initial}
+    <>
+      {!profileQuery.data && (
+        <div className="max-w-4xl mx-auto pt-8">
+          <ErrorState variant="banner" message={profileQuery.error ?? t.public.loadError} onRetry={profileQuery.refetch} />
         </div>
-
-        {/* User Titles & Meta */}
-        <div className="text-center md:text-left flex-1 min-w-0 space-y-1.5">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 truncate">
-            {user.displayName || user.username}
-          </h1>
-
-          <div>
-            <span className="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
-              {label}
-            </span>
-          </div>
-        </div>
-
-        {/* Right Side: Joined Date & Logout */}
-        <div className="flex flex-col sm:flex-row md:flex-col items-center md:items-end gap-2 shrink-0">
-          <span className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            {t.accountInfo.labels.joined} {formattedJoinedDate}
-          </span>
-          <button
-            type="button"
-            onClick={handleLogout}
-            disabled={logoutMutation.isPending}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors disabled:opacity-50"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>{logoutMutation.isPending ? t.accountInfo.logoutPending : t.accountInfo.logoutButton}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Account Info Card (Exact 4 Cards Grid) */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-sm space-y-4">
-        <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
-          {t.accountInfo.title}
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          {/* Username */}
-          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-900/60 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
-              <AtSign className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
-                {t.accountInfo.labels.username}
-              </span>
-              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base font-mono block truncate">
-                @{user.username}
-              </span>
-            </div>
-          </div>
-
-          {/* Enrollment Year */}
-          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-              <GraduationCap className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
-                {t.accountInfo.labels.year}
-              </span>
-              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base block">
-                {formatEnrollmentYear(user.year) ?? t.accountInfo.notSet}
-              </span>
-            </div>
-          </div>
-
-          {/* Role */}
-          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-              <Shield className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
-                {t.accountInfo.labels.role}
-              </span>
-              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base block">
-                {label}
-              </span>
-            </div>
-          </div>
-
-          {/* Discord Handle */}
-          <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-slate-400 dark:text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">
-                {t.accountInfo.labels.discord}
-              </span>
-              <span className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base font-mono block truncate">
-                {user.discordName ? `@${user.discordName.replace(/^@/, '')}` : t.accountInfo.notSet}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      )}
+      <ProfileView
+        profile={profile}
+      isOwn
+      account={user}
+      onLogout={handleLogout}
+        logoutPending={logoutMutation.isPending}
+      />
+    </>
   )
 }
 

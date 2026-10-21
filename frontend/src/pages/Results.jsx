@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import { bundlesApi, questionsApi, extractErrorMessage } from '../lib/api'
+import { queryClient, qk } from '../lib/queryClient'
 import { isQuestionCorrect, flattenAnswerIds } from '../lib/scoring'
 import { toast } from '../store/toastStore'
 import BackButton from '../components/ui/BackButton'
@@ -56,6 +57,7 @@ function Results() {
       : null
     bundlesApi
       .create({ setNum: setIndex, answerIds, timeForCompletion })
+      .then(() => queryClient.invalidateQueries({ queryKey: qk.community.all })) // new quiz -> fresh profile stats/badges
       .catch((err) => console.warn('Bundle submit failed', err))
   }, [hasResults, answers, setIndex, startedAt, endedAt])
 

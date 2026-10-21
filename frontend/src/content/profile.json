@@ -40,6 +40,108 @@
     "logoutButton": "Αποσύνδεση",
     "logoutPending": "Αποσύνδεση…"
   },
+  "roles": {
+    "ADMIN": {
+      "nickname": "Kraken"
+    },
+    "HELPER": {
+      "nickname": "Πλοκάμι"
+    },
+    "STUDENT": {
+      "nickname": "Καλαμαράκι"
+    }
+  },
+  "badges": {
+    "title": "Επιτεύγματα",
+    "emptyOwn": "Δεν έχεις ξεκλειδώσει ακόμα επιτεύγματα. Λύσε το πρώτο σου κουίζ!",
+    "emptyOther": "Δεν έχει ξεκλειδώσει ακόμα επιτεύγματα.",
+    "categories": {
+      "quizzes": "Λύτης",
+      "creator": "Creator",
+      "challenges": "Προκλήσεις",
+      "special": "Special"
+    },
+    "items": {
+      "FOUNDER": {
+        "name": "Founder",
+        "description": "Ένας από τους δημιουργούς του Octopus."
+      },
+      "OG": {
+        "name": "OG",
+        "description": "Από τα πρώτα μέλη της κοινότητας."
+      },
+      "CREATOR": {
+        "tiers": [
+          "Creator I",
+          "Creator II",
+          "Creator III",
+          "Creator IV"
+        ],
+        "description": "Ερωτήσεις που έγραψε για την κοινότητα.",
+        "unit": "ερωτήσεις"
+      },
+      "QUIZZES": {
+        "tiers": [
+          "Λύτης I",
+          "Λύτης II",
+          "Λύτης III",
+          "Λύτης IV"
+        ],
+        "description": "Ολοκληρωμένα κουίζ.",
+        "unit": "κουίζ"
+      },
+      "PERFECT": {
+        "tiers": ["Τέλειο I", "Τέλειο II", "Τέλειο III", "Τέλειο IV"],
+        "description": "Κουίζ με όλες τις απαντήσεις σωστές.",
+        "unit": "τέλεια κουίζ"
+      },
+      "NIGHT_OWL": {
+        "tiers": ["Νυχτοπούλι I", "Νυχτοπούλι II", "Νυχτοπούλι III", "Νυχτοπούλι IV"],
+        "description": "Κουίζ που ολοκλήρωσες ανάμεσα στις 02:00 και 05:00.",
+        "unit": "νυχτερινά κουίζ"
+      }
+    }
+  },
+  "public": {
+    "memberSince": "Μέλος από {date}",
+    "cohort": "Φουρνιά {year}",
+    "stats": {
+      "quizzes": "Κουίζ",
+      "avgScore": "Μέση επιτυχία",
+      "courses": "Μαθήματα",
+      "questions": "Ερωτήσεις"
+    },
+    "viewProfile": "Δες προφίλ",
+    "viewOwnProfile": "Το προφίλ μου",
+    "previewTitle": "Προφίλ χρήστη",
+    "you": "Εσύ",
+    "notFound": {
+      "title": "Δεν βρέθηκε αυτός ο χρήστης",
+      "subtitle": "Ίσως άλλαξε όνομα χρήστη ή ο λογαριασμός δεν είναι πια ενεργός.",
+      "cta": "Πίσω στην κοινότητα"
+    },
+    "loadError": "Δεν ήταν δυνατή η φόρτωση του προφίλ."
+  },
+  "achievements": {
+    "menu": "Επιτεύγματα",
+    "seeAll": "Όλα τα achievements",
+    "title": "Τα επιτεύγματά μου",
+    "subtitle": "Λύσε κουίζ, γράψε ερωτήσεις, κυνήγα το τέλειο και τα ξενύχτια. Κάθε επίπεδο μετράει.",
+    "counter": "{count}/{total} ξεκλειδωμένα",
+    "tierTarget": "{target} {unit}",
+    "next": "Επόμενο: {name} · {current}/{target}",
+    "maxed": "Έφτασες στο ανώτερο επίπεδο!",
+    "earned": "Ξεκλειδωμένο",
+    "loggedOut": {
+      "title": "Τα επιτεύγματά σου σε περιμένουν!",
+      "subtitle": "Συνδέσου για να δεις ποια badges έχεις ξεκλειδώσει και πόσο απέχεις από τα επόμενα.",
+      "login": "Σύνδεση / Εγγραφή"
+    }
+  },
+  "own": {
+    "settingsLink": "Επεξεργασία στις Ρυθμίσεις",
+    "founderWave": "Γεια σου, Founder!"
+  },
   "shortcuts": {
     "title": "ΓΡΗΓΟΡΗ ΠΡΟΣΒΑΣΗ",
     "quizzes": {
