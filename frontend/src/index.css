@@ -127,8 +127,33 @@ html.dark *::-webkit-scrollbar-thumb:hover,
 }
 .animate-sweep { animation: sweep 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
 
+/* Light sweep across a placeholder (locked leaderboard bars and rows). */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer { animation: shimmer 2.2s ease-in-out infinite; }
+
+/* InkAvatar easter egg: each drop flies out to (--dx, --dy) and fades. */
+@keyframes inkSplat {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
+  70%  { opacity: 0.9; }
+  100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2); opacity: 0; }
+}
+.ink-drop { animation: inkSplat 1.1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Count-up numbers in the Community hero settle with a small pop. */
+@keyframes popIn {
+  0%   { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop { animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
+  .ink-drop,
+  .animate-pop,
+  .animate-shimmer,
   .animate-fade-up,
   .animate-float,
   .animate-fadeIn,

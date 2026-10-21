@@ -14,6 +14,8 @@ import {
 } from '../hooks/queries'
 import CourseSearchCombobox from '../components/leaderboard/CourseSearchCombobox'
 import LeaderboardTabContent from '../components/leaderboard/LeaderboardTabContent'
+import LeaderboardLocked from '../components/leaderboard/LeaderboardLocked'
+import { LEADERBOARD_ENABLED } from '../lib/features'
 import t from '../content/leaderboard.json'
 
 const TAB_ICONS = {
@@ -24,7 +26,12 @@ const TAB_ICONS = {
   helpers: Award,
 }
 
+// While locked, the board below never mounts, so none of its queries run.
 function Leaderboard() {
+  return LEADERBOARD_ENABLED ? <LeaderboardBoard /> : <LeaderboardLocked />
+}
+
+function LeaderboardBoard() {
   const [activeTab, setActiveTab] = useState('users')
   const [selectedCourseId, setSelectedCourseId] = useState('')
   const { data: courses } = useCourses()
