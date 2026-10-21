@@ -9,7 +9,7 @@
 //   the toast store keep working unchanged.
 import { useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi, setAccessToken } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi, leaderboardApi, setAccessToken } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -565,6 +565,50 @@ export function useUpdateCourseProgress() {
     },
   })
 }
+
+/* ---------------------------------------------------------------- leaderboard */
+
+export function useLeaderboardUsersAvg(fallbackError = 'Σφάλμα φόρτωσης κατάταξης χρηστών') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.usersAvg(),
+    queryFn: leaderboardApi.getUsersAvg,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
+export function useLeaderboardByCourse(courseId, fallbackError = 'Σφάλμα φόρτωσης κατάταξης μαθήματος') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.byCourse(courseId),
+    queryFn: () => leaderboardApi.getByCourse(courseId),
+    enabled: Boolean(courseId),
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
+export function useLeaderboardPopularCourses(fallbackError = 'Σφάλμα φόρτωσης δημοφιλών μαθημάτων') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.popularCourses(),
+    queryFn: leaderboardApi.getPopularCourses,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
+export function useLeaderboardCoursesAvg(fallbackError = 'Σφάλμα φόρτωσης βαθμολογίας μαθημάτων') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.coursesAvg(),
+    queryFn: leaderboardApi.getCoursesAvg,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
+export function useLeaderboardHelpersTotalQuestions(fallbackError = 'Σφάλμα φόρτωσης στατιστικών helpers') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.helpersTotalQuestions(),
+    queryFn: leaderboardApi.getHelpersTotalQuestions,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
 
 
 

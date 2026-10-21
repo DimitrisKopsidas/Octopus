@@ -38,54 +38,45 @@ html.dark body {
   background-color: var(--color-slate-950);
 }
 
-/* ── Scrollbar (matches page theme) ───────────────────────── */
-html {
+/* ── Scrollbar (universal, matches dark/light theme) ────────── */
+* {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-slate-300) var(--color-slate-50);
-}
-html.dark {
-  scrollbar-color: var(--color-slate-700) var(--color-slate-950);
+  scrollbar-color: #cbd5e1 #f8fafc;
 }
 
-.scrollbar-custom {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-slate-300) transparent;
-}
-.dark .scrollbar-custom {
-  scrollbar-color: var(--color-slate-700) transparent;
+html.dark,
+html.dark *,
+.dark,
+.dark * {
+  scrollbar-color: #334155 #020617;
 }
 
 /* WebKit/Blink (Chrome, Edge, Safari) */
-html::-webkit-scrollbar,
-.scrollbar-custom::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-html::-webkit-scrollbar-track {
-  background: var(--color-slate-50);
+*::-webkit-scrollbar-track {
+  background: #f8fafc;
 }
-html.dark::-webkit-scrollbar-track {
-  background: var(--color-slate-950);
+html.dark *::-webkit-scrollbar-track,
+.dark *::-webkit-scrollbar-track {
+  background: #020617;
 }
-.scrollbar-custom::-webkit-scrollbar-track {
-  background: transparent;
-}
-html::-webkit-scrollbar-thumb,
-.scrollbar-custom::-webkit-scrollbar-thumb {
-  background-color: var(--color-slate-300);
+*::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
   border-radius: 9999px;
 }
-html::-webkit-scrollbar-thumb:hover,
-.scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-brand-400);
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #0d9488;
 }
-html.dark::-webkit-scrollbar-thumb,
-.dark .scrollbar-custom::-webkit-scrollbar-thumb {
-  background-color: var(--color-slate-700);
+html.dark *::-webkit-scrollbar-thumb,
+.dark *::-webkit-scrollbar-thumb {
+  background-color: #334155;
 }
-html.dark::-webkit-scrollbar-thumb:hover,
-.dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-brand-500);
+html.dark *::-webkit-scrollbar-thumb:hover,
+.dark *::-webkit-scrollbar-thumb:hover {
+  background-color: #14b8a6;
 }
 
 @keyframes slideInRight {
