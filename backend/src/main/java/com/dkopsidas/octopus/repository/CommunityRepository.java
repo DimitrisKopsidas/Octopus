@@ -78,7 +78,7 @@ public interface CommunityRepository extends Repository<User, UUID> {
                     JOIN answers a ON a.id = ba.answer_id
                     JOIN questions q ON q.id = a.question_id
                  WHERE b.created_by = u.id) AS "courses",
-                u.id IN (SELECT id FROM users ORDER BY created, id LIMIT 50) AS "og"
+                u.id IN (SELECT id FROM users ORDER BY created, id LIMIT 30) AS "og"
             FROM users u
             WHERE u.id IN (:ids)
             """, nativeQuery = true)

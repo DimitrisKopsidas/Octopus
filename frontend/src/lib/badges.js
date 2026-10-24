@@ -1,6 +1,6 @@
 // Achievements: the one table of rules, plus icon, colour and Greek text.
 // Computed here from the stats the backend sends (PublicUserDto); only "og"
-// (first 50 users) comes from the database.
+// (first 30 users) comes from the database.
 import { Crown, Gem, PenLine, Waves, Target, Moon } from 'lucide-react'
 import t from '../content/profile.json'
 import { statsOf } from './profiles'
