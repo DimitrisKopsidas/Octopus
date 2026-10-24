@@ -12,6 +12,8 @@ public record QuestionResponseDto(
         List<AnswerResponseDto> answers,
         Long courseId,
         UUID createdById,
-        String createdByName
+        String createdByName,
+        // Links the attribution to /profile/:username; null when the author is unknown or inactive.
+        String createdByUsername
 ) {
 }

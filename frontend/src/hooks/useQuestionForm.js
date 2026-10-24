@@ -1,7 +1,8 @@
 // State + validation + submit for a question form. Used by QuestionForm.
 import { useState } from 'react'
 import { extractErrorMessage } from '../lib/api'
-import { useCreateQuestion, useUpdateQuestion } from './queries'
+import { useCreateQuestion, useUpdateQuestion, useMe } from './queries'
+import { fetchCurrentProfile, checkAchievementsAfter } from '../lib/achievementCelebration'
 
 export const MIN_ANSWERS = 3
 export const MAX_ANSWERS = 10
@@ -34,6 +35,7 @@ function initialCorrectSet(question) {
 // Keeps QuestionForm as pure composition.
 export function useQuestionForm({ courseId, initialQuestion, onCreated, onUpdated }) {
   const isEdit = Boolean(initialQuestion)
+  const { user: me } = useMe()
 
   const [questionType, setQuestionType] = useState(detectType(initialQuestion))
   const [title, setTitle] = useState(initialQuestion?.title || '')
@@ -165,6 +167,7 @@ export function useQuestionForm({ courseId, initialQuestion, onCreated, onUpdate
         })
         onUpdated?.()
       } else {
+        const prevProfile = await fetchCurrentProfile(me?.username)
         await createQuestion.mutateAsync({
           payload: {
             title: title.trim(),
@@ -175,6 +178,9 @@ export function useQuestionForm({ courseId, initialQuestion, onCreated, onUpdate
         })
         resetForNew()
         onCreated?.()
+        if (me?.username) {
+          await checkAchievementsAfter(me.username, prevProfile)
+        }
       }
     } catch (err) {
       setError(extractErrorMessage(err, 'Σφάλμα αποθήκευσης.'))

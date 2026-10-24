@@ -8,6 +8,8 @@ import UserMenu from './UserMenu'
 import ThemeToggle from './ThemeToggle'
 import Footer from './Footer'
 import ToastContainer from '../ui/Toast'
+import UserPreviewModal from '../user/UserPreviewModal'
+import AchievementCelebrationModal from '../user/AchievementCelebrationModal'
 import { useMe } from '../../hooks/queries'
 import t from '../../content/layout.json'
 
@@ -39,6 +41,12 @@ function Layout() {
             </NavLink>
             <NavLink to="/courses" className={navLinkClass}>
               {t.nav.courses}
+            </NavLink>
+            <NavLink to="/community" className={navLinkClass}>
+              {t.nav.community}
+            </NavLink>
+            <NavLink to="/leaderboard" className={navLinkClass}>
+              {t.nav.leaderboard}
             </NavLink>
             <NavLink to="/info" className={navLinkClass}>
               {t.nav.info}
@@ -85,6 +93,8 @@ function Layout() {
       <Footer />
 
       <ToastContainer />
+      <UserPreviewModal />
+      <AchievementCelebrationModal />
     </div>
   )
 }

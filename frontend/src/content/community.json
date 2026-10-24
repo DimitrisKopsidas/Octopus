@@ -1,0 +1,69 @@
+{
+  "title": "Η κοινότητα του Octopus",
+  "subtitle": "Γνώρισε τους φοιτητές, τους helpers και τους admins που κρατάνε το χταπόδι ζωντανό.",
+  "hero": {
+    "members": "Μέλη",
+    "quizzes": "Κουίζ που λύθηκαν",
+    "questions": "Ερωτήσεις που γράφτηκαν",
+    "roles": "{admins} Krakens · {helpers} Πλοκάμια · {students} Καλαμαράκια",
+    "ctaMe": "Πώς σε βλέπουν οι άλλοι",
+    "ctaAchievements": "Τα επιτεύγματά μου",
+    "ctaJoin": "Γίνε μέλος"
+  },
+  "activity": {
+    "title": "Ροή Δραστηριότητας & Επιτευγμάτων",
+    "subtitle": "Όλα τα πρόσφατα ξεκλειδώματα, rank-ups και ορόσημα των μελών σε πραγματικό χρόνο.",
+    "filterAll": "Όλα",
+    "filterRankups": "Rank-ups 🔥",
+    "filterUnlocks": "Νέα Badges 🏆",
+    "empty": "Δεν υπάρχει πρόσφατη δραστηριότητα ακόμα.",
+    "unlocked": "Ξεκλείδωσε το",
+    "rankedUp": "Ανέβηκε στο",
+    "joined": "Έγινε νέο μέλος στην κοινότητα!",
+    "justNow": "Μόλις τώρα",
+    "showMore": "Προβολή περισσότερων (+{count})",
+    "showLess": "Λιγότερα"
+  },
+  "crew": {
+    "title": "Το πλήρωμα",
+    "subtitle": "Οι admins και οι helpers που γράφουν ερωτήσεις και κρατάνε τα μαθήματα σε τάξη.",
+    "questions": "{count} ερωτήσεις",
+    "empty": "Το πλήρωμα ετοιμάζεται ακόμα.",
+    "questionsOne": "1 ερώτηση"
+  },
+  "creators": {
+    "title": "Creators",
+    "subtitle": "Όσοι έχουν γράψει ερωτήσεις για όλους μας.",
+    "count": "{count} ερωτήσεις",
+    "countOne": "1 ερώτηση"
+  },
+  "newcomers": {
+    "title": "Καλωσορίστε",
+    "subtitle": "Τα πιο πρόσφατα μέλη. Πείτε ένα γεια!"
+  },
+  "konami": {
+    "on": "🐙 Λειτουργία χταποδιού ενεργή!",
+    "off": "Τα χταπόδια γύρισαν στον βυθό."
+  },
+  "errorLoad": "Δεν ήταν δυνατή η φόρτωση της κοινότητας.",
+  "join": {
+    "title": "Θες να μπεις στο πλήρωμα;",
+    "subtitle": "Το Octopus είναι open-source και φτιάχνεται από φοιτητές για φοιτητές.",
+    "card": {
+      "emoji": "🛠️",
+      "title": "Γινε μέλος της ομαδας",
+      "description": "Γίνε μέλος του development team και συνείσφερε σε ένα open-source project.",
+      "cta": "Github Repo",
+      "kind": "external",
+      "target": "https://github.com/DimitrisKopsidas/Octopus"
+    }
+  },
+  "cardLabel": "Προβολή προφίλ: {name}",
+  "search": {
+    "label": "Αναζήτηση μέλους",
+    "placeholder": "Βρες κάποιον με όνομα ή username…",
+    "clear": "Καθαρισμός αναζήτησης",
+    "empty": "Το χταπόδι έψαξε παντού, αλλά δεν βρήκε κανέναν με αυτό το όνομα."
+  },
+  "memberQuizzes": "{count} κουίζ"
+}

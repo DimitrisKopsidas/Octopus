@@ -69,7 +69,7 @@ function ReviewCard({ index, question, chosenAnswerId }) {
         })}
       </ul>
 
-      <QuestionAuthor name={question.createdByName} className="px-5 pb-3" />
+      <QuestionAuthor name={question.createdByName} username={question.createdByUsername} className="px-5 pb-3" />
     </div>
   )
 }

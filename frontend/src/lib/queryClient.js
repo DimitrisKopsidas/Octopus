@@ -69,6 +69,23 @@ export const qk = {
     list: () => ['course-progress', 'list'],
     byCourse: (courseId) => ['course-progress', 'byCourse', String(courseId)],
   },
+  leaderboard: {
+    all: ['leaderboard'],
+    usersAvg: () => ['leaderboard', 'users', 'avg'],
+    byCourse: (courseId) => ['leaderboard', 'courses', String(courseId)],
+    popularCourses: () => ['leaderboard', 'courses', 'popular'],
+    coursesAvg: () => ['leaderboard', 'courses', 'avg'],
+    helpersTotalQuestions: () => ['leaderboard', 'helpers', 'total_questions'],
+  },
+  community: {
+    all: ['community'],
+    // Lowercased: usernames are unique case-insensitively, so /profile/Nikos and
+    // /profile/nikos share one cache entry.
+    profile: (username) => ['community', 'profile', String(username).toLowerCase()],
+    search: (params) => ['community', 'search', params],
+    summary: () => ['community', 'summary'],
+    activity: (params) => ['community', 'activity', params],
+  },
 }
 
 // Shared error mapper so every hook surfaces the same Greek message shape the

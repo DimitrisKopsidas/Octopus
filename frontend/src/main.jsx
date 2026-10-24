@@ -29,9 +29,13 @@ import UserManagementPage from './pages/UserManagementPage.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Profile from './pages/Profile.jsx'
+import PublicProfile from './pages/PublicProfile.jsx'
+import Community from './pages/Community.jsx'
+import Achievements from './pages/Achievements.jsx'
 import Settings from './pages/Settings.jsx'
 import Favorites from './pages/Favorites.jsx'
 import Quizzes from './pages/Quizzes.jsx'
+import Leaderboard from './pages/Leaderboard.jsx'
 import Info from './pages/Info.jsx'
 import NotFound from './pages/NotFound.jsx'
 
@@ -80,11 +84,15 @@ createRoot(document.getElementById('root')).render(
             element={<RequireRole allowedRoles={[ROLE.ADMIN]}><UserManagementPage /></RequireRole>}
           />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:username" element={<PublicProfile />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/achievements" element={<Achievements />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/quizzes" element={<Quizzes />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/info" element={<Info />} />
           <Route path="*" element={<NotFound />} />
         </Route>

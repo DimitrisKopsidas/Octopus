@@ -9,7 +9,9 @@ import {
   Sliders,
   Shield,
   LogOut,
+  Trophy,
 } from 'lucide-react'
+import profileText from '../../content/profile.json'
 import { useMe, useLogout } from '../../hooks/queries'
 import { ROLE, roleLabel, userInitial } from '../../lib/roles'
 import ThemeToggle from './ThemeToggle'
@@ -107,6 +109,18 @@ function UserMenu() {
               <span className="flex items-center gap-3">
                 <User className="w-4 h-4 text-slate-400" />
                 <span>Το προφίλ μου</span>
+              </span>
+            </Link>
+
+            <Link
+              to="/achievements"
+              onClick={() => setOpen(false)}
+              role="menuitem"
+              className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+            >
+              <span className="flex items-center gap-3">
+                <Trophy className="w-4 h-4 text-amber-500" />
+                <span>{profileText.achievements.menu}</span>
               </span>
             </Link>
 
