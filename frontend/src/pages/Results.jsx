@@ -3,8 +3,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTestStore } from '../store/testStore'
 import { bundlesApi, questionsApi, extractErrorMessage } from '../lib/api'
-import { queryClient, qk } from '../lib/queryClient'
+import { useMe } from '../hooks/queries'
 import { isQuestionCorrect, flattenAnswerIds } from '../lib/scoring'
+import { fetchCurrentProfile, checkAchievementsAfter } from '../lib/achievementCelebration'
 import { toast } from '../store/toastStore'
 import BackButton from '../components/ui/BackButton'
 import StatCard from '../components/ui/StatCard'
@@ -21,6 +22,7 @@ function formatDuration(ms) {
 function Results() {
   const { courseId } = useParams()
   const navigate = useNavigate()
+  const { user } = useMe()
 
   const questions = useTestStore((s) => s.questions)
   const sessionCourseId = useTestStore((s) => s.courseId)
@@ -55,11 +57,21 @@ function Results() {
     const timeForCompletion = endedAt && startedAt
       ? Math.round((endedAt - startedAt) / 1000)
       : null
-    bundlesApi
-      .create({ setNum: setIndex, answerIds, timeForCompletion })
-      .then(() => queryClient.invalidateQueries({ queryKey: qk.community.all })) // new quiz -> fresh profile stats/badges
-      .catch((err) => console.warn('Bundle submit failed', err))
-  }, [hasResults, answers, setIndex, startedAt, endedAt])
+
+    async function submitBundle() {
+      const prevProfile = await fetchCurrentProfile(user?.username)
+      try {
+        await bundlesApi.create({ setNum: setIndex, answerIds, timeForCompletion })
+        if (user?.username) {
+          await checkAchievementsAfter(user.username, prevProfile)
+        }
+      } catch (err) {
+        console.warn('Bundle submit failed', err)
+      }
+    }
+
+    submitBundle()
+  }, [hasResults, answers, setIndex, startedAt, endedAt, user?.username])
 
   const { correctCount, total, durationMs } = useMemo(() => {
     let correct = 0

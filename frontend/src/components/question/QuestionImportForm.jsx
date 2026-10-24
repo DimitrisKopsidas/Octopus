@@ -8,7 +8,8 @@ import {
   AlertTriangle,
   RotateCcw,
 } from 'lucide-react'
-import { useImportQuestions } from '../../hooks/queries'
+import { useImportQuestions, useMe } from '../../hooks/queries'
+import { fetchCurrentProfile, checkAchievementsAfter } from '../../lib/achievementCelebration'
 import { extractErrorMessage } from '../../lib/api'
 import { toast } from '../../store/toastStore'
 import t from '../../content/adminCourse.json'
@@ -57,6 +58,7 @@ function parseQuestions(raw) {
 }
 
 function QuestionImportForm({ courseId, onImported, onCancel }) {
+  const { user: me } = useMe()
   const [raw, setRaw] = useState('')
   const [fileName, setFileName] = useState('')
   const [error, setError] = useState(null)
@@ -93,6 +95,7 @@ function QuestionImportForm({ courseId, onImported, onCancel }) {
 
     setError(null)
     setPhase('loading')
+    const prevProfile = await fetchCurrentProfile(me?.username)
 
     // Racing the request against a fixed floor is simpler than measuring
     // elapsed time, and allSettled keeps the floor on the failure path too.
@@ -104,6 +107,9 @@ function QuestionImportForm({ courseId, onImported, onCancel }) {
     if (outcome.status === 'fulfilled') {
       setResult(outcome.value)
       setPhase('done')
+      if (me?.username) {
+        checkAchievementsAfter(me.username, prevProfile)
+      }
       return
     }
 

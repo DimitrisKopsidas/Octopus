@@ -149,6 +149,33 @@ html.dark *::-webkit-scrollbar-thumb:hover,
 }
 .animate-pop { animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
+/* Achievement Celebration & LoL Rank-up animations */
+@keyframes rankSlam {
+  0%   { transform: scale(2.5); opacity: 0; filter: brightness(2.2) blur(3px); }
+  55%  { transform: scale(0.92); opacity: 1; filter: brightness(1.3); }
+  75%  { transform: scale(1.06); filter: brightness(1.1); }
+  100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
+.animate-rank-slam { animation: rankSlam 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes shockwave {
+  0%   { transform: scale(0.4); opacity: 0.9; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+.animate-shockwave { animation: shockwave 0.8s ease-out forwards; }
+
+@keyframes raySpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-ray-spin { animation: raySpin 14s linear infinite; }
+
+@keyframes goldGlow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.35)); }
+  50%      { filter: drop-shadow(0 0 26px rgba(245, 158, 11, 0.8)); }
+}
+.animate-gold-glow { animation: goldGlow 2.4s ease-in-out infinite; }
+
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   .ink-drop,
@@ -159,7 +186,11 @@ html.dark *::-webkit-scrollbar-thumb:hover,
   .animate-fadeIn,
   .animate-slideInRight,
   .animate-sweep,
-  .animate-reveal {
+  .animate-reveal,
+  .animate-rank-slam,
+  .animate-shockwave,
+  .animate-ray-spin,
+  .animate-gold-glow {
     animation: none !important;
   }
 }

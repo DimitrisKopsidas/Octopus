@@ -9,6 +9,7 @@ import ThemeToggle from './ThemeToggle'
 import Footer from './Footer'
 import ToastContainer from '../ui/Toast'
 import UserPreviewModal from '../user/UserPreviewModal'
+import AchievementCelebrationModal from '../user/AchievementCelebrationModal'
 import { useMe } from '../../hooks/queries'
 import t from '../../content/layout.json'
 
@@ -93,6 +94,7 @@ function Layout() {
 
       <ToastContainer />
       <UserPreviewModal />
+      <AchievementCelebrationModal />
     </div>
   )
 }

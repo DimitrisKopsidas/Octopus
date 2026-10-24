@@ -5,7 +5,7 @@ import { Crown, Gem, PenLine, Waves, Target, Moon } from 'lucide-react'
 import t from '../content/profile.json'
 import { statsOf } from './profiles'
 
-const FOUNDERS = ['corporal1984', 'rets5820']
+const FOUNDERS = ['dimitriskopsidas', 'retsos']
 const CREATOR_TIERS = [25, 50, 100, 300]
 const QUIZ_TIERS = [25, 50, 100, 300]
 const PERFECT_TIERS = [25, 50, 100, 300]
