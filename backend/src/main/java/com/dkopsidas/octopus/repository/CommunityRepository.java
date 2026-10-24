@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -69,7 +70,7 @@ public interface CommunityRepository extends Repository<User, UUID> {
             SELECT u.id AS "userId",
                 (SELECT COUNT(*) FROM b WHERE b.created_by = u.id) AS "quizzes",
                 (SELECT AVG(b.score * 100.0 / NULLIF(b.answered, 0)) FROM b WHERE b.created_by = u.id)::double precision AS "avgScore",
-                (SELECT COUNT(*) FROM b WHERE b.created_by = u.id AND b.answered >= 5 AND b.score >= b.answered) AS "perfect",
+                (SELECT COUNT(*) FROM b WHERE b.created_by = u.id AND b.answered >= 1 AND b.score >= b.answered) AS "perfect",
                 (SELECT COUNT(*) FROM b WHERE b.created_by = u.id
                     AND EXTRACT(HOUR FROM b.created AT TIME ZONE 'Europe/Athens') BETWEEN 2 AND 4) AS "nightOwl",
                 (SELECT COUNT(*) FROM questions q WHERE q.created_by = u.id AND q.is_active = true) AS "questions",
@@ -102,4 +103,87 @@ public interface CommunityRepository extends Repository<User, UUID> {
             WHERE u.active = true
             """, nativeQuery = true)
     SummaryRow getSummary();
+
+    interface ActivityRow {
+        String getId();
+        String getType();
+        String getUsername();
+        String getDisplayName();
+        String getRole();
+        String getBadgeCode();
+        Integer getTier();
+        String getTitle();
+        Instant getTimestamp();
+    }
+
+    @Query(value = """
+            SELECT * FROM (
+                (
+                    SELECT 
+                        'bundle-' || b.id::text AS "id",
+                        CASE 
+                            WHEN b.score >= COUNT(ba.answer_id) AND COUNT(ba.answer_id) >= 1 THEN 'PERFECT_QUIZ'
+                            ELSE 'QUIZ_COMPLETED'
+                        END AS "type",
+                        u.username AS "username",
+                        u.display_name AS "displayName",
+                        u.role::text AS "role",
+                        CASE 
+                            WHEN b.score >= COUNT(ba.answer_id) AND COUNT(ba.answer_id) >= 1 THEN 'PERFECT'
+                            ELSE 'QUIZZES'
+                        END AS "badgeCode",
+                        (SELECT COUNT(*) FROM bundles b2 WHERE b2.created_by = u.id AND b2.created <= b.created)::int AS "tier",
+                        CASE 
+                            WHEN b.score >= COUNT(ba.answer_id) AND COUNT(ba.answer_id) >= 1 THEN '100% Επιτυχία!'
+                            ELSE 'Ολοκληρωμένο Quiz'
+                        END AS "title",
+                        b.created AS "timestamp"
+                    FROM bundles b
+                    JOIN users u ON u.id = b.created_by
+                    LEFT JOIN bundle_answers ba ON ba.bundle_id = b.id
+                    WHERE u.active = true
+                    GROUP BY b.id, b.score, b.created, u.id, u.username, u.display_name, u.role
+                    ORDER BY b.created DESC
+                    LIMIT :limit
+                )
+                UNION ALL
+                (
+                    SELECT 
+                        'q-' || q.id::text AS "id",
+                        'QUESTION_CREATED' AS "type",
+                        u.username AS "username",
+                        u.display_name AS "displayName",
+                        u.role::text AS "role",
+                        'CREATOR' AS "badgeCode",
+                        (SELECT COUNT(*) FROM questions q2 WHERE q2.created_by = u.id AND q2.created <= q.created AND q2.is_active = true)::int AS "tier",
+                        q.title AS "title",
+                        q.created AS "timestamp"
+                    FROM questions q
+                    JOIN users u ON u.id = q.created_by
+                    WHERE q.is_active = true AND u.active = true
+                    ORDER BY q.created DESC
+                    LIMIT :limit
+                )
+                UNION ALL
+                (
+                    SELECT 
+                        'join-' || u.id::text AS "id",
+                        'MEMBER_JOINED' AS "type",
+                        u.username AS "username",
+                        u.display_name AS "displayName",
+                        u.role::text AS "role",
+                        CASE WHEN u.id IN (SELECT id FROM users ORDER BY created, id LIMIT 30) THEN 'OG' ELSE NULL END AS "badgeCode",
+                        1 AS "tier",
+                        'Νέο μέλος' AS "title",
+                        u.created AS "timestamp"
+                    FROM users u
+                    WHERE u.active = true
+                    ORDER BY u.created DESC
+                    LIMIT :limit
+                )
+            ) activity
+            ORDER BY "timestamp" DESC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<ActivityRow> findRecentActivity(@Param("limit") int limit);
 }

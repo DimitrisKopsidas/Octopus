@@ -1,5 +1,6 @@
 package com.dkopsidas.octopus.controller;
 
+import com.dkopsidas.octopus.domain.dto.CommunityActivityDto;
 import com.dkopsidas.octopus.domain.dto.PublicUserDto;
 import com.dkopsidas.octopus.service.CommunityService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /** Public (permitAll) profiles and member directory. */
 @RequiredArgsConstructor
@@ -35,6 +38,13 @@ public class CommunityController {
     @GetMapping("/summary")
     public ResponseEntity<PublicUserDto.Summary> getSummary() {
         return ResponseEntity.ok(communityService.getSummary());
+    }
+
+    @GetMapping("/activity")
+    public ResponseEntity<List<CommunityActivityDto>> getRecentActivity(
+            @RequestParam(defaultValue = "20") int limit
+    ) {
+        return ResponseEntity.ok(communityService.getRecentActivity(limit));
     }
 
     /** 404 when there is no active user with this username. */

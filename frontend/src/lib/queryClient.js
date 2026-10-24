@@ -84,6 +84,7 @@ export const qk = {
     profile: (username) => ['community', 'profile', String(username).toLowerCase()],
     search: (params) => ['community', 'search', params],
     summary: () => ['community', 'summary'],
+    activity: (params) => ['community', 'activity', params],
   },
 }
 

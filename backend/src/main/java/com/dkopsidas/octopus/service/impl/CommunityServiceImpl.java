@@ -1,6 +1,8 @@
 package com.dkopsidas.octopus.service.impl;
 
+import com.dkopsidas.octopus.domain.dto.CommunityActivityDto;
 import com.dkopsidas.octopus.domain.dto.PublicUserDto;
+import com.dkopsidas.octopus.domain.entity.UserRole;
 import com.dkopsidas.octopus.domain.entity.DisplayPreference;
 import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.repository.CommunityRepository;
@@ -64,6 +66,25 @@ public class CommunityServiceImpl implements CommunityService {
                 row.getAdmins(), row.getHelpers(), row.getStudents(),
                 row.getQuizzes(), row.getQuestions()
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CommunityActivityDto> getRecentActivity(int limit) {
+        int cappedLimit = Math.clamp(limit > 0 ? limit : 20, 1, 50);
+        return communityRepository.findRecentActivity(cappedLimit).stream()
+                .map(row -> new CommunityActivityDto(
+                        row.getId(),
+                        row.getType(),
+                        row.getUsername(),
+                        row.getDisplayName(),
+                        UserRole.valueOf(row.getRole()),
+                        row.getBadgeCode(),
+                        row.getTier(),
+                        row.getTitle(),
+                        row.getTimestamp()
+                ))
+                .toList();
     }
 
     private static PublicUserDto toDto(User user, CommunityRepository.StatsRow s) {

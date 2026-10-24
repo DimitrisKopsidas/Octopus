@@ -238,6 +238,7 @@ export const communityApi = {
   getProfile: (username) => unwrap(http.get(`/community/users/${encodeURIComponent(username)}`)),
   search: (params) => unwrap(http.get('/community', { params })),
   summary: () => unwrap(http.get('/community/summary')),
+  activity: (params) => unwrap(http.get('/community/activity', { params })),
 }
 
 export default { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi, leaderboardApi, communityApi }

@@ -660,8 +660,11 @@ export function useCommunitySummary(fallbackError = 'Σφάλμα φόρτωση
   return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
 }
 
-
-
-
-
-
+export function useCommunityActivity(limit = 20, fallbackError = 'Σφάλμα φόρτωσης δραστηριότητας') {
+  const q = useQuery({
+    queryKey: qk.community.activity({ limit }),
+    queryFn: () => communityApi.activity({ limit }),
+    staleTime: 60 * 1000,
+  })
+  return { ...q, activities: q.data ?? [], error: q.error ? toMessage(q.error, fallbackError) : null }
+}
