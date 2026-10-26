@@ -49,7 +49,7 @@ function StudyQuestionCard({ number, question }) {
           })}
         </ul>
 
-        <QuestionAuthor name={question.createdByName} className="mt-3" />
+        <QuestionAuthor name={question.createdByName} username={question.createdByUsername} className="mt-3" />
       </div>
     </li>
   )

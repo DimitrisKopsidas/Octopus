@@ -71,12 +71,14 @@ public class User {
 
     /**
      * The name every public surface should print -- profile, user menu, question
-     * attribution, leaderboard. If the user provided a Discord handle, it is
-     * displayed in parentheses next to their display name.
+     * attribution, leaderboard. Respects the user's display preference. If the user
+     * chose DISCORD_NAME and provided a Discord handle, it is displayed in
+     * parentheses next to their display name.
      * Deliberately not a getter: Jackson must not pick it up as a bean property.
      */
     public String publicName() {
-        if (discordName != null && !discordName.isBlank()) {
+        if (DisplayPreference.orDefault(displayPreference) == DisplayPreference.DISCORD_NAME
+                && discordName != null && !discordName.isBlank()) {
             String cleanDiscord = discordName.trim();
             if (!cleanDiscord.startsWith("@")) {
                 cleanDiscord = "@" + cleanDiscord;

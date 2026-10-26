@@ -9,7 +9,7 @@
 //   the toast store keep working unchanged.
 import { useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi, setAccessToken } from '../lib/api'
+import { coursesApi, questionsApi, bundlesApi, authApi, auditApi, crashApi, inviteCodesApi, usersApi, courseProgressApi, leaderboardApi, communityApi, setAccessToken } from '../lib/api'
 import { qk, toMessage } from '../lib/queryClient'
 
 /* ------------------------------------------------------------------ courses */
@@ -238,6 +238,8 @@ export function useUpdateMe() {
     mutationFn: (payload) => authApi.updateMe(payload),
     onSuccess: (updatedUser) => {
       qc.setQueryData(qk.auth.me(), updatedUser)
+      // Name and Discord show on public profiles and Community cards too.
+      qc.invalidateQueries({ queryKey: qk.community.all })
     },
   })
 }
@@ -566,7 +568,103 @@ export function useUpdateCourseProgress() {
   })
 }
 
+/* ---------------------------------------------------------------- leaderboard */
 
+export function useLeaderboardUsersAvg(fallbackError = 'Σφάλμα φόρτωσης κατάταξης χρηστών') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.usersAvg(),
+    queryFn: leaderboardApi.getUsersAvg,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
 
+export function useLeaderboardByCourse(courseId, fallbackError = 'Σφάλμα φόρτωσης κατάταξης μαθήματος') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.byCourse(courseId),
+    queryFn: () => leaderboardApi.getByCourse(courseId),
+    enabled: Boolean(courseId),
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
 
+export function useLeaderboardPopularCourses(fallbackError = 'Σφάλμα φόρτωσης δημοφιλών μαθημάτων') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.popularCourses(),
+    queryFn: leaderboardApi.getPopularCourses,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
 
+export function useLeaderboardCoursesAvg(fallbackError = 'Σφάλμα φόρτωσης βαθμολογίας μαθημάτων') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.coursesAvg(),
+    queryFn: leaderboardApi.getCoursesAvg,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
+export function useLeaderboardHelpersTotalQuestions(fallbackError = 'Σφάλμα φόρτωσης στατιστικών helpers') {
+  const q = useQuery({
+    queryKey: qk.leaderboard.helpersTotalQuestions(),
+    queryFn: leaderboardApi.getHelpersTotalQuestions,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
+/* ---------------------------------------------------------------- community */
+
+const isNotFound = (err) => err?.response?.status === 404
+
+// Public profile by username. One cache entry per user (app default staleTime,
+// 5 min), shared by the preview modal, /profile/:username, /profile and
+// /achievements, so moving between them doesn't refetch. `notFound` is split out of `error` so the page can
+// show "no such user" instead of a retry card; a 404 is never retried.
+export function usePublicProfile(username, fallbackError = 'Σφάλμα φόρτωσης προφίλ') {
+  const q = useQuery({
+    queryKey: qk.community.profile(username),
+    queryFn: () => communityApi.getProfile(username),
+    enabled: Boolean(username),
+    retry: (count, err) => !isNotFound(err) && count < 1,
+  })
+  const notFound = isNotFound(q.error)
+  return {
+    ...q,
+    notFound,
+    error: q.error && !notFound ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+// One page of the Community directory. Keeps the previous page on screen while
+// the next loads, so typing in the search box doesn't flash skeletons.
+export function useCommunityMembers(params, { enabled = true } = {}, fallbackError = 'Σφάλμα φόρτωσης κοινότητας') {
+  const q = useQuery({
+    queryKey: qk.community.search(params),
+    queryFn: () => communityApi.search(params),
+    placeholderData: (prev) => prev,
+    enabled,
+  })
+  return {
+    ...q,
+    members: q.data?.content ?? [],
+    totalPages: q.data?.totalPages ?? 0,
+    totalElements: q.data?.totalElements ?? 0,
+    error: q.error ? toMessage(q.error, fallbackError) : null,
+  }
+}
+
+export function useCommunitySummary(fallbackError = 'Σφάλμα φόρτωσης στατιστικών') {
+  const q = useQuery({
+    queryKey: qk.community.summary(),
+    queryFn: communityApi.summary,
+  })
+  return { ...q, error: q.error ? toMessage(q.error, fallbackError) : null }
+}
+
+export function useCommunityActivity(limit = 20, fallbackError = 'Σφάλμα φόρτωσης δραστηριότητας') {
+  const q = useQuery({
+    queryKey: qk.community.activity({ limit }),
+    queryFn: () => communityApi.activity({ limit }),
+    staleTime: 60 * 1000,
+  })
+  return { ...q, activities: q.data ?? [], error: q.error ? toMessage(q.error, fallbackError) : null }
+}

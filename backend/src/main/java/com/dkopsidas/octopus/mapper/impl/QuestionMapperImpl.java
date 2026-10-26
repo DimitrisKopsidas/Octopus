@@ -90,7 +90,8 @@ public class QuestionMapperImpl implements QuestionMapper {
                 answers,
                 question.getCourse().getId(),
                 creator != null ? creator.getId() : null,
-                creator != null ? creator.publicName() : null
+                creator != null ? creator.publicName() : null,
+                creator != null && creator.isActive() ? creator.getUsername() : null
         );
     }
 
