@@ -5,7 +5,16 @@ import { Crown, Gem, PenLine, Waves, Target, Moon } from 'lucide-react'
 import t from '../content/profile.json'
 import { statsOf } from './profiles'
 
-const FOUNDERS = ['dimitriskopsidas', 'retsos']
+const FOUNDERS = ['dimitriskopsidas', 'corporal1984', 'retsos', 'rets5820', 'rets']
+
+function isFounder(user) {
+  if (!user) return false
+  const candidates = [user.username, user.name, user.discordName]
+    .filter(Boolean)
+    .map((c) => c.toLowerCase().replace(/^@/, ''))
+  return candidates.some((c) => FOUNDERS.includes(c))
+}
+
 const CREATOR_TIERS = [25, 50, 100, 300]
 const QUIZ_TIERS = [25, 50, 100, 300]
 const PERFECT_TIERS = [25, 50, 100, 300]
@@ -13,6 +22,26 @@ const NIGHT_OWL_TIERS = [10, 30, 100, 200]
 
 /** Thresholds of the tiered badges, for the tier ladders on /achievements. */
 export const TIER_THRESHOLDS = { CREATOR: CREATOR_TIERS, QUIZZES: QUIZ_TIERS, PERFECT: PERFECT_TIERS, NIGHT_OWL: NIGHT_OWL_TIERS }
+
+/**
+ * Given a badgeCode and the cumulative count reached at the time of an event,
+ * returns { isMilestone: true, tier: 1..4, isRankUp: boolean } if this count was
+ * an exact milestone crossing, or { isMilestone: false } if it was a normal activity.
+ */
+export function checkMilestone(badgeCode, count) {
+  const tiers = TIER_THRESHOLDS[badgeCode]
+  if (!tiers || count == null || count < 1) return { isMilestone: false }
+
+  const tierIndex = tiers.indexOf(count)
+  if (tierIndex === -1) return { isMilestone: false }
+
+  const tier = tierIndex + 1
+  return {
+    isMilestone: true,
+    tier,
+    isRankUp: tier > 1,
+  }
+}
 
 function single(code, earned) {
   return { code, tier: earned ? 1 : 0, maxTier: 1, earned, progress: null, nextTarget: null }
@@ -28,7 +57,7 @@ export function computeBadges(user) {
   if (!user) return []
   const stats = statsOf(user)
   return [
-    single('FOUNDER', FOUNDERS.includes(user.username?.toLowerCase())),
+    single('FOUNDER', isFounder(user)),
     single('OG', Boolean(user.og)),
     tiered('CREATOR', CREATOR_TIERS, stats.questionsCreated),
     tiered('QUIZZES', QUIZ_TIERS, stats.quizzesCompleted),

@@ -1,6 +1,7 @@
-import { Trophy } from 'lucide-react'
-import { computeBadges, badgeView } from './badges'
+import { Trophy, Waves, Target, PenLine, UserPlus } from 'lucide-react'
+import { computeBadges, badgeView, checkMilestone } from './badges'
 import { joinedAgo } from './profiles'
+import t from '../content/community.json'
 
 /** "πριν από 5 λεπτά", "πριν από 2 ώρες", etc. Greek relative time for activity feed. */
 export function timeAgo(timestamp) {
@@ -27,14 +28,88 @@ export function formatBackendActivities(items = []) {
   if (!items || items.length === 0) return []
 
   return items.map((item) => {
-    const safeTier = Math.min(Math.max(item.tier || 1, 1), 4)
-    const view = badgeView({ code: item.badgeCode, tier: safeTier, earned: true })
-    const isRankUp = (item.tier || 1) > 1 || item.type === 'rankup'
-    const badgeName = view?.name || item.title || item.badgeCode
+    // 1. OG Milestone
+    if (item.badgeCode === 'OG') {
+      const view = badgeView({ code: 'OG', tier: 1, earned: true })
+      return {
+        id: item.id,
+        type: 'unlock',
+        user: {
+          username: item.username,
+          name: item.displayName || item.username,
+          role: item.role,
+        },
+        badge: {
+          code: 'OG',
+          name: view?.name || 'OG',
+          tier: 1,
+          Icon: view?.Icon || Trophy,
+          tone: view?.tone,
+        },
+        timeText: timeAgo(item.timestamp),
+        priority: 4,
+        timestamp: new Date(item.timestamp).getTime(),
+      }
+    }
+
+    // 2. Member Joined without OG
+    if (item.type === 'MEMBER_JOINED') {
+      return {
+        id: item.id,
+        type: 'join',
+        user: {
+          username: item.username,
+          name: item.displayName || item.username,
+          role: item.role,
+        },
+        badge: {
+          name: t.activity.joined,
+          Icon: UserPlus,
+          tone: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800',
+        },
+        timeText: timeAgo(item.timestamp),
+        priority: 1,
+        timestamp: new Date(item.timestamp).getTime(),
+      }
+    }
+
+    // 3. Tiered Badges: Check if this event was an actual milestone crossing
+    const milestone = checkMilestone(item.badgeCode, item.tier)
+
+    if (milestone.isMilestone) {
+      const view = badgeView({ code: item.badgeCode, tier: milestone.tier, earned: true })
+      const isRankUp = milestone.isRankUp
+      const type = isRankUp ? 'rankup' : 'unlock'
+
+      return {
+        id: item.id,
+        type,
+        user: {
+          username: item.username,
+          name: item.displayName || item.username,
+          role: item.role,
+        },
+        badge: {
+          code: item.badgeCode,
+          name: view?.name || item.badgeCode,
+          tier: milestone.tier,
+          Icon: view?.Icon || Trophy,
+          tone: view?.tone,
+        },
+        detailTitle: item.title,
+        timeText: timeAgo(item.timestamp),
+        priority: isRankUp ? 3 : 2,
+        timestamp: new Date(item.timestamp).getTime(),
+      }
+    }
+
+    // 4. Regular Activity (e.g. normal quiz completion, new question creation)
+    const isPerfect = item.type === 'PERFECT_QUIZ'
+    const isQuestion = item.type === 'QUESTION_CREATED'
 
     return {
       id: item.id,
-      type: isRankUp ? 'rankup' : 'unlock',
+      type: 'activity',
       user: {
         username: item.username,
         name: item.displayName || item.username,
@@ -42,14 +117,21 @@ export function formatBackendActivities(items = []) {
       },
       badge: {
         code: item.badgeCode,
-        name: badgeName,
-        tier: safeTier,
-        Icon: view?.Icon || Trophy,
-        tone: view?.tone,
+        name: isQuestion
+          ? `Νέα ερώτηση: ${item.title}`
+          : isPerfect
+            ? '100% Επιτυχία σε Quiz'
+            : 'Ολοκληρωμένο Quiz',
+        Icon: isQuestion ? PenLine : isPerfect ? Target : Waves,
+        tone: isQuestion
+          ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800'
+          : isPerfect
+            ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800'
+            : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700',
       },
       detailTitle: item.title,
       timeText: timeAgo(item.timestamp),
-      priority: isRankUp ? 3 : item.badgeCode === 'OG' ? 4 : 2,
+      priority: 1,
       timestamp: new Date(item.timestamp).getTime(),
     }
   })

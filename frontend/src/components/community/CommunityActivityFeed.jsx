@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
-import { Flame, Trophy, Sparkles, Zap, ChevronDown, ChevronUp, Activity } from 'lucide-react'
+import { Trophy, Sparkles, Zap, ChevronDown, ChevronUp, Activity } from 'lucide-react'
 import UserAvatar from '../user/UserAvatar'
-import UserLink from '../user/UserLink'
 import RoleBadge from '../user/RoleBadge'
 import { openUserPreview } from '../../store/userPreviewStore'
 import t from '../../content/community.json'
@@ -116,7 +115,6 @@ export default function CommunityActivityFeed({ events = [], isLoading = false }
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {displayEvents.map((event) => {
             const BadgeIcon = event.badge?.Icon || Trophy
-            const isRankUp = event.type === 'rankup'
 
             return (
               <div
@@ -142,20 +140,37 @@ export default function CommunityActivityFeed({ events = [], isLoading = false }
                     </div>
 
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
-                      {isRankUp ? (
+                      {event.type === 'rankup' ? (
                         <>
                           <Zap className="w-3 h-3 text-amber-500 fill-amber-500 inline shrink-0" />
                           <span>{t.activity.rankedUp}</span>
+                          <strong className="font-bold text-amber-600 dark:text-amber-400">
+                            {event.badge?.name}
+                          </strong>
                         </>
-                      ) : (
+                      ) : event.type === 'unlock' ? (
                         <>
                           <Sparkles className="w-3 h-3 text-teal-500 inline shrink-0" />
                           <span>{t.activity.unlocked}</span>
+                          <strong className="font-bold text-teal-600 dark:text-teal-400">
+                            {event.badge?.name}
+                          </strong>
+                        </>
+                      ) : event.type === 'join' ? (
+                        <>
+                          <Sparkles className="w-3 h-3 text-indigo-500 inline shrink-0" />
+                          <span className="font-medium text-slate-600 dark:text-slate-300">
+                            {event.badge?.name}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <Activity className="w-3 h-3 text-slate-400 inline shrink-0" />
+                          <span className="font-medium text-slate-700 dark:text-slate-200 truncate max-w-[220px]">
+                            {event.badge?.name}
+                          </span>
                         </>
                       )}
-                      <strong className={`font-bold ${isRankUp ? 'text-amber-600 dark:text-amber-400' : 'text-teal-600 dark:text-teal-400'}`}>
-                        {event.badge?.name}
-                      </strong>
                     </p>
                   </div>
                 </div>
