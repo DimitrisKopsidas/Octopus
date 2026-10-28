@@ -5,14 +5,17 @@ import { Crown, Gem, PenLine, Waves, Target, Moon } from 'lucide-react'
 import t from '../content/profile.json'
 import { statsOf } from './profiles'
 
-const FOUNDERS = ['dimitriskopsidas', 'corporal1984', 'retsos', 'rets5820', 'rets']
+const FOUNDERS = ['dimitriskopsidas','rets']
 
+// Μόνο με το username: το όνομα και το discord τα αλλάζει ο καθένας από τις ρυθμίσεις.
 function isFounder(user) {
-  if (!user) return false
-  const candidates = [user.username, user.name, user.discordName]
-    .filter(Boolean)
-    .map((c) => c.toLowerCase().replace(/^@/, ''))
-  return candidates.some((c) => FOUNDERS.includes(c))
+  return founderRank(user) !== -1
+}
+
+/** Θέση στη λίστα FOUNDERS (πρώτα ο Kops, μετά ο george), ή -1 αν δεν είναι founder. */
+export function founderRank(user) {
+  if (!user?.username) return -1
+  return FOUNDERS.indexOf(user.username.toLowerCase())
 }
 
 const CREATOR_TIERS = [25, 50, 100, 300]
@@ -23,33 +26,13 @@ const NIGHT_OWL_TIERS = [10, 30, 100, 200]
 /** Thresholds of the tiered badges, for the tier ladders on /achievements. */
 export const TIER_THRESHOLDS = { CREATOR: CREATOR_TIERS, QUIZZES: QUIZ_TIERS, PERFECT: PERFECT_TIERS, NIGHT_OWL: NIGHT_OWL_TIERS }
 
-/**
- * Given a badgeCode and the cumulative count reached at the time of an event,
- * returns { isMilestone: true, tier: 1..4, isRankUp: boolean } if this count was
- * an exact milestone crossing, or { isMilestone: false } if it was a normal activity.
- */
-export function checkMilestone(badgeCode, count) {
-  const tiers = TIER_THRESHOLDS[badgeCode]
-  if (!tiers || count == null || count < 1) return { isMilestone: false }
-
-  const tierIndex = tiers.indexOf(count)
-  if (tierIndex === -1) return { isMilestone: false }
-
-  const tier = tierIndex + 1
-  return {
-    isMilestone: true,
-    tier,
-    isRankUp: tier > 1,
-  }
-}
-
 function single(code, earned) {
-  return { code, tier: earned ? 1 : 0, maxTier: 1, earned, progress: null, nextTarget: null }
+  return { code, tier: earned ? 1 : 0, maxTier: 1, earned, tiered: false, progress: null, nextTarget: null }
 }
 
 function tiered(code, tiers, count) {
   const tier = tiers.filter((min) => count >= min).length
-  return { code, tier, maxTier: tiers.length, earned: tier > 0, progress: count, nextTarget: tiers[tier] ?? null }
+  return { code, tier, maxTier: tiers.length, earned: tier > 0, tiered: true, progress: count, nextTarget: tiers[tier] ?? null }
 }
 
 /** Every badge for a PublicUserDto, earned or not, in display order. */
@@ -103,7 +86,6 @@ export function groupBadges(badges) {
     .filter((c) => c.badges.length > 0)
 }
 
-
 const LOCKED_TONE = 'text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'
 
 /**
@@ -116,7 +98,8 @@ export function badgeView(badge) {
   if (!meta || !text) return null
 
   const tiered = Array.isArray(text.tiers)
-  const name = tiered ? text.tiers[Math.max(badge.tier, 1) - 1] : text.name
+  // Tier εκτός ορίων κόβεται στο τελευταίο, για να μη φαίνεται ποτέ ο κωδικός (π.χ. "QUIZZES")
+  const name = tiered ? text.tiers[Math.min(Math.max(badge.tier ?? 1, 1), text.tiers.length) - 1] : text.name
 
   return {
     code: badge.code,
@@ -129,10 +112,6 @@ export function badgeView(badge) {
     maxTier: badge.maxTier,
     tiered,
   }
-}
-
-export function roleNickname(role) {
-  return t.roles[role]?.nickname ?? t.roles.STUDENT.nickname
 }
 
 export function hasBadge(badges, code) {
