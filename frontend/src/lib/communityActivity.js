@@ -1,5 +1,5 @@
-import { Trophy, Waves, Target, PenLine, UserPlus } from 'lucide-react'
-import { computeBadges, badgeView, checkMilestone } from './badges'
+import { Trophy, UserPlus } from 'lucide-react'
+import { computeBadges, badgeView } from './badges'
 import { joinedAgo } from './profiles'
 import t from '../content/community.json'
 
@@ -12,7 +12,7 @@ export function timeAgo(timestamp) {
   const diffHour = Math.round(diffMin / 60)
   const diffDay = Math.round(diffHour / 24)
 
-  const rtf = new Intl.RelativeTimeFormat('el', { numeric: 'auto' })
+  const rtf = new Intl.RelativeTimeFormat('el', { numeric: 'auto', style: 'short' })
   if (Math.abs(diffSec) < 45) return 'πριν λίγο'
   if (Math.abs(diffMin) < 60) return rtf.format(diffMin, 'minute')
   if (Math.abs(diffHour) < 24) return rtf.format(diffHour, 'hour')
@@ -28,7 +28,7 @@ export function formatBackendActivities(items = []) {
   if (!items || items.length === 0) return []
 
   return items.map((item) => {
-    // 1. OG Milestone
+    // 1. OG Milestone or Badge
     if (item.badgeCode === 'OG') {
       const view = badgeView({ code: 'OG', tier: 1, earned: true })
       return {
@@ -52,7 +52,7 @@ export function formatBackendActivities(items = []) {
       }
     }
 
-    // 2. Member Joined without OG
+    // 2. Member Joined
     if (item.type === 'MEMBER_JOINED') {
       return {
         id: item.id,
@@ -73,43 +73,14 @@ export function formatBackendActivities(items = []) {
       }
     }
 
-    // 3. Tiered Badges: Check if this event was an actual milestone crossing
-    const milestone = checkMilestone(item.badgeCode, item.tier)
-
-    if (milestone.isMilestone) {
-      const view = badgeView({ code: item.badgeCode, tier: milestone.tier, earned: true })
-      const isRankUp = milestone.isRankUp
-      const type = isRankUp ? 'rankup' : 'unlock'
-
-      return {
-        id: item.id,
-        type,
-        user: {
-          username: item.username,
-          name: item.displayName || item.username,
-          role: item.role,
-        },
-        badge: {
-          code: item.badgeCode,
-          name: view?.name || item.badgeCode,
-          tier: milestone.tier,
-          Icon: view?.Icon || Trophy,
-          tone: view?.tone,
-        },
-        detailTitle: item.title,
-        timeText: timeAgo(item.timestamp),
-        priority: isRankUp ? 3 : 2,
-        timestamp: new Date(item.timestamp).getTime(),
-      }
-    }
-
-    // 4. Regular Activity (e.g. normal quiz completion, new question creation)
-    const isPerfect = item.type === 'PERFECT_QUIZ'
-    const isQuestion = item.type === 'QUESTION_CREATED'
+    // 3. Rank up or Badge unlock
+    const isRankUp = item.type === 'RANK_UP' || (item.tier && item.tier > 1)
+    const tier = item.tier || 1
+    const view = badgeView({ code: item.badgeCode, tier, earned: true })
 
     return {
       id: item.id,
-      type: 'activity',
+      type: isRankUp ? 'rankup' : 'unlock',
       user: {
         username: item.username,
         name: item.displayName || item.username,
@@ -117,21 +88,13 @@ export function formatBackendActivities(items = []) {
       },
       badge: {
         code: item.badgeCode,
-        name: isQuestion
-          ? `Νέα ερώτηση: ${item.title}`
-          : isPerfect
-            ? '100% Επιτυχία σε Quiz'
-            : 'Ολοκληρωμένο Quiz',
-        Icon: isQuestion ? PenLine : isPerfect ? Target : Waves,
-        tone: isQuestion
-          ? 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800'
-          : isPerfect
-            ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800'
-            : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700',
+        name: view?.name || item.badgeCode,
+        tier,
+        Icon: view?.Icon || Trophy,
+        tone: view?.tone,
       },
-      detailTitle: item.title,
       timeText: timeAgo(item.timestamp),
-      priority: 1,
+      priority: isRankUp ? 3 : 2,
       timestamp: new Date(item.timestamp).getTime(),
     }
   })
@@ -154,7 +117,7 @@ export function deriveCommunityActivity(members = []) {
       const view = badgeView(b)
       if (!view) return
 
-      const isRankUp = b.tiered && b.tier > 1
+      const isRankUp = (b.tiered || view.tiered) && b.tier > 1
       const isSpecial = b.code === 'FOUNDER' || b.code === 'OG'
 
       events.push({
@@ -180,6 +143,11 @@ export function deriveCommunityActivity(members = []) {
         id: `${member.username}-joined`,
         type: 'join',
         user: member,
+        badge: {
+          name: t.activity.joined,
+          Icon: UserPlus,
+          tone: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800',
+        },
         timeText: joinedAgo(member.memberSince) || 'πρόσφατα',
         priority: 1,
         timestamp: new Date(member.memberSince || Date.now()).getTime(),
