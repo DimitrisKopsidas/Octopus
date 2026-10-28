@@ -1,6 +1,6 @@
 // Course landing page: 3-step journey (study/systematic/sandbox). Logic in useCourseStart. Route: /courses/:courseId/start
 import { useParams } from 'react-router-dom'
-import { Heart, CheckCircle2 } from 'lucide-react'
+import { GraduationCap, CheckCircle2 } from 'lucide-react'
 import { useCourseStart } from '../hooks/useCourseStart'
 import { useMe, useCourseProgress, useToggleFavoriteCourse, useTogglePassedCourse } from '../hooks/queries'
 import { toast } from '../store/toastStore'
@@ -30,7 +30,7 @@ function CourseStart() {
 
   const handleFavoriteClick = () => {
     if (!user) {
-      toast.info('Συνδέσου για να προσθέσεις μαθήματα στα αγαπημένα.')
+      toast.info('Συνδέσου για να παρακολουθείς μαθήματα.')
       return
     }
     toggleFavorite.mutate(courseId)
@@ -73,13 +73,13 @@ function CourseStart() {
         {course && (
           <div className="flex items-center gap-1 self-start sm:self-auto shrink-0">
             <CourseToggleButton
-              icon={Heart}
-              tone="red"
+              icon={GraduationCap}
+              tone="amber"
               size="lg"
               active={isFavorite}
               pending={isFavoriteLoading}
               onClick={handleFavoriteClick}
-              label={isFavorite ? 'Αφαίρεση από τα αγαπημένα' : 'Προσθήκη στα αγαπημένα'}
+              label={isFavorite ? 'Αφαίρεση από τα παρακολουθούμενα' : 'Παρακολούθηση μαθήματος'}
             />
 
             {user && (

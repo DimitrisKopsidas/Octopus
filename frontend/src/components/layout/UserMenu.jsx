@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import {
   ChevronDown,
   User,
-  Heart,
+  GraduationCap,
   Settings,
   Sliders,
   Shield,
@@ -131,8 +131,8 @@ function UserMenu() {
               className="flex items-center justify-between px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
             >
               <span className="flex items-center gap-3">
-                <Heart className="w-4 h-4 text-rose-500" />
-                <span>Αγαπημένα</span>
+                <GraduationCap className="w-4 h-4 text-amber-500" />
+                <span>Παρακολουθώ</span>
               </span>
             </Link>
 

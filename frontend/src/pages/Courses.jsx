@@ -49,6 +49,7 @@ function Courses() {
   const loading = (isPending || (user && progressPending)) && !error
 
   const [query, setQuery] = useState('')
+  const [sortBy, setSortBy] = useState('default') // 'default' | 'recent' | 'oldest' | 'name' | 'nameDesc' | 'semester' | 'semesterDesc'
 
   // Applied filters
   const [semesters, setSemesters] = useState([])   // empty = all
@@ -61,7 +62,7 @@ function Courses() {
   const [prevFilterKey, setPrevFilterKey] = useState('')
   const [showScrollTop, setShowScrollTop] = useState(false)
 
-  const filterKey = `${query}|${semesters.join(',')}`
+  const filterKey = `${query}|${semesters.join(',')}|${sortBy}`
   if (filterKey !== prevFilterKey) {
     setPrevFilterKey(filterKey)
     setExtraEmptyCount(0)
@@ -103,6 +104,22 @@ function Courses() {
       .filter(c => semesters.length === 0 || semesters.includes(c.semester))
       .filter(c => !q || normalize(c.name).includes(q) || String(c.id).includes(q))
       .sort((a, b) => {
+        if (sortBy === 'recent' || sortBy === 'oldest') {
+          const dateA = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0
+          const dateB = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0
+          if (dateA !== dateB) return sortBy === 'recent' ? dateB - dateA : dateA - dateB
+          return a.name.localeCompare(b.name, 'el')
+        }
+        if (sortBy === 'name') {
+          return a.name.localeCompare(b.name, 'el')
+        }
+        if (sortBy === 'nameDesc') {
+          return b.name.localeCompare(a.name, 'el')
+        }
+        if (sortBy === 'semester' || sortBy === 'semesterDesc') {
+          if (a.semester !== b.semester) return sortBy === 'semester' ? a.semester - b.semester : b.semester - a.semester
+          return a.name.localeCompare(b.name, 'el')
+        }
         const rankA = getRank(a)
         const rankB = getRank(b)
         if (rankA !== rankB) return rankA - rankB
@@ -122,7 +139,7 @@ function Courses() {
     }
 
     return { contentCourses: withContent, emptyCourses: withoutContent }
-  }, [courses, query, semesters, progressMap])
+  }, [courses, query, semesters, progressMap, sortBy])
 
   const initialEmptyCount =
     contentCourses.length > 0
@@ -158,8 +175,8 @@ function Courses() {
         <p className="text-slate-600 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
-      <div className="mb-6 flex items-center gap-2">
-        <div className="relative flex-1 max-w-md">
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[200px] max-w-md">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none">
             <SearchIcon />
           </span>
@@ -171,6 +188,7 @@ function Courses() {
             className="w-full pl-10 pr-4 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
+
         <button
           type="button"
           onClick={openFilters}
@@ -184,6 +202,26 @@ function Courses() {
             </span>
           )}
         </button>
+
+        <div className="relative">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="appearance-none pl-3 pr-8 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer text-sm"
+            aria-label="Ταξινόμηση μαθημάτων"
+          >
+            <option value="default">Προεπιλογή</option>
+            <option value="recent">Πρόσφατα ενημερωμένα</option>
+            <option value="oldest">Παλαιότερα ενημερωμένα</option>
+            <option value="name">Αλφαβητικά (Α-Ω)</option>
+            <option value="nameDesc">Αλφαβητικά (Ω-Α)</option>
+            <option value="semester">Εξάμηνο (1ο → 8ο)</option>
+            <option value="semesterDesc">Εξάμηνο (8ο → 1ο)</option>
+          </select>
+          <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+            <ChevronDownIcon />
+          </div>
+        </div>
       </div>
 
       {loading && (

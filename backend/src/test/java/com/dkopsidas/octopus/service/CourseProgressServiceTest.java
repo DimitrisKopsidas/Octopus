@@ -194,6 +194,50 @@ class CourseProgressServiceTest {
     }
 
     @Test
+    void toggleFavorite_ClearsPassed() {
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
+
+        CourseProgress progress = new CourseProgress();
+        progress.setUser(user);
+        progress.setCourse(course);
+        progress.setPassed(true);
+
+        when(courseProgressRepository.findByUserIdAndCourseId(userId, courseId)).thenReturn(Optional.of(progress));
+        when(courseProgressRepository.save(progress)).thenReturn(progress);
+        when(courseProgressMapper.toDto(progress)).thenAnswer(inv ->
+                new CourseProgressResponseDto(1L, userId, courseId, progress.isFavorite(), progress.isPassed())
+        );
+
+        CourseProgressResponseDto result = courseProgressService.toggleFavorite(userId, courseId);
+
+        assertTrue(result.isFavorite());
+        assertFalse(result.isPassed());
+    }
+
+    @Test
+    void togglePassed_ClearsFavorite() {
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
+
+        CourseProgress progress = new CourseProgress();
+        progress.setUser(user);
+        progress.setCourse(course);
+        progress.setFavorite(true);
+
+        when(courseProgressRepository.findByUserIdAndCourseId(userId, courseId)).thenReturn(Optional.of(progress));
+        when(courseProgressRepository.save(progress)).thenReturn(progress);
+        when(courseProgressMapper.toDto(progress)).thenAnswer(inv ->
+                new CourseProgressResponseDto(1L, userId, courseId, progress.isFavorite(), progress.isPassed())
+        );
+
+        CourseProgressResponseDto result = courseProgressService.togglePassed(userId, courseId);
+
+        assertTrue(result.isPassed());
+        assertFalse(result.isFavorite());
+    }
+
+    @Test
     void updateProgress_UserNotFound_ThrowsException() {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
