@@ -74,8 +74,8 @@ public class BadgeEvaluationServiceImpl implements BadgeEvaluationService {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || !user.isActive()) return;
 
-        // An OG (first 30 users) gets the OG unlock as their only feed entry, otherwise
-        // they would show twice at the same moment: once as joined and once as OG.
+        // Ένας OG (πρώτοι 30 χρήστες) έχει μόνο το OG unlock στο feed, αλλιώς θα
+        // εμφανιζόταν δύο φορές την ίδια στιγμή: μία ως νέο μέλος και μία ως OG.
         List<CommunityRepository.StatsRow> statsList = communityRepository.findStats(List.of(userId));
         if (!statsList.isEmpty() && Boolean.TRUE.equals(statsList.getFirst().getOg())) {
             awardSingleBadge(user, "OG", 1, user.getCreated());
@@ -87,8 +87,8 @@ public class BadgeEvaluationServiceImpl implements BadgeEvaluationService {
     }
 
     /**
-     * Awards every tier reached but posts one feed entry, for the highest new tier,
-     * so e.g. importing 300 questions at once doesn't flood the feed with four entries.
+     * Δίνει όλα τα tiers που έχουν καλυφθεί, αλλά γράφει μία εγγραφή στο feed για το ψηλότερο νέο tier,
+     * ώστε π.χ. ένα import 300 ερωτήσεων να μη γεμίζει το feed με τέσσερις εγγραφές.
      */
     private void checkAndAwardTiers(User user, String badgeCode, int[] thresholds, long currentCount) {
         Instant now = Instant.now();
