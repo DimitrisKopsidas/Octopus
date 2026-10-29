@@ -139,33 +139,37 @@ export default function CommunityActivityFeed({ events = [], isLoading = false }
                       <RoleBadge role={event.user?.role} size="sm" />
                     </div>
 
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-start gap-1 leading-snug">
                       {event.type === 'rankup' ? (
                         <>
-                          <Zap className="w-3 h-3 text-amber-500 fill-amber-500 inline shrink-0" />
-                          <span>{t.activity.rankedUp}</span>
-                          <strong className="font-bold text-amber-600 dark:text-amber-400">
-                            {event.badge?.name}
-                          </strong>
+                          <Zap className="w-3 h-3 mt-0.5 text-amber-500 fill-amber-500 shrink-0" />
+                          <span>
+                            {t.activity.rankedUp}{' '}
+                            <strong className="font-bold text-amber-600 dark:text-amber-400">
+                              {event.badge?.name}
+                            </strong>
+                          </span>
                         </>
                       ) : event.type === 'unlock' ? (
                         <>
-                          <Sparkles className="w-3 h-3 text-teal-500 inline shrink-0" />
-                          <span>{t.activity.unlocked}</span>
-                          <strong className="font-bold text-teal-600 dark:text-teal-400">
-                            {event.badge?.name}
-                          </strong>
+                          <Sparkles className="w-3 h-3 mt-0.5 text-teal-500 shrink-0" />
+                          <span>
+                            {t.activity.unlocked}{' '}
+                            <strong className="font-bold text-teal-600 dark:text-teal-400">
+                              {event.badge?.name}
+                            </strong>
+                          </span>
                         </>
                       ) : event.type === 'join' ? (
                         <>
-                          <Sparkles className="w-3 h-3 text-indigo-500 inline shrink-0" />
+                          <Sparkles className="w-3 h-3 mt-0.5 text-indigo-500 shrink-0" />
                           <span className="font-medium text-slate-600 dark:text-slate-300">
                             {event.badge?.name}
                           </span>
                         </>
                       ) : (
                         <>
-                          <Activity className="w-3 h-3 text-slate-400 inline shrink-0" />
+                          <Activity className="w-3 h-3 mt-0.5 text-slate-400 shrink-0" />
                           <span className="font-medium text-slate-700 dark:text-slate-200 truncate max-w-[220px]">
                             {event.badge?.name}
                           </span>
@@ -176,7 +180,7 @@ export default function CommunityActivityFeed({ events = [], isLoading = false }
                 </div>
 
                 {/* Right: Badge Icon Emblem & Relative Time */}
-                <div className="flex flex-col items-end gap-1 shrink-0">
+                <div className="self-stretch flex flex-col items-end justify-between gap-1.5 shrink-0">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-xs transition-transform group-hover:scale-105 ${
                     event.badge?.tone || 'bg-slate-100 dark:bg-slate-800 text-slate-600 border-slate-200'
                   }`}>

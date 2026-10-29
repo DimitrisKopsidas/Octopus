@@ -46,6 +46,8 @@ function Footer() {
             <ul className="space-y-2">
               <li><FooterLink to="/" end>{t.nav.home}</FooterLink></li>
               <li><FooterLink to="/courses">{t.nav.courses}</FooterLink></li>
+              <li><FooterLink to="/community">{t.nav.community}</FooterLink></li>
+              <li><FooterLink to="/leaderboard">{t.nav.leaderboard}</FooterLink></li>
               <li><FooterLink to="/info">{t.nav.info}</FooterLink></li>
             </ul>
           </nav>

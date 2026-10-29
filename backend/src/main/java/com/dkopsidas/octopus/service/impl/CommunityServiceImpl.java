@@ -2,9 +2,9 @@ package com.dkopsidas.octopus.service.impl;
 
 import com.dkopsidas.octopus.domain.dto.CommunityActivityDto;
 import com.dkopsidas.octopus.domain.dto.PublicUserDto;
-import com.dkopsidas.octopus.domain.entity.UserRole;
 import com.dkopsidas.octopus.domain.entity.DisplayPreference;
 import com.dkopsidas.octopus.domain.entity.User;
+import com.dkopsidas.octopus.repository.CommunityActivityRepository;
 import com.dkopsidas.octopus.repository.CommunityRepository;
 import com.dkopsidas.octopus.repository.UserRepository;
 import com.dkopsidas.octopus.service.CommunityService;
@@ -31,6 +31,7 @@ public class CommunityServiceImpl implements CommunityService {
 
     private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
+    private final CommunityActivityRepository communityActivityRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -72,29 +73,29 @@ public class CommunityServiceImpl implements CommunityService {
     @Transactional(readOnly = true)
     public List<CommunityActivityDto> getRecentActivity(int limit) {
         int cappedLimit = Math.clamp(limit > 0 ? limit : 20, 1, 50);
-        return communityRepository.findRecentActivity(cappedLimit).stream()
-                .map(row -> new CommunityActivityDto(
-                        row.getId(),
-                        row.getType(),
-                        row.getUsername(),
-                        row.getDisplayName(),
-                        UserRole.valueOf(row.getRole()),
-                        row.getBadgeCode(),
-                        row.getTier(),
-                        row.getTitle(),
-                        row.getTimestamp()
+        return communityActivityRepository.findRecentActivities(PageRequest.of(0, cappedLimit)).stream()
+                .map(ca -> new CommunityActivityDto(
+                        ca.getId().toString(),
+                        ca.getType(),
+                        ca.getUser().getUsername(),
+                        ca.getUser().getDisplayName(),
+                        ca.getUser().getRole(),
+                        ca.getBadgeCode(),
+                        ca.getTier(),
+                        null,
+                        ca.getCreatedAt()
                 ))
                 .toList();
     }
 
     private static PublicUserDto toDto(User user, CommunityRepository.StatsRow s) {
-        // publicName() carries the Discord handle, so only use it when the user picked Discord.
+        // Το discord βγαίνει μόνο αν ο χρήστης το διάλεξε ως όνομα. Το publicName() το χειρίζεται ήδη.
         boolean showDiscord = DisplayPreference.orDefault(user.getDisplayPreference()) == DisplayPreference.DISCORD_NAME
                 && user.getDiscordName() != null && !user.getDiscordName().isBlank();
 
         return new PublicUserDto(
                 user.getUsername(),
-                showDiscord ? user.publicName() : user.getDisplayName(),
+                user.publicName(),
                 showDiscord ? user.getDiscordName() : null,
                 user.getRole(),
                 user.getYear(),

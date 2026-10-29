@@ -34,6 +34,7 @@ public class Question {
             cascade = CascadeType.ALL,//Saving a Question also saves its Answers
             orphanRemoval = true//Removing an answer from the list deletes it from DB
     )
+    @OrderBy("id ASC")// σταθερή σειρά από τη βάση· το quiz τις ανακατεύει στο frontend
     private List<Answer> answers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -21,6 +21,7 @@ import com.dkopsidas.octopus.mapper.QuestionMapper;
 import com.dkopsidas.octopus.repository.CourseRepository;
 import com.dkopsidas.octopus.repository.QuestionRepository;
 import com.dkopsidas.octopus.repository.UserRepository;
+import com.dkopsidas.octopus.service.BadgeEvaluationService;
 import com.dkopsidas.octopus.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
@@ -57,6 +58,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionMapper questionMapper;
     private final ImageService imageService;
     private final ApplicationEventPublisher eventPublisher;
+    private final BadgeEvaluationService badgeEvaluationService;
 
     @Override
     public QuestionResponseDto createQuestion(CreateQuestionRequestDto createRequest) {
@@ -72,6 +74,7 @@ public class QuestionServiceImpl implements QuestionService {
         checkCorrectAnswerCount(question);
 
         Question saved = questionRepository.save(question);
+        badgeEvaluationService.evaluateQuestionMilestones(userRef.getId());
 
         eventPublisher.publishEvent(AuditEvent.success(
                 null,
@@ -88,30 +91,49 @@ public class QuestionServiceImpl implements QuestionService {
     /**
      * Bulk import for one course. Validates the whole file first and writes
      * nothing if any entry is unusable, so a rejected upload never leaves the
-     * course half-filled. Titles already present are skipped rather than
-     * duplicated, which makes re-running the same file safe.
-     *
-     * There is no question "type" to declare: a true/false question is simply
-     * one with two answers titled Σωστό and Λάθος, exactly as the editor stores it.
+     * course half-imported.
+     * <p>
+     * Duplicates:
+     * - Within the file: rejected with an error;
+     * - Against existing questions of this course: silently skipped and
+     *   reported in the response summary.
      */
     @Override
-    public ImportQuestionsResponseDto importQuestions(Long courseId, ImportQuestionsRequestDto importRequest) {
+    public ImportQuestionsResponseDto importQuestions(Long courseId, ImportQuestionsRequestDto requestDto) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(courseId));
 
-        List<ImportQuestionsRequestDto.ImportedQuestion> entries = importRequest.questions();
+        List<ImportQuestionsRequestDto.ImportedQuestion> entries = requestDto.questions();
+        if (entries == null || entries.isEmpty()) {
+            throw new QuestionImportException(List.of("The file contains no questions"));
+        }
+
         List<String> problems = new ArrayList<>();
         Set<String> seenInFile = new LinkedHashSet<>();
 
         for (int i = 0; i < entries.size(); i++) {
             ImportQuestionsRequestDto.ImportedQuestion entry = entries.get(i);
-            String position = "#" + (i + 1) + " \"" + preview(entry.title()) + "\"";
+            String position = "Question #" + (i + 1) + (entry.title() != null ? " (\"" + preview(entry.title()) + "\")" : "");
 
-            boolean hasCorrect = entry.answers().stream().anyMatch(AnswerRequestDto::isCorrect);
-            if (!hasCorrect) {
-                problems.add(position + ": no answer is marked correct");
+            if (entry.title() == null || entry.title().trim().isEmpty()) {
+                problems.add(position + ": title is missing or empty");
             }
-
+            if (entry.answers() == null || entry.answers().size() < 2) {
+                problems.add(position + ": must have at least 2 answers");
+            } else {
+                long correct = entry.answers().stream()
+                        .filter(a -> Boolean.TRUE.equals(a.isCorrect()))
+                        .count();
+                if (correct == 0) {
+                    problems.add(position + ": has no correct answer marked");
+                }
+                for (int aIdx = 0; aIdx < entry.answers().size(); aIdx++) {
+                    AnswerRequestDto a = entry.answers().get(aIdx);
+                    if (a.title() == null || a.title().trim().isEmpty()) {
+                        problems.add(position + ", answer #" + (aIdx + 1) + ": title is empty");
+                    }
+                }
+            }
             if (!seenInFile.add(normalise(entry.title()))) {
                 problems.add(position + ": appears more than once in the file");
             }
@@ -150,6 +172,7 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         List<Question> saved = questionRepository.saveAll(toSave);
+        badgeEvaluationService.evaluateQuestionMilestones(userRef.getId());
 
         eventPublisher.publishEvent(AuditEvent.success(
                 null,

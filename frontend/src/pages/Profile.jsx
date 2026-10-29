@@ -141,7 +141,6 @@ function Profile() {
       <ProfileView
         profile={profile}
       isOwn
-      account={user}
       onLogout={handleLogout}
         logoutPending={logoutMutation.isPending}
       />

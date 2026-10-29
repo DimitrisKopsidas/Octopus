@@ -1,6 +1,6 @@
 // Course card in the Courses grid matching custom design system. Used by Courses page.
 import { Link } from 'react-router-dom'
-import { Heart, CheckCircle2, BookOpen, History } from 'lucide-react'
+import { GraduationCap, CheckCircle2, BookOpen, History } from 'lucide-react'
 import CourseToggleButton from './CourseToggleButton'
 import { useMe, useToggleFavoriteCourse, useTogglePassedCourse } from '../../hooks/queries'
 import { toast } from '../../store/toastStore'
@@ -38,7 +38,7 @@ function CourseCard({
     e.preventDefault()
     e.stopPropagation()
     if (!user) {
-      toast.info('Συνδέσου για να προσθέσεις μαθήματα στα αγαπημένα.')
+      toast.info('Συνδέσου για να παρακολουθείς μαθήματα.')
       return
     }
     if (onToggleFavorite) {
@@ -70,8 +70,13 @@ function CourseCard({
           <span className="text-xs font-semibold tracking-wide text-slate-500 dark:text-slate-400">
             {course.semester}ο Εξάμηνο
           </span>
+          {isFavorite && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300/90 bg-amber-50/70 dark:bg-amber-950/30 px-2 py-0.5 rounded-md border border-amber-200/60 dark:border-amber-900/40">
+              Παρακολουθώ
+            </span>
+          )}
           {isPassed && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/70 dark:border-emerald-800/70">
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300/90 bg-emerald-50/70 dark:bg-emerald-950/30 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-900/40">
               Περασμένο
             </span>
           )}
@@ -86,12 +91,12 @@ function CourseCard({
         {!disabled && (
           <div className="flex items-center gap-0.5 -mr-1.5 shrink-0">
             <CourseToggleButton
-              icon={Heart}
-              tone="red"
+              icon={GraduationCap}
+              tone="amber"
               active={isFavorite}
               pending={isFavoriteLoading}
               onClick={handleFavoriteClick}
-              label={isFavorite ? 'Αφαίρεση από τα αγαπημένα' : 'Προσθήκη στα αγαπημένα'}
+              label={isFavorite ? 'Αφαίρεση από τα παρακολουθούμενα' : 'Παρακολούθηση μαθήματος'}
             />
 
             {user && (
@@ -162,9 +167,9 @@ function CourseCard({
       to={`/courses/${course.id}/start`}
       className={`group relative overflow-hidden bg-white dark:bg-slate-900 rounded-2xl p-6 pt-7 border shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${
         isPassed
-          ? 'border-emerald-300/60 dark:border-emerald-800/50 hover:border-emerald-500/60 opacity-90'
+          ? 'border-emerald-200/70 dark:border-emerald-900/40 hover:border-emerald-300 dark:hover:border-emerald-800/70 opacity-90'
           : isFavorite
-          ? 'border-rose-300/60 dark:border-rose-900/50 hover:border-rose-500/60'
+          ? 'border-amber-200/70 dark:border-amber-900/40 hover:border-amber-300 dark:hover:border-amber-800/70'
           : 'border-slate-200/80 dark:border-slate-800 hover:border-brand-500/50'
       }`}
     >
@@ -173,10 +178,10 @@ function CourseCard({
         aria-hidden="true"
         className={`absolute inset-x-0 top-0 h-1 ${
           isPassed
-            ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+            ? 'bg-emerald-400/50 dark:bg-emerald-500/40'
             : isFavorite
-            ? 'bg-gradient-to-r from-rose-500 to-pink-500'
-            : 'bg-gradient-to-r from-brand-500 to-teal-400'
+            ? 'bg-amber-400/60 dark:bg-amber-500/40'
+            : 'bg-brand-500/30 dark:bg-brand-400/25'
         }`}
       />
       {inner}

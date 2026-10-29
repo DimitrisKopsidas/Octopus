@@ -1,5 +1,5 @@
 // Sidebar info card (questions count, code, semester, progress status). Used by CourseStart.
-import { Heart, CheckCircle2 } from 'lucide-react'
+import { GraduationCap, CheckCircle2 } from 'lucide-react'
 import InfoRow from './InfoRow'
 // import SoonBadge from '../ui/SoonBadge'
 import { formatLastUpdated } from '../../lib/dates'
@@ -38,9 +38,9 @@ function CourseInfoCard({ course, questionCount, isFavorite = false, isPassed = 
           <InfoRow label="Κατάσταση">
             <div className="flex items-center gap-1.5 flex-wrap">
               {isFavorite && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-900/60">
-                  <Heart className="w-3 h-3 fill-rose-500 text-rose-500" />
-                  Αγαπημένο
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-900/50">
+                  <GraduationCap className="w-3 h-3 text-amber-500" />
+                  Παρακολουθώ
                 </span>
               )}
               {isPassed && (

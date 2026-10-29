@@ -17,23 +17,23 @@ class UserTest {
     }
 
     @Test
-    void publicName_returnsDiscordInParentheses_whenPreferenceIsDiscordNameAndDiscordPresent() {
+    void publicName_returnsOnlyDiscord_whenPreferenceIsDiscordNameAndDiscordPresent() {
         User user = new User();
         user.setDisplayName("Bob");
         user.setDiscordName("bob_handle");
         user.setDisplayPreference(DisplayPreference.DISCORD_NAME);
 
-        assertEquals("Bob (@bob_handle)", user.publicName());
+        assertEquals("bob_handle", user.publicName());
     }
 
     @Test
-    void publicName_doesNotDoubleAtSign_whenDiscordAlreadyHasAtSign() {
+    void publicName_stripsAtSign_whenDiscordHasAtSign() {
         User user = new User();
         user.setDisplayName("Charlie");
         user.setDiscordName("@charlie_handle");
         user.setDisplayPreference(DisplayPreference.DISCORD_NAME);
 
-        assertEquals("Charlie (@charlie_handle)", user.publicName());
+        assertEquals("charlie_handle", user.publicName());
     }
 
     @Test

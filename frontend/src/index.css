@@ -151,18 +151,36 @@ html.dark *::-webkit-scrollbar-thumb:hover,
 
 /* Achievement Celebration & LoL Rank-up animations */
 @keyframes rankSlam {
-  0%   { transform: scale(2.5); opacity: 0; filter: brightness(2.2) blur(3px); }
+  0%   { transform: scale(3.2); opacity: 0; filter: brightness(2.4) blur(4px); }
   55%  { transform: scale(0.92); opacity: 1; filter: brightness(1.3); }
   75%  { transform: scale(1.06); filter: brightness(1.1); }
   100% { transform: scale(1); opacity: 1; filter: brightness(1); }
 }
-.animate-rank-slam { animation: rankSlam 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-rank-slam { animation: rankSlam 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 @keyframes shockwave {
   0%   { transform: scale(0.4); opacity: 0.9; }
   100% { transform: scale(2.6); opacity: 0; }
 }
 .animate-shockwave { animation: shockwave 0.8s ease-out forwards; }
+
+/* Μεγάλο κύμα τη στιγμή του rank-up */
+@keyframes shockwaveBig {
+  0%   { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(4); opacity: 0; }
+}
+.animate-shockwave-big { animation: shockwaveBig 1.1s ease-out both; }
+
+/* «Φόρτιση» πριν το rank-up: τρέμει και φουσκώνει σιγά σιγά */
+@keyframes charge {
+  0%   { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0 rgba(245, 158, 11, 0)); }
+  20%  { transform: scale(1.03) rotate(-2deg); }
+  40%  { transform: scale(1.05) rotate(2deg); }
+  60%  { transform: scale(1.08) rotate(-3deg); }
+  80%  { transform: scale(1.1) rotate(3deg); }
+  100% { transform: scale(1.12) rotate(0deg); filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.9)); }
+}
+.animate-charge { animation: charge 1.1s ease-in both; }
 
 @keyframes raySpin {
   0%   { transform: rotate(0deg); }
@@ -189,6 +207,8 @@ html.dark *::-webkit-scrollbar-thumb:hover,
   .animate-reveal,
   .animate-rank-slam,
   .animate-shockwave,
+  .animate-shockwave-big,
+  .animate-charge,
   .animate-ray-spin,
   .animate-gold-glow {
     animation: none !important;
