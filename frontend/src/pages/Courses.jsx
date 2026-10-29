@@ -175,8 +175,9 @@ function Courses() {
         <p className="text-slate-600 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
+      <div className="mb-6 flex flex-wrap sm:flex-nowrap items-stretch gap-2">
+        {/* Στο κινητό η αναζήτηση πιάνει όλη τη γραμμή και Φίλτρα/Ταξινόμηση πάνε από κάτω. */}
+        <div className="relative basis-full sm:basis-auto sm:flex-1 min-w-0 sm:max-w-md">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none">
             <SearchIcon />
           </span>
@@ -195,7 +196,7 @@ function Courses() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
         >
           <FilterIcon />
-          <span className="hidden sm:inline">{t.filtersButton}</span>
+          <span>{t.filtersButton}</span>
           {activeFilterCount > 0 && (
             <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-brand-600 text-white text-xs font-semibold">
               {activeFilterCount}
@@ -203,22 +204,22 @@ function Courses() {
           )}
         </button>
 
-        <div className="relative">
+        <div className="relative flex-1 sm:flex-none">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="appearance-none pl-3 pr-8 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer text-sm"
+            className="w-full sm:w-auto h-full appearance-none pl-3 sm:pl-4 pr-8 sm:pr-9 py-2 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-700 dark:hover:text-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer transition-colors"
             aria-label="Ταξινόμηση μαθημάτων"
           >
             <option value="default">Προεπιλογή</option>
-            <option value="recent">Πρόσφατα ενημερωμένα</option>
-            <option value="oldest">Παλαιότερα ενημερωμένα</option>
-            <option value="name">Αλφαβητικά (Α-Ω)</option>
-            <option value="nameDesc">Αλφαβητικά (Ω-Α)</option>
-            <option value="semester">Εξάμηνο (1ο → 8ο)</option>
-            <option value="semesterDesc">Εξάμηνο (8ο → 1ο)</option>
+            <option value="recent">Πιο πρόσφατα</option>
+            <option value="oldest">Πιο παλιά</option>
+            <option value="name">Α → Ω</option>
+            <option value="nameDesc">Ω → Α</option>
+            <option value="semester">Εξάμηνο 1 → 9</option>
+            <option value="semesterDesc">Εξάμηνο 9 → 1</option>
           </select>
-          <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
+          <div className="pointer-events-none absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
             <ChevronDownIcon />
           </div>
         </div>
