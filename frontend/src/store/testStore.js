@@ -18,6 +18,28 @@ const initialState = {
   totalSets: null,       // total number of sets (systematic only)
 }
 
+// Απαντήσεις που αναφέρονται σε άλλες («Όλα τα παραπάνω», «Κανένα από τα παραπάνω»)
+// χάνουν το νόημά τους αν αλλάξει η σειρά, οπότε τέτοιες ερωτήσεις μένουν όπως είναι.
+const POSITIONAL_ANSWER = /παραπάνω|παραπανω|προηγούμεν|προηγουμεν|above|previous/i
+
+function shuffled(list) {
+  const out = [...list]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
+// Ανακατεύει τις απαντήσεις μία φορά στην αρχή του quiz. Αποθηκεύονται έτσι στο store,
+// άρα η σειρά μένει ίδια σε refresh και στην ανασκόπηση των αποτελεσμάτων.
+function shuffleAnswers(questions) {
+  return questions.map((q) => {
+    if (!Array.isArray(q.answers) || q.answers.some((a) => POSITIONAL_ANSWER.test(a.title ?? ''))) return q
+    return { ...q, answers: shuffled(q.answers) }
+  })
+}
+
 export const useTestStore = create(
   persist(
     (set) => ({
@@ -30,7 +52,7 @@ export const useTestStore = create(
           count,
           durationSeconds,
           order,
-          questions,
+          questions: shuffleAnswers(questions),
           currentIndex: 0,
           answers: {},
           flaggedIds: new Set(),

@@ -446,7 +446,9 @@ export function useToggleFavoriteCourse() {
       let updatedList
       if (exists) {
         updatedList = prevList.map((p) =>
-          String(p.courseId) === String(courseId) ? { ...p, isFavorite: !p.isFavorite } : p
+          String(p.courseId) === String(courseId)
+            ? { ...p, isFavorite: !p.isFavorite, isPassed: p.isFavorite ? p.isPassed : false }
+            : p
         )
       } else {
         updatedList = [...prevList, { id: null, courseId: Number(courseId), isFavorite: true, isPassed: false }]
@@ -457,6 +459,7 @@ export function useToggleFavoriteCourse() {
         qc.setQueryData(qk.courseProgress.byCourse(courseId), {
           ...prevCourse,
           isFavorite: !prevCourse.isFavorite,
+          isPassed: prevCourse.isFavorite ? prevCourse.isPassed : false,
         })
       }
 
@@ -507,7 +510,9 @@ export function useTogglePassedCourse() {
       let updatedList
       if (exists) {
         updatedList = prevList.map((p) =>
-          String(p.courseId) === String(courseId) ? { ...p, isPassed: !p.isPassed } : p
+          String(p.courseId) === String(courseId)
+            ? { ...p, isPassed: !p.isPassed, isFavorite: p.isPassed ? p.isFavorite : false }
+            : p
         )
       } else {
         updatedList = [...prevList, { id: null, courseId: Number(courseId), isFavorite: false, isPassed: true }]
@@ -518,6 +523,7 @@ export function useTogglePassedCourse() {
         qc.setQueryData(qk.courseProgress.byCourse(courseId), {
           ...prevCourse,
           isPassed: !prevCourse.isPassed,
+          isFavorite: prevCourse.isPassed ? prevCourse.isFavorite : false,
         })
       }
 

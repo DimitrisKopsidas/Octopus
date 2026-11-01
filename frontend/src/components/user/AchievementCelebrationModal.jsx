@@ -8,8 +8,13 @@ import t from '../../content/profile.json'
 
 const ROMAN = ['', 'I', 'II', 'III', 'IV']
 
+// Χρονισμός του rank-up: δείχνει το παλιό tier, «φορτίζει», και μετά σκάει το νέο.
+// Το κομφετί του modal ξεκινάει τη στιγμή του UPGRADE_AT, μαζί με το slam.
+const CHARGE_AT = 1300
+const UPGRADE_AT = 2400
+
 // Lightweight pure-canvas confetti generator (no external dependencies)
-function ConfettiCanvas() {
+function ConfettiCanvas({ delay = 0 }) {
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -21,7 +26,7 @@ function ConfettiCanvas() {
     let height = (canvas.height = window.innerHeight)
 
     const colors = ['#14b8a6', '#0d9488', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#10b981']
-    const particles = Array.from({ length: 65 }, () => ({
+    const particles = Array.from({ length: 110 }, () => ({
       x: width * 0.5 + (Math.random() - 0.5) * 200,
       y: height * 0.35 + (Math.random() - 0.5) * 100,
       vx: (Math.random() - 0.5) * 16,
@@ -35,8 +40,9 @@ function ConfettiCanvas() {
       drag: 0.98,
     }))
 
-    const start = performance.now()
+    let start = null
     function render(time) {
+      if (start === null) start = time
       const elapsed = time - start
       ctx.clearRect(0, 0, width, height)
 
@@ -47,8 +53,8 @@ function ConfettiCanvas() {
         p.x += p.vx
         p.y += p.vy
         p.rotation += p.rotSpeed
-        if (elapsed > 2000) {
-          p.opacity = Math.max(0, p.opacity - 0.02)
+        if (elapsed > 3200) {
+          p.opacity = Math.max(0, p.opacity - 0.015)
         }
 
         if (p.opacity > 0 && p.y < height + 50) {
@@ -63,12 +69,14 @@ function ConfettiCanvas() {
         }
       }
 
-      if (anyAlive && elapsed < 4000) {
+      if (anyAlive && elapsed < 6000) {
         animationFrameId = requestAnimationFrame(render)
       }
     }
 
-    animationFrameId = requestAnimationFrame(render)
+    const delayId = setTimeout(() => {
+      animationFrameId = requestAnimationFrame(render)
+    }, delay)
 
     function handleResize() {
       if (!canvas) return
@@ -78,10 +86,11 @@ function ConfettiCanvas() {
     window.addEventListener('resize', handleResize)
 
     return () => {
+      clearTimeout(delayId)
       cancelAnimationFrame(animationFrameId)
       window.removeEventListener('resize', handleResize)
     }
-  }, [])
+  }, [delay])
 
   return (
     <canvas
@@ -103,9 +112,9 @@ function RankUpCard({ item }) {
 
   useEffect(() => {
     // Stage 1: display old tier
-    const t1 = setTimeout(() => setStage('morphing'), 750)
+    const t1 = setTimeout(() => setStage('morphing'), CHARGE_AT)
     // Stage 2: slam into new tier
-    const t2 = setTimeout(() => setStage('upgraded'), 1250)
+    const t2 = setTimeout(() => setStage('upgraded'), UPGRADE_AT)
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
@@ -131,15 +140,24 @@ function RankUpCard({ item }) {
       <div className="relative my-3 flex items-center justify-center">
         {/* Shockwave ripple when morphing */}
         {stage === 'morphing' && (
-          <span className="absolute inset-0 rounded-full border-2 border-amber-400 animate-shockwave pointer-events-none" />
+          <span className="absolute inset-0 rounded-full border-2 border-amber-400/60 animate-shockwave pointer-events-none" />
+        )}
+        {/* Διπλό κύμα τη στιγμή του upgrade */}
+        {stage === 'upgraded' && (
+          <>
+            <span className="absolute inset-0 rounded-full border-4 border-amber-300 animate-shockwave-big pointer-events-none" />
+            <span className="absolute inset-0 rounded-full border-2 border-yellow-200 animate-shockwave-big [animation-delay:180ms] pointer-events-none" />
+          </>
         )}
 
-        <div className={`relative w-24 h-24 rounded-2xl flex items-center justify-center border shadow-inner transition-all duration-500 ${
+        <div className={`relative w-28 h-28 rounded-2xl flex items-center justify-center border shadow-inner transition-all duration-700 ${
           stage === 'upgraded'
-            ? 'bg-gradient-to-br from-amber-500/25 to-yellow-500/10 border-amber-400 text-amber-400 animate-gold-glow scale-105'
-            : 'bg-slate-800/80 border-slate-700 text-slate-300'
+            ? 'bg-gradient-to-br from-amber-500/25 to-yellow-500/10 border-amber-400 text-amber-400 animate-gold-glow scale-110'
+            : stage === 'morphing'
+              ? 'bg-slate-800/80 border-amber-500/60 text-amber-200 animate-charge'
+              : 'bg-slate-800/80 border-slate-700 text-slate-300'
         }`}>
-          <Icon className="w-12 h-12 stroke-[1.75]" />
+          <Icon className="w-14 h-14 stroke-[1.75]" />
         </div>
       </div>
 
@@ -152,7 +170,7 @@ function RankUpCard({ item }) {
           {stage !== 'upgraded' ? (
             <span
               className={`text-base font-black text-amber-400 transition-all duration-300 ${
-                stage === 'morphing' ? 'scale-0 opacity-0 filter blur-xs' : 'scale-100 opacity-100'
+                stage === 'morphing' ? 'scale-110 opacity-60 animate-pulse' : 'scale-100 opacity-100'
               }`}
             >
               {oldNumeral}
@@ -267,7 +285,7 @@ function AchievementCelebrationModal({
       role="dialog"
       aria-modal="true"
     >
-      <ConfettiCanvas />
+      <ConfettiCanvas delay={hasUpgrades ? UPGRADE_AT : 0} />
 
       {/* Backdrop */}
       <div

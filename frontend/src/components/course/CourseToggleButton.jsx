@@ -4,6 +4,7 @@
 const TONES = {
   red: { hover: 'hover:text-red-500', on: 'text-red-500 fill-red-500' },
   brand: { hover: 'hover:text-brand-600 dark:hover:text-brand-400', on: 'text-brand-600 dark:text-brand-400 fill-brand-600/15' },
+  amber: { hover: 'hover:text-amber-500 dark:hover:text-amber-400', on: 'text-amber-500 dark:text-amber-400 fill-amber-500/25' },
 }
 
 function CourseToggleButton({ icon: Icon, active, pending = false, onClick, label, tone = 'red', size = 'md' }) {

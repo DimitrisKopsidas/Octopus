@@ -5,7 +5,7 @@
     "members": "Μέλη",
     "quizzes": "Κουίζ που λύθηκαν",
     "questions": "Ερωτήσεις που γράφτηκαν",
-    "roles": "{admins} Krakens · {helpers} Πλοκάμια · {students} Καλαμαράκια",
+    "roles": "{admins} Διαχειριστές · {helpers} Helpers · {students} Φοιτητές",
     "ctaMe": "Πώς σε βλέπουν οι άλλοι",
     "ctaAchievements": "Τα επιτεύγματά μου",
     "ctaJoin": "Γίνε μέλος"
@@ -14,12 +14,12 @@
     "title": "Ροή Δραστηριότητας & Επιτευγμάτων",
     "subtitle": "Όλα τα πρόσφατα ξεκλειδώματα, rank-ups και ορόσημα των μελών σε πραγματικό χρόνο.",
     "filterAll": "Όλα",
-    "filterRankups": "Rank-ups 🔥",
-    "filterUnlocks": "Νέα Badges 🏆",
+    "filterRankups": "Rank-ups",
+    "filterUnlocks": "Νέα Badges",
     "empty": "Δεν υπάρχει πρόσφατη δραστηριότητα ακόμα.",
-    "unlocked": "Ξεκλείδωσε το",
+    "unlocked": "Ξεκλείδωσε",
     "rankedUp": "Ανέβηκε στο",
-    "joined": "Έγινε νέο μέλος στην κοινότητα!",
+    "joined": "Νέο μέλος",
     "justNow": "Μόλις τώρα",
     "showMore": "Προβολή περισσότερων (+{count})",
     "showLess": "Λιγότερα"
@@ -29,17 +29,19 @@
     "subtitle": "Οι admins και οι helpers που γράφουν ερωτήσεις και κρατάνε τα μαθήματα σε τάξη.",
     "questions": "{count} ερωτήσεις",
     "empty": "Το πλήρωμα ετοιμάζεται ακόμα.",
-    "questionsOne": "1 ερώτηση"
+    "questionsOne": "1 ερώτηση",
+    "showAll": "Δες όλο το πλήρωμα (+{count})",
+    "showLess": "Λιγότερα"
   },
   "creators": {
     "title": "Creators",
-    "subtitle": "Όσοι έχουν γράψει ερωτήσεις για όλους μας.",
+    "subtitle": "Όσοι γράφουν τις ερωτήσεις.",
     "count": "{count} ερωτήσεις",
     "countOne": "1 ερώτηση"
   },
   "newcomers": {
     "title": "Καλωσορίστε",
-    "subtitle": "Τα πιο πρόσφατα μέλη. Πείτε ένα γεια!"
+    "subtitle": "Τα νεότερα μέλη μας."
   },
   "konami": {
     "on": "🐙 Λειτουργία χταποδιού ενεργή!",

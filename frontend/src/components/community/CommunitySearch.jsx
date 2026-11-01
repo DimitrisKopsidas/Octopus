@@ -67,7 +67,7 @@ function CommunitySearch() {
           ) : (
             <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
               {members.map((m) => (
-                <MemberRow key={m.username} member={m} subtitle={`@${m.username} · ${roleLabel(m)}`} />
+                <MemberRow key={m.username} member={m} subtitle={roleLabel(m)} />
               ))}
             </div>
           )}

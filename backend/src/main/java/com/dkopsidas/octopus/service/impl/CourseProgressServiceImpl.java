@@ -105,6 +105,10 @@ public class CourseProgressServiceImpl implements CourseProgressService {
                 });
 
         progress.setFavorite(!progress.isFavorite());
+        // Ένα μάθημα που παρακολουθείς δεν είναι περασμένο.
+        if (progress.isFavorite()) {
+            progress.setPassed(false);
+        }
 
         CourseProgress saved = courseProgressRepository.save(progress);
 
@@ -139,6 +143,10 @@ public class CourseProgressServiceImpl implements CourseProgressService {
                 });
 
         progress.setPassed(!progress.isPassed());
+        // Ένα περασμένο μάθημα δεν το παρακολουθείς πια.
+        if (progress.isPassed()) {
+            progress.setFavorite(false);
+        }
 
         CourseProgress saved = courseProgressRepository.save(progress);
 

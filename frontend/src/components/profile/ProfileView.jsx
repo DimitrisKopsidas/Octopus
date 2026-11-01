@@ -1,7 +1,7 @@
 // Profile layout shared by /profile (isOwn) and /profile/:username.
 // Own profile adds: Discord, Settings link, logout and a link to /achievements.
 import { Link } from 'react-router-dom'
-import { Calendar, GraduationCap, LogOut, MessageSquare, Settings, Waves, Percent, BookOpen, PenLine, ArrowRight } from 'lucide-react'
+import { Calendar, GraduationCap, LogOut, Settings, Waves, Percent, BookOpen, PenLine, ArrowRight } from 'lucide-react'
 import UserAvatar from '../user/UserAvatar'
 import RoleBadge from '../user/RoleBadge'
 import UserBadges from '../user/UserBadges'
@@ -27,13 +27,13 @@ const BANNER = {
 
 function ProfileStat({ icon: Icon, label, value, tone }) {
   return (
-    <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-3.5">
+    <div className="p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center gap-2 sm:gap-3.5 text-center sm:text-left min-w-0">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${tone}`}>
         <Icon className="w-5 h-5" />
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 max-w-full">
         <p className="text-xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums leading-tight">{value}</p>
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-normal sm:tracking-wider text-slate-500 dark:text-slate-400 break-words">{label}</p>
       </div>
     </div>
   )
@@ -62,15 +62,12 @@ export function ProfileViewSkeleton() {
 
 /**
  * @param profile  PublicUserDto
- * @param account  own profile only: the /auth/me user (for Discord, which the
- *                 public DTO hides unless the user chose to show it)
  */
-function ProfileView({ profile, isOwn = false, account, onLogout, logoutPending = false }) {
+function ProfileView({ profile, isOwn = false, onLogout, logoutPending = false }) {
   const badges = computeBadges(profile)
   const founder = hasBadge(badges, 'FOUNDER')
   const cohort = cohortLabel(profile.year)
   const anyEarned = badges.some((b) => b.earned)
-  const discord = isOwn ? account?.discordName : profile.discordName
 
   return (
     <div className="max-w-4xl mx-auto py-8 space-y-6 animate-fade-up">
@@ -106,7 +103,6 @@ function ProfileView({ profile, isOwn = false, account, onLogout, logoutPending 
             <div className="flex-1 min-w-0 space-y-1.5 pt-1 sm:pt-4">
               <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 truncate">{profile.name}</h1>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-mono text-slate-500 dark:text-slate-400">@{profile.username}</span>
                 <RoleBadge role={profile.role} />
               </div>
             </div>
@@ -144,18 +140,12 @@ function ProfileView({ profile, isOwn = false, account, onLogout, logoutPending 
                 {cohort}
               </span>
             )}
-            {discord && (
-              <span className="inline-flex items-center gap-1.5 font-mono">
-                <MessageSquare className="w-3.5 h-3.5" />
-                @{discord.replace(/^@/, '')}
-              </span>
-            )}
           </div>
         </div>
       </section>
 
       {/* Stats: which ones depends on the role (lib/profiles.js) */}
-      <section className="grid grid-cols-3 gap-3">
+      <section className="grid grid-cols-3 gap-2 sm:gap-3">
         {profileStats(profile).map((stat) => (
           <ProfileStat key={stat.key} icon={STAT_STYLE[stat.key].icon} label={stat.label} value={stat.value} tone={STAT_STYLE[stat.key].tone} />
         ))}

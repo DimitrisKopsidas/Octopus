@@ -65,7 +65,6 @@ function PreviewBody({ username, onClose }) {
             {profile.name}
             {own && <span className="ml-2 text-xs font-semibold text-brand-600 dark:text-brand-400">({t.public.you})</span>}
           </h3>
-          <p className="text-sm font-mono text-slate-500 dark:text-slate-400 truncate">@{profile.username}</p>
           <RoleBadge role={profile.role} />
         </div>
       </div>

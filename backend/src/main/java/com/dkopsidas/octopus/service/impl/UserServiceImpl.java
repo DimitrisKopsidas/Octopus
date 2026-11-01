@@ -15,6 +15,7 @@ import com.dkopsidas.octopus.exception.UserNotFoundException;
 import com.dkopsidas.octopus.mapper.UserMapper;
 import com.dkopsidas.octopus.repository.UserRepository;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
+import com.dkopsidas.octopus.service.BadgeEvaluationService;
 import com.dkopsidas.octopus.service.UserService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserCodeService userCodeService;
     private final ApplicationEventPublisher eventPublisher;
+    private final BadgeEvaluationService badgeEvaluationService;
 
     @Override
     public UserResponseDto getUser(UUID userId) {
@@ -112,6 +114,8 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toEntity(createRequest, passwordHash, role);
         User savedUser = userRepository.save(user);
+
+        badgeEvaluationService.recordNewMember(savedUser.getId());
 
         if (usesCode) {
             userCodeService.assignTo(userCode, savedUser.getId());

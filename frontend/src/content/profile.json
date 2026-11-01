@@ -40,17 +40,6 @@
     "logoutButton": "Αποσύνδεση",
     "logoutPending": "Αποσύνδεση…"
   },
-  "roles": {
-    "ADMIN": {
-      "nickname": "Kraken"
-    },
-    "HELPER": {
-      "nickname": "Πλοκάμι"
-    },
-    "STUDENT": {
-      "nickname": "Καλαμαράκι"
-    }
-  },
   "badges": {
     "title": "Επιτεύγματα",
     "emptyOwn": "Δεν έχεις ξεκλειδώσει ακόμα επιτεύγματα. Λύσε το πρώτο σου κουίζ!",

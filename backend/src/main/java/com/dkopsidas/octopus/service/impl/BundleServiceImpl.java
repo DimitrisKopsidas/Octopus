@@ -3,25 +3,26 @@ package com.dkopsidas.octopus.service.impl;
 import com.dkopsidas.octopus.domain.dto.CreateBundleRequestDto;
 import com.dkopsidas.octopus.domain.dto.BundleResponseDto;
 import com.dkopsidas.octopus.domain.entity.Answer;
+import com.dkopsidas.octopus.domain.entity.AuditAction;
 import com.dkopsidas.octopus.domain.entity.Bundle;
 import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.mapper.BundleMapper;
 import com.dkopsidas.octopus.repository.AnswerRepository;
 import com.dkopsidas.octopus.repository.BundleRepository;
 import com.dkopsidas.octopus.repository.UserRepository;
+import com.dkopsidas.octopus.security.audit.AuditEvent;
+import com.dkopsidas.octopus.service.BadgeEvaluationService;
 import com.dkopsidas.octopus.service.BundleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.dkopsidas.octopus.domain.entity.AuditAction;
-import com.dkopsidas.octopus.security.audit.AuditEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import java.util.List;
-import org.springframework.security.oauth2.jwt.Jwt;
-import java.util.UUID;
 
+import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +33,7 @@ public class BundleServiceImpl implements BundleService {
     private final AnswerRepository answerRepository;
     private final BundleMapper bundleMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final BadgeEvaluationService badgeEvaluationService;
 
     /**
      * Transactional για δύο λόγους: είναι write, και το audit log θέλει να
@@ -47,7 +49,7 @@ public class BundleServiceImpl implements BundleService {
         User userRef = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
-                userRef = userRepository.getReferenceById(UUID.fromString(jwt.getSubject()));
+            userRef = userRepository.getReferenceById(UUID.fromString(jwt.getSubject()));
         }
         int score = (int) answers.stream()
                 .filter(Answer::getIsCorrect)
@@ -58,6 +60,10 @@ public class BundleServiceImpl implements BundleService {
         bundle.setCreatedBy(userRef);
 
         Bundle saved = bundleRepository.save(bundle);
+
+        if (userRef != null) {
+            badgeEvaluationService.evaluateQuizMilestones(userRef.getId());
+        }
 
         String courseLabel = answers.stream()
                 .findFirst()
@@ -91,4 +97,3 @@ public class BundleServiceImpl implements BundleService {
         return bundleRepository.countByCourseId(courseId);
     }
 }
-

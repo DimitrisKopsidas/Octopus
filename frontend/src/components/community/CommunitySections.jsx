@@ -1,12 +1,13 @@
 // The curated bands of the Community page: the crew (admins + helpers), the
 // creators ranking, the newest members and the join-the-team CTA.
+import { useState } from 'react'
 import { useCommunityMembers } from '../../hooks/queries'
 import Skeleton from '../ui/Skeleton'
 import HelpCard from '../info/HelpCard'
 import { CrewCard, MemberRow } from './MemberCard'
-import { PenLine, Sparkles } from 'lucide-react'
+import { PenLine, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import { joinedAgo, statsOf } from '../../lib/profiles'
-import { roleNickname } from '../../lib/badges'
+import { computeBadges, founderRank, hasBadge } from '../../lib/badges'
 import t from '../../content/community.json'
 
 // Stable param objects: TanStack keys on them, so they must not change per render.
@@ -28,8 +29,17 @@ function SectionHeader({ title, subtitle }) {
 export function CrewSection() {
   const admins = useCommunityMembers(ADMINS)
   const helpers = useCommunityMembers(HELPERS)
-  const crew = [...admins.members, ...helpers.members]
+  // Founders πρώτοι, με τη σειρά της λίστας FOUNDERS. Οι υπόλοιποι κρατάνε τη σειρά τους (stable sort).
+  const rank = (m) => {
+    const r = founderRank(m)
+    return r === -1 ? Infinity : r
+  }
+  const crew = [...admins.members, ...helpers.members].sort((a, b) => rank(a) - rank(b))
   const loading = admins.isPending || helpers.isPending
+  // Στο κινητό φαίνονται μόνο οι founders, οι υπόλοιποι με «Δες όλο το πλήρωμα».
+  const [expanded, setExpanded] = useState(false)
+  const isFounder = (m) => hasBadge(computeBadges(m), 'FOUNDER')
+  const hiddenOnMobile = crew.filter((m) => !isFounder(m)).length
 
   return (
     <section className="space-y-4">
@@ -41,14 +51,27 @@ export function CrewSection() {
       ) : crew.length === 0 ? (
         <p className="text-sm text-slate-500 dark:text-slate-400">{t.crew.empty}</p>
       ) : (
-        // Horizontal scroll on phones, grid from sm up.
-        <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-3 overflow-x-auto sm:overflow-visible snap-x pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
-          {crew.map((m) => (
-            <div key={m.username} className="snap-start shrink-0 w-72 sm:w-auto">
-              <CrewCard member={m} />
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {crew.map((m) => (
+              <div key={m.username} className={expanded || isFounder(m) ? '' : 'hidden sm:block'}>
+                <CrewCard member={m} />
+              </div>
+            ))}
+          </div>
+          {hiddenOnMobile > 0 && (
+            <div className="sm:hidden text-center">
+              <button
+                type="button"
+                onClick={() => setExpanded((prev) => !prev)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                {expanded ? t.crew.showLess : t.crew.showAll.replace('{count}', hiddenOnMobile)}
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </section>
   )
@@ -93,7 +116,7 @@ export function CreatorsPanel() {
             key={m.username}
             member={m}
             rank={i + 1}
-            subtitle={roleNickname(m.role)}
+            showBadges={true}
             aside={
               <div className="w-20 sm:w-24 shrink-0 text-right space-y-1">
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-300 tabular-nums">
@@ -121,7 +144,6 @@ export function NewcomersPanel() {
         <MemberRow
           key={m.username}
           member={m}
-          subtitle={`@${m.username}`}
           aside={<span className="shrink-0 text-[11px] font-semibold text-slate-400 dark:text-slate-500">{joinedAgo(m.memberSince)}</span>}
         />
       ))}
