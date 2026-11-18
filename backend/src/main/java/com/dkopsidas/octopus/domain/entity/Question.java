@@ -28,6 +28,10 @@ public class Question {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "exam_type", nullable = false, length = 16)
+    private ExamType examType = ExamType.EXAM;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "question",//field not column

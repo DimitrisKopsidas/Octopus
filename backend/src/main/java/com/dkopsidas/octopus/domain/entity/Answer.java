@@ -21,6 +21,10 @@ public class Answer {
     @Column(name = "is_correct", nullable = false)
     private boolean isCorrect;
 
+    // false = replaced by an edit
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)//column name
