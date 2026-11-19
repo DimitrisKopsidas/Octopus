@@ -28,6 +28,10 @@ public class Question {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "exam_type", nullable = false, length = 16)
+    private ExamType examType = ExamType.EXAM;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "question",//field not column
@@ -83,6 +87,7 @@ public class Question {
     }
 
     public void replaceAnswers(List<Answer> newAnswers) {
+        // Task 54 note, afteer DB update, answers should be soft deleted so user quiz history is kept.
         this.answers.clear(); // orphanRemoval deletes removed answers from DB
         newAnswers.forEach(this::addAnswer); // sets back-reference on each
     }

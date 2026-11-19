@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -57,6 +58,11 @@ public class GlobalExceptionHandler {
     ) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponseDto(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponseDto> handleResponseStatusException(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(new ErrorResponseDto(ex.getReason()));
     }
 
     @ExceptionHandler(Exception.class)

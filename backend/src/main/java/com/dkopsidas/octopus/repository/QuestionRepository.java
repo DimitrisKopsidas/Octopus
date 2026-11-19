@@ -20,6 +20,15 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Long countByCourseIdAndIsActiveTrue(Long courseId);
 
+    /** v2 custom quiz, random active questions of a course and exam type */
+    @Query(value = """
+            select * from questions
+            where course_id = :courseId and exam_type = :examType and is_active
+            order by random()
+            limit :count
+            """, nativeQuery = true)
+    List<Question> findRandomActive(Long courseId, String examType, int count);
+
     /** Titles already in the course, used to skip duplicates on import. */
     @Query("select q.title from Question q where q.course.id = :courseId")
     List<String> findTitlesByCourseId(Long courseId);
