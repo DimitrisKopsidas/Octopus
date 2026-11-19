@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public interface QuizRepository extends JpaRepository<Quiz, UUID> {
 
+    //  and qq.question.examType = qq.quiz.examType
     /** Questions of a set in order. Skips deactivated questions. */
     @Query("""
             select qq.question from QuizQuestion qq
@@ -19,7 +20,6 @@ public interface QuizRepository extends JpaRepository<Quiz, UUID> {
               and qq.question.isActive = true
             order by qq.id.position
             """)
-    //  and qq.question.examType = qq.quiz.examType
     List<Question> findActiveQuestions(UUID quizId);
 
     /** Quiz list of a course, questionCount counts only the questions findActiveQuestions would serve. */
@@ -33,7 +33,6 @@ public interface QuizRepository extends JpaRepository<Quiz, UUID> {
             group by q.id, q.course.id, q.examType, q.setNum, q.updated
             order by q.examType, q.setNum
             """)
-    // and qu.examType = q.examType
     List<QuizResponseDto> findListByCourseId(Long courseId);
 
     boolean existsByCourseIdAndExamTypeAndSetNum(Long courseId, ExamType examType, int setNum);

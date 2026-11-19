@@ -113,7 +113,10 @@ public class SecurityConfig {
                                 "/api/v1/auth/logout",
                                 "/api/v1/logs/audit",
                                 "/api/v1/logs/crash",
-                                "/api/v1/bundles/**"
+                                "/api/v1/bundles/**",
+                                "/api/v2/quizzes/*/attempts",
+                                "/api/v2/courses/*/attempts",
+                                "/api/v2/attempts/*/submit"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/auth/csrf",

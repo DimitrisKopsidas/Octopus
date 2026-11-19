@@ -81,4 +81,9 @@ public class QuizAttempt {
     public boolean isFinished() {
         return finishedAt != null;
     }
+
+    /** Submitted after the timer ran out. False while unfinished or without a timer. */
+    public boolean isLate() {
+        return finishedAt != null && expiresAt != null && finishedAt.isAfter(expiresAt);
+    }
 }
