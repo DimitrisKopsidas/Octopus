@@ -1,5 +1,6 @@
 package com.dkopsidas.octopus.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -87,9 +88,13 @@ public class Question {
     }
 
     public void replaceAnswers(List<Answer> newAnswers) {
-        // Task 54 note, afteer DB update, answers should be soft deleted so user quiz history is kept.
-        this.answers.clear(); // orphanRemoval deletes removed answers from DB
+        answers.forEach(a -> a.setActive(false));
         newAnswers.forEach(this::addAnswer); // sets back-reference on each
+    }
+
+    @JsonIgnore
+    public List<Answer> getActiveAnswers() {
+        return answers.stream().filter(Answer::isActive).toList();
     }
 
     public Question() {

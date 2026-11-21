@@ -4,6 +4,10 @@ import com.dkopsidas.octopus.domain.dto.v2.*;
 import com.dkopsidas.octopus.service.v2.QuizAttemptService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -45,6 +49,22 @@ public class QuizAttemptController {
             @AuthenticationPrincipal Jwt jwt
     ) {
         return ResponseEntity.ok(attemptService.submit(attemptId, dto, userId(jwt)));
+    }
+
+    @GetMapping(path = "/attempts")
+    public ResponseEntity<Page<AttemptSummaryDto>> listMyAttempts(
+            @AuthenticationPrincipal Jwt jwt,
+            @PageableDefault(size = 20, sort = "finishedAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(attemptService.listUserAttempts(userId(jwt), pageable));
+    }
+
+    @GetMapping(path = "/attempts/{attemptId}")
+    public ResponseEntity<AttemptDetailDto> getMyAttempt(
+            @PathVariable UUID attemptId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(attemptService.getUserAttempt(attemptId, userId(jwt)));
     }
 
     private static UUID userId(Jwt jwt) {

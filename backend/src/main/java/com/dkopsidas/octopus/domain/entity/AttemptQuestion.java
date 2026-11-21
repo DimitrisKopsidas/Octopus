@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,6 +46,8 @@ public class AttemptQuestion {
 
     // answers the user picked
     @OneToMany(mappedBy = "attemptQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    // n + 1 query problem
+    @BatchSize(size = 100)
     private Set<AttemptAnswer> selectedAnswers = new HashSet<>();
 
     public AttemptQuestion(Question question, int position) {

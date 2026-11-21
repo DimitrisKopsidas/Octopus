@@ -70,7 +70,7 @@ public class QuestionMapperImpl implements QuestionMapper {
 
     @Override
     public QuestionResponseDto toDto(Question question) {
-        List<AnswerResponseDto> answers = question.getAnswers().stream()
+        List<AnswerResponseDto> answers = question.getActiveAnswers().stream()
                 .map(answer -> new AnswerResponseDto(
                         answer.getId(),
                         answer.getTitle(),

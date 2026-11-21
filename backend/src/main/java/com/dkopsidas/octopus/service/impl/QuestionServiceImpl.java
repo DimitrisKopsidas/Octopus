@@ -226,7 +226,7 @@ public class QuestionServiceImpl implements QuestionService {
                 "QUESTION",
                 saved.getId().toString(),
                 "Updated question " + describe(saved)
-                        + ", answers: " + saved.getAnswers().size()
+                        + ", answers: " + saved.getActiveAnswers().size()
         ));
 
         return questionMapper.toDto(saved);
@@ -357,7 +357,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     private void checkCorrectAnswerCount(Question question) {
-        long correctCount = question.getAnswers().stream()
+        long correctCount = question.getActiveAnswers().stream()
                 .filter(Answer::getIsCorrect)
                 .count();
 

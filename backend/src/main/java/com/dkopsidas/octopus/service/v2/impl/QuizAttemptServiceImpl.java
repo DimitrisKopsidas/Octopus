@@ -6,6 +6,8 @@ import com.dkopsidas.octopus.domain.entity.*;
 import com.dkopsidas.octopus.repository.*;
 import com.dkopsidas.octopus.service.BadgeEvaluationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,6 +134,57 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
             badgeEvaluationService.evaluateQuizMilestones(attempt.getUser().getId());
         }
         return new AttemptResultDto(attempt.getId(), correctCount, attempt.getQuestionCount(), now, results);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AttemptSummaryDto> listUserAttempts(UUID userId, Pageable pageable) {
+        return attemptRepository.findByUserIdAndFinishedAtIsNotNull(userId, pageable).map(this::toSummary);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AttemptDetailDto getUserAttempt(UUID attemptId, UUID userId) {
+        QuizAttempt attempt = attemptRepository.findWithQuestionsById(attemptId)
+                .filter(a -> a.getUser() != null && a.getUser().getId().equals(userId))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attempt not found"));
+
+        if (!attempt.isFinished()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempt not submitted yet");
+        }
+
+        // question, {answers}
+        Map<Long, List<Answer>> active = activeAnswersByQuestion(
+                attempt.getQuestions().stream().map(aq -> aq.getQuestion().getId()).toList());
+
+        List<AttemptReviewQuestionDto> questions = attempt.getQuestions().stream().map(aq -> {
+            
+            Question q = aq.getQuestion();
+            
+            List<Answer> options = new ArrayList<>(active.getOrDefault(q.getId(), List.of()));            
+            
+            Set<Long> picked = new HashSet<>();
+            for (AttemptAnswer selected : aq.getSelectedAnswers()) {
+                picked.add(selected.getAnswer().getId());
+                if (!selected.getAnswer().isActive()) {
+                    options.add(selected.getAnswer());
+                }
+            }
+            List<AttemptReviewAnswerDto> answers = options.stream()
+                    .map(a -> new AttemptReviewAnswerDto(a.getId(), a.getTitle(), a.getIsCorrect(), picked.contains(a.getId())))
+                    .toList();
+            return new AttemptReviewQuestionDto(q.getId(), q.getTitle(), q.getImageUrl(),
+                    Boolean.TRUE.equals(aq.getCorrect()), answers);
+        }).toList();
+
+        return new AttemptDetailDto(toSummary(attempt), questions);
+    }
+
+    private AttemptSummaryDto toSummary(QuizAttempt a) {
+        return new AttemptSummaryDto(a.getId(), a.getCourse().getId(), a.getCourse().getName(),
+                a.getQuiz() == null ? null : a.getQuiz().getId(), a.getExamType(), a.getSetNum(),
+                a.getCorrectCount(), a.getQuestionCount(), a.getStartedAt(), a.getFinishedAt(),
+                a.getExpiresAt(), a.isLate());
     }
 
     private Map<Long, List<Answer>> activeAnswersByQuestion(Collection<Long> questionIds) {
