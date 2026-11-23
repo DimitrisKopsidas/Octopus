@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 -- Ids are uuid, generated in Java (@GeneratedValue(strategy = GenerationType.UUID)), so no sequences.
 -- Attempt ids must be unguessable: guests own an attempt only by knowing its id.
 
@@ -54,10 +56,11 @@ CREATE TABLE attempt_questions (
 );
 CREATE INDEX idx_attempt_questions_question_id ON attempt_questions(question_id);
 
--- Answers the user picked
+-- Every answer option served with a question; is_selected = the user picked it
 CREATE TABLE attempt_answers (
-    attempt_question_id uuid   NOT NULL REFERENCES attempt_questions(id) ON DELETE CASCADE,
-    answer_id           bigint NOT NULL REFERENCES answers(id),
+    attempt_question_id uuid    NOT NULL REFERENCES attempt_questions(id) ON DELETE CASCADE,
+    answer_id           bigint  NOT NULL REFERENCES answers(id),
+    is_selected         boolean NOT NULL DEFAULT false,
     PRIMARY KEY (attempt_question_id, answer_id)
 );
 

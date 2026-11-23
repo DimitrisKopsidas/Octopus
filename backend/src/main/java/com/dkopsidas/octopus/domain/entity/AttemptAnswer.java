@@ -4,11 +4,12 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-/** An answer the user picked for a served question. */
+/** An answer option served with a question, picked or not. */
 @Getter
 @NoArgsConstructor
 @Entity
@@ -27,6 +28,10 @@ public class AttemptAnswer {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "answer_id", nullable = false, updatable = false)
     private Answer answer;
+
+    @Setter
+    @Column(name = "is_selected", nullable = false)
+    private boolean selected;
 
     public AttemptAnswer(AttemptQuestion attemptQuestion, Answer answer) {
         this.attemptQuestion = attemptQuestion;

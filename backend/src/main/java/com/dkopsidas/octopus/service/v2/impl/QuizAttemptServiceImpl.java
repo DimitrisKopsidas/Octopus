@@ -65,12 +65,14 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
         attempt.setQuestionCount(questions.size());
         attempt.setStartedAt(now);
         attempt.setExpiresAt(timerMinutes == null ? null : now.plus(Duration.ofMinutes(timerMinutes)));
+        Map<Long, List<Answer>> answers = activeAnswersByQuestion(questions.stream().map(Question::getId).toList());
         for (int i = 0; i < questions.size(); i++) {
-            attempt.addQuestion(new AttemptQuestion(questions.get(i), i));
+            AttemptQuestion aq = new AttemptQuestion(questions.get(i), i);
+            answers.getOrDefault(questions.get(i).getId(), List.of()).forEach(aq::addOption);
+            attempt.addQuestion(aq);
         }
         QuizAttempt saved = attemptRepository.save(attempt);
 
-        Map<Long, List<Answer>> answers = activeAnswersByQuestion(questions.stream().map(Question::getId).toList());
         List<AttemptQuestionDto> questionDtos = questions.stream()
                 .map(q -> new AttemptQuestionDto(q.getId(), q.getTitle(), q.getImageUrl(),
                         answers.getOrDefault(q.getId(), List.of()).stream()
@@ -83,7 +85,7 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
 
     @Override
     @Transactional
-    public AttemptResultDto submit(UUID attemptId, SubmitAttemptRequestDto dto, UUID userId) {
+    public AttemptDetailDto submit(UUID attemptId, SubmitAttemptRequestDto dto, UUID userId) {
         QuizAttempt attempt = attemptRepository.findWithQuestionsById(attemptId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attempt not found"));
 
@@ -98,34 +100,38 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
 
         Map<Long, AttemptQuestion> served = attempt.getQuestions().stream()
                 .collect(Collectors.toMap(aq -> aq.getQuestion().getId(), aq -> aq));
+        // all served questionIds should match the submitted questionIds
         if (!served.keySet().containsAll(dto.answers().keySet())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Answer for a question not in this attempt");
         }
-        Map<Long, List<Answer>> answers = activeAnswersByQuestion(served.keySet());
-
         int correctCount = 0;
-        List<QuestionResultDto> results = new ArrayList<>();
         for (AttemptQuestion aq : attempt.getQuestions()) {
+            // for each attempt question, get question and all it's answer options
             Long questionId = aq.getQuestion().getId();
-            Map<Long, Answer> options = answers.getOrDefault(questionId, List.of()).stream()
-                    .collect(Collectors.toMap(Answer::getId, a -> a));
+            Map<Long, AttemptAnswer> options = aq.getOptions().stream()
+                    .collect(Collectors.toMap(o -> o.getAnswer().getId(), o -> o));
+
+            // find what user picked
             Set<Long> picked = Objects.requireNonNullElse(dto.answers().get(questionId), Set.of());
             for (Long answerId : picked) {
-                Answer answer = options.get(answerId);
-                if (answer == null) {
+                AttemptAnswer option = options.get(answerId);
+                if (option == null) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Answer " + answerId + " is not an option of question " + questionId);
                 }
-                aq.addSelectedAnswer(answer);
+                option.setSelected(true);
             }
+
+            // all correct answer Ids
             Set<Long> correctIds = options.values().stream()
-                    .filter(Answer::getIsCorrect).map(Answer::getId).collect(Collectors.toSet());
+                    .filter(o -> o.getAnswer().getIsCorrect())
+                    .map(o -> o.getAnswer().getId())
+                    .collect(Collectors.toSet());
+
             // all-or-nothing, skipped = wrong
             boolean correct = !picked.isEmpty() && picked.equals(correctIds);
             aq.setCorrect(correct);
             if (correct) correctCount++;
-            results.add(new QuestionResultDto(questionId, correct,
-                    picked.stream().sorted().toList(), correctIds.stream().sorted().toList()));
         }
         attempt.setCorrectCount(correctCount);
         attempt.setFinishedAt(now);
@@ -133,7 +139,7 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
         if (attempt.getUser() != null) {
             badgeEvaluationService.evaluateQuizMilestones(attempt.getUser().getId());
         }
-        return new AttemptResultDto(attempt.getId(), correctCount, attempt.getQuestionCount(), now, results);
+        return toDetail(attempt);
     }
 
     @Override
@@ -152,26 +158,16 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
         if (!attempt.isFinished()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempt not submitted yet");
         }
+        return toDetail(attempt);
+    }
 
-        // question, {answers}
-        Map<Long, List<Answer>> active = activeAnswersByQuestion(
-                attempt.getQuestions().stream().map(aq -> aq.getQuestion().getId()).toList());
-
+    private AttemptDetailDto toDetail(QuizAttempt attempt) {
         List<AttemptReviewQuestionDto> questions = attempt.getQuestions().stream().map(aq -> {
-            
             Question q = aq.getQuestion();
-            
-            List<Answer> options = new ArrayList<>(active.getOrDefault(q.getId(), List.of()));            
-            
-            Set<Long> picked = new HashSet<>();
-            for (AttemptAnswer selected : aq.getSelectedAnswers()) {
-                picked.add(selected.getAnswer().getId());
-                if (!selected.getAnswer().isActive()) {
-                    options.add(selected.getAnswer());
-                }
-            }
-            List<AttemptReviewAnswerDto> answers = options.stream()
-                    .map(a -> new AttemptReviewAnswerDto(a.getId(), a.getTitle(), a.getIsCorrect(), picked.contains(a.getId())))
+            List<AttemptReviewAnswerDto> answers = aq.getOptions().stream()
+                    .sorted(Comparator.comparing(o -> o.getAnswer().getId()))
+                    .map(o -> new AttemptReviewAnswerDto(o.getAnswer().getId(), o.getAnswer().getTitle(),
+                            o.getAnswer().getIsCorrect(), o.isSelected()))
                     .toList();
             return new AttemptReviewQuestionDto(q.getId(), q.getTitle(), q.getImageUrl(),
                     Boolean.TRUE.equals(aq.getCorrect()), answers);

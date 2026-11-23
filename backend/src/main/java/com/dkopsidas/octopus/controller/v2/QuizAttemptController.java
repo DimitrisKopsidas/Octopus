@@ -43,7 +43,7 @@ public class QuizAttemptController {
     }
 
     @PostMapping(path = "/attempts/{attemptId}/submit")
-    public ResponseEntity<AttemptResultDto> submit(
+    public ResponseEntity<AttemptDetailDto> submit(
             @PathVariable UUID attemptId,
             @Valid @RequestBody SubmitAttemptRequestDto dto,
             @AuthenticationPrincipal Jwt jwt

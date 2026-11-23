@@ -44,18 +44,18 @@ public class AttemptQuestion {
     @Column(name = "is_correct")
     private Boolean correct;
 
-    // answers the user picked
+    // answer options served with the question; picked ones have selected = true
     @OneToMany(mappedBy = "attemptQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
     // n + 1 query problem
     @BatchSize(size = 100)
-    private Set<AttemptAnswer> selectedAnswers = new HashSet<>();
+    private Set<AttemptAnswer> options = new HashSet<>();
 
     public AttemptQuestion(Question question, int position) {
         this.question = question;
         this.position = position;
     }
 
-    public void addSelectedAnswer(Answer answer) {
-        selectedAnswers.add(new AttemptAnswer(this, answer));
+    public void addOption(Answer answer) {
+        options.add(new AttemptAnswer(this, answer));
     }
 }

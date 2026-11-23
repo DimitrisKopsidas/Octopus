@@ -1,11 +1,10 @@
 package com.dkopsidas.octopus.service.v2;
 
-import com.dkopsidas.octopus.domain.dto.v2.AttemptResultDto;
+import com.dkopsidas.octopus.domain.dto.v2.AttemptDetailDto;
 import com.dkopsidas.octopus.domain.dto.v2.AttemptStartResponseDto;
 import com.dkopsidas.octopus.domain.dto.v2.StartCustomAttemptRequestDto;
 import com.dkopsidas.octopus.domain.dto.v2.SubmitAttemptRequestDto;
 
-import com.dkopsidas.octopus.domain.dto.v2.AttemptDetailDto;
 import com.dkopsidas.octopus.domain.dto.v2.AttemptSummaryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,7 @@ public interface QuizAttemptService {
 
     AttemptStartResponseDto startCustomAttempt(Long courseId, StartCustomAttemptRequestDto dto, UUID userId);
 
-    AttemptResultDto submit(UUID attemptId, SubmitAttemptRequestDto dto, UUID userId);
+    AttemptDetailDto submit(UUID attemptId, SubmitAttemptRequestDto dto, UUID userId);
 
     Page<AttemptSummaryDto> listUserAttempts(UUID userId, Pageable pageable);
 
