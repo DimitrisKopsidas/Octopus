@@ -1,5 +1,6 @@
 package com.dkopsidas.octopus.domain.dto;
 
+import com.dkopsidas.octopus.domain.entity.ExamType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
@@ -13,7 +14,8 @@ public record UpdateQuestionRequestDto(
         String imageUrl,
         boolean isActive,
         @Size(min = 2, max = 10, message = ERROR_MESSAGE_ANSWER_COUNT)
-        List<AnswerRequestDto> answers
+        List<AnswerRequestDto> answers,
+        ExamType examType // null = keep current
 ) {
     private static final String ERROR_MESSAGE_TITLE_LENGTH = "Title must be between 1 and 510 characters";
     private static final String ERROR_MESSAGE_ANSWER_COUNT = "Answer count cannot be less than 2 and more than 10";

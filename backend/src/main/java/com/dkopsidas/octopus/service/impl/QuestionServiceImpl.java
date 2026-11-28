@@ -163,7 +163,8 @@ public class QuestionServiceImpl implements QuestionService {
                     entry.title().trim(),
                     entry.imageUrl(),
                     entry.answers(),
-                    courseId
+                    courseId,
+                    entry.examType()
             );
 
             Question question = questionMapper.toEntity(asCreate, course);
@@ -216,6 +217,9 @@ public class QuestionServiceImpl implements QuestionService {
         question.setTitle(questionFromDto.getTitle());
         question.setImageUrl(questionFromDto.getImageUrl());
         question.replaceAnswers(questionFromDto.getAnswers());
+        if (updateRequest.examType() != null) {
+            question.setExamType(updateRequest.examType());
+        }
 
         Question saved = questionRepository.save(question);
 
@@ -226,7 +230,7 @@ public class QuestionServiceImpl implements QuestionService {
                 "QUESTION",
                 saved.getId().toString(),
                 "Updated question " + describe(saved)
-                        + ", answers: " + saved.getAnswers().size()
+                        + ", answers: " + saved.getActiveAnswers().size()
         ));
 
         return questionMapper.toDto(saved);
@@ -357,7 +361,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     private void checkCorrectAnswerCount(Question question) {
-        long correctCount = question.getAnswers().stream()
+        long correctCount = question.getActiveAnswers().stream()
                 .filter(Answer::getIsCorrect)
                 .count();
 

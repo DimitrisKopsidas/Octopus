@@ -1,5 +1,6 @@
 package com.dkopsidas.octopus.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -28,11 +29,14 @@ public class Question {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "exam_type", nullable = false, length = 16)
+    private ExamType examType = ExamType.EXAM;
+
     @JsonManagedReference
     @OneToMany(
             mappedBy = "question",//field not column
-            cascade = CascadeType.ALL,//Saving a Question also saves its Answers
-            orphanRemoval = true//Removing an answer from the list deletes it from DB
+            cascade = CascadeType.ALL//Saving a Question also saves its Answers; no orphanRemoval: answers are soft-deleted (FKs from attempt_answers, bundle_answers)
     )
     @OrderBy("id ASC")// σταθερή σειρά από τη βάση· το quiz τις ανακατεύει στο frontend
     private List<Answer> answers = new ArrayList<>();
@@ -83,8 +87,13 @@ public class Question {
     }
 
     public void replaceAnswers(List<Answer> newAnswers) {
-        this.answers.clear(); // orphanRemoval deletes removed answers from DB
+        answers.forEach(a -> a.setActive(false));
         newAnswers.forEach(this::addAnswer); // sets back-reference on each
+    }
+
+    @JsonIgnore
+    public List<Answer> getActiveAnswers() {
+        return answers.stream().filter(Answer::isActive).toList();
     }
 
     public Question() {

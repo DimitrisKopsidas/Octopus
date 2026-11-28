@@ -6,6 +6,7 @@ import com.dkopsidas.octopus.domain.dto.QuestionResponseDto;
 import com.dkopsidas.octopus.domain.dto.UpdateQuestionRequestDto;
 import com.dkopsidas.octopus.domain.entity.Answer;
 import com.dkopsidas.octopus.domain.entity.Course;
+import com.dkopsidas.octopus.domain.entity.ExamType;
 import com.dkopsidas.octopus.domain.entity.Question;
 import com.dkopsidas.octopus.domain.entity.User;
 import com.dkopsidas.octopus.mapper.QuestionMapper;
@@ -30,6 +31,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 Instant.now(),
                 Instant.now()
         );
+        question.setExamType(dto.examType() == null ? ExamType.EXAM : dto.examType());
 
         dto.answers().stream()
                 .map(a -> {
@@ -70,7 +72,7 @@ public class QuestionMapperImpl implements QuestionMapper {
 
     @Override
     public QuestionResponseDto toDto(Question question) {
-        List<AnswerResponseDto> answers = question.getAnswers().stream()
+        List<AnswerResponseDto> answers = question.getActiveAnswers().stream()
                 .map(answer -> new AnswerResponseDto(
                         answer.getId(),
                         answer.getTitle(),
@@ -87,6 +89,7 @@ public class QuestionMapperImpl implements QuestionMapper {
                 question.getTitle(),
                 question.getImageUrl(),
                 question.getIsActive(),
+                question.getExamType(),
                 answers,
                 question.getCourse().getId(),
                 creator != null ? creator.getId() : null,

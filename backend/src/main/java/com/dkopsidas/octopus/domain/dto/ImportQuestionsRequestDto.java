@@ -1,5 +1,6 @@
 package com.dkopsidas.octopus.domain.dto;
 
+import com.dkopsidas.octopus.domain.entity.ExamType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -30,7 +31,9 @@ public record ImportQuestionsRequestDto(
             @NotNull(message = ERROR_MESSAGE_ANSWER_COUNT)
             @Size(min = 2, max = 10, message = ERROR_MESSAGE_ANSWER_COUNT)
             @Valid
-            List<AnswerRequestDto> answers
+            List<AnswerRequestDto> answers,
+
+            ExamType examType // null = EXAM
     ) {
         private static final String ERROR_MESSAGE_TITLE_LENGTH = "Title must be between 1 and 510 characters";
         private static final String ERROR_MESSAGE_ANSWER_COUNT = "Answer count cannot be less than 2 and more than 10";

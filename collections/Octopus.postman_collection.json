@@ -35,6 +35,16 @@
         {
           "name": "CreateQuestion",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -47,12 +57,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/v1/questions",
+              "raw": "http://localhost/api/v1/questions",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "v1",
@@ -127,7 +136,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"displayName\": \"George Tsantekidis\",\r\n    \"password\": \"12345678\",\r\n    \"year\": \"2022\"\r\n    // \"helperCode\": \"HLP-SOMETHING\"\r\n}",
+              "raw": "{\r\n    \"username\": \"tsandasasasassafsafsa\",\r\n    \"displayName\": \"George Tsantekidis\",\r\n    \"password\": \"12345678\",\r\n    \"year\": \"2022\"\r\n    // \"helperCode\": \"HLP-SOMETHING\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -229,15 +238,19 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"name\": \"ntina\",\r\n    \"password\": \"liogka\",\r\n    \"year\": \"2017\"\r\n}"
+              "raw": "{\r\n    \"name\": \"ntina\",\r\n    \"password\": \"liogka\",\r\n    \"year\": \"2017\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
             },
             "url": {
-              "raw": "http://localhost:8080/api/v1/courses",
+              "raw": "http://localhost/api/v1/courses",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "v1",
@@ -250,6 +263,16 @@
         {
           "name": "CreateCourse",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
@@ -262,12 +285,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/v1/courses",
+              "raw": "http://localhost/api/v1/courses",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "v1",
@@ -288,24 +310,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "const body = pm.response.json();\r",
-                  "pm.environment.set(\"ACCESS_TOKEN\", body.accessToken);"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
                 "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                  "const body = pm.response.json();\r\npm.environment.set(\"ACCESS_TOKEN\", body.accessToken);"
+                ]
               }
             }
           ],
@@ -314,7 +322,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"password\": \"12345678\"\r\n}",
+              "raw": "{\r\n    \"username\": \"tsandas\",\r\n    \"password\": \"\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -322,12 +330,11 @@
               }
             },
             "url": {
-              "raw": "http://localhost:8080/api/v1/auth/login",
+              "raw": "http://localhost/api/v1/auth/login",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8080",
               "path": [
                 "api",
                 "v1",
@@ -398,7 +405,14 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
             "url": {
               "raw": "http://localhost:8080/api/v1/auth/refresh",
               "protocol": "http",
@@ -625,6 +639,319 @@
                 "v1",
                 "access",
                 "admin"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "UserSide",
+          "item": [
+            {
+              "name": "Attempt",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"timerMinutes\": 1\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost/api/v2/quizzes/8ed25f51-1872-4b94-bde4-b07697543e37/attempts",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "quizzes",
+                    "8ed25f51-1872-4b94-bde4-b07697543e37",
+                    "attempts"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GetAttempts",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost/api/v2/attempts/",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "attempts",
+                    ""
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GetAttempt",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost/api/v2/attempts/65e76dc6-415c-4627-9fc3-acfc6694a9cc",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "attempts",
+                    "65e76dc6-415c-4627-9fc3-acfc6694a9cc"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Submit",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{ACCESS_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"answers\": {\r\n        \"6324\": [7766]\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost/api/v2/attempts/65e76dc6-415c-4627-9fc3-acfc6694a9cc/submit",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "path": [
+                    "api",
+                    "v2",
+                    "attempts",
+                    "65e76dc6-415c-4627-9fc3-acfc6694a9cc",
+                    "submit"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "GetQuizzes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost/api/v2/courses/1103/quizzes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "courses",
+                "1103",
+                "quizzes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "CreateQuiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"courseId\": 1103,\r\n  \"examType\": \"EXAM\",\r\n  \"setNum\": 2,\r\n  \"questionIds\": [6324]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost/api/v2/quizzes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "quizzes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ListQuiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"courseId\": 1103,\r\n  \"examType\": \"EXAM\",\r\n  \"setNum\": 2,\r\n  \"questionIds\": [6324]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost/api/v2/quizzes/7020f428-6e43-4129-8aa1-16ac6e1b060e",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "quizzes",
+                "7020f428-6e43-4129-8aa1-16ac6e1b060e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UpdateQuiz",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ACCESS_TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"courseId\": 1103,\r\n  \"examType\": \"EXAM\",\r\n  \"setNum\": 1,\r\n  \"questionIds\": [6324,6103]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost/api/v2/quizzes/7f196598-3cfd-40ba-994d-149d5917e267",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "path": [
+                "api",
+                "v2",
+                "quizzes",
+                "7f196598-3cfd-40ba-994d-149d5917e267"
               ]
             }
           },
