@@ -163,7 +163,8 @@ public class QuestionServiceImpl implements QuestionService {
                     entry.title().trim(),
                     entry.imageUrl(),
                     entry.answers(),
-                    courseId
+                    courseId,
+                    entry.examType()
             );
 
             Question question = questionMapper.toEntity(asCreate, course);
@@ -216,6 +217,9 @@ public class QuestionServiceImpl implements QuestionService {
         question.setTitle(questionFromDto.getTitle());
         question.setImageUrl(questionFromDto.getImageUrl());
         question.replaceAnswers(questionFromDto.getAnswers());
+        if (updateRequest.examType() != null) {
+            question.setExamType(updateRequest.examType());
+        }
 
         Question saved = questionRepository.save(question);
 
