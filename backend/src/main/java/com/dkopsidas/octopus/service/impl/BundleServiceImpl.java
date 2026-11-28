@@ -11,7 +11,6 @@ import com.dkopsidas.octopus.repository.AnswerRepository;
 import com.dkopsidas.octopus.repository.BundleRepository;
 import com.dkopsidas.octopus.repository.UserRepository;
 import com.dkopsidas.octopus.security.audit.AuditEvent;
-import com.dkopsidas.octopus.service.BadgeEvaluationService;
 import com.dkopsidas.octopus.service.BundleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,7 +32,6 @@ public class BundleServiceImpl implements BundleService {
     private final AnswerRepository answerRepository;
     private final BundleMapper bundleMapper;
     private final ApplicationEventPublisher eventPublisher;
-    private final BadgeEvaluationService badgeEvaluationService;
 
     /**
      * Transactional για δύο λόγους: είναι write, και το audit log θέλει να
@@ -60,10 +58,6 @@ public class BundleServiceImpl implements BundleService {
         bundle.setCreatedBy(userRef);
 
         Bundle saved = bundleRepository.save(bundle);
-
-        if (userRef != null) {
-            badgeEvaluationService.evaluateQuizMilestones(userRef.getId());
-        }
 
         String courseLabel = answers.stream()
                 .findFirst()

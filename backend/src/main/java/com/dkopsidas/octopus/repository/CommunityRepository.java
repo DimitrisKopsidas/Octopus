@@ -31,7 +31,8 @@ public interface CommunityRepository extends Repository<User, UUID> {
             WHERE
             """ + FILTER + """
             ORDER BY
-                CASE WHEN :sort = 'quizzes' THEN (SELECT COUNT(*) FROM bundles b WHERE b.created_by = u.id) END DESC,
+                CASE WHEN :sort = 'quizzes' THEN (SELECT COUNT(*) FROM quiz_attempts qa
+                    WHERE qa.user_id = u.id AND qa.finished_at IS NOT NULL) END DESC,
                 CASE WHEN :sort = 'questions' THEN (SELECT COUNT(*) FROM questions q WHERE q.created_by = u.id AND q.is_active = true) END DESC,
                 CASE WHEN :sort = 'oldest' THEN u.created END ASC,
                 CASE WHEN :sort = 'name' THEN lower(u.display_name) END ASC,
@@ -54,30 +55,26 @@ public interface CommunityRepository extends Repository<User, UUID> {
     }
 
     /**
-     * Everything a profile shows, for a batch of users in one query. A quiz's
-     * percentage is correct answers over answers given; "perfect" counts those where they are
-     * equal, with at least 5 answers so a quiz with one answered question doesn't count.
+     * Everything a profile shows, for a batch of users in one query. Quiz stats come from
+     * submitted quiz_attempts only: bundles don't store skipped questions, so their scores are wrong.
+     * "perfect" = every served question correct, in a quiz of at least 10 questions.
      * Only active questions count towards "questions" (soft-deleted ones don't).
      */
     @Query(value = """
-            WITH b AS (
-                SELECT b.id, b.created_by, b.score, b.created, COUNT(ba.answer_id) AS answered
-                FROM bundles b LEFT JOIN bundle_answers ba ON ba.bundle_id = b.id
-                WHERE b.created_by IN (:ids)
-                GROUP BY b.id
+            WITH a AS (
+                SELECT user_id, course_id, question_count, correct_count, finished_at
+                FROM quiz_attempts
+                WHERE user_id IN (:ids) AND finished_at IS NOT NULL
             )
             SELECT u.id AS "userId",
-                (SELECT COUNT(*) FROM b WHERE b.created_by = u.id) AS "quizzes",
-                (SELECT AVG(b.score * 100.0 / NULLIF(b.answered, 0)) FROM b WHERE b.created_by = u.id)::double precision AS "avgScore",
-                (SELECT COUNT(*) FROM b WHERE b.created_by = u.id AND b.answered >= 1 AND b.score >= b.answered) AS "perfect",
-                (SELECT COUNT(*) FROM b WHERE b.created_by = u.id
-                    AND EXTRACT(HOUR FROM b.created AT TIME ZONE 'Europe/Athens') BETWEEN 2 AND 4) AS "nightOwl",
+                (SELECT COUNT(*) FROM a WHERE a.user_id = u.id) AS "quizzes",
+                (SELECT AVG(a.correct_count * 100.0 / a.question_count) FROM a WHERE a.user_id = u.id)::double precision AS "avgScore",
+                (SELECT COUNT(*) FROM a WHERE a.user_id = u.id
+                    AND a.question_count >= 10 AND a.correct_count = a.question_count) AS "perfect",
+                (SELECT COUNT(*) FROM a WHERE a.user_id = u.id
+                    AND EXTRACT(HOUR FROM a.finished_at AT TIME ZONE 'Europe/Athens') BETWEEN 2 AND 4) AS "nightOwl",
                 (SELECT COUNT(*) FROM questions q WHERE q.created_by = u.id AND q.is_active = true) AS "questions",
-                (SELECT COUNT(DISTINCT q.course_id) FROM b
-                    JOIN bundle_answers ba ON ba.bundle_id = b.id
-                    JOIN answers a ON a.id = ba.answer_id
-                    JOIN questions q ON q.id = a.question_id
-                 WHERE b.created_by = u.id) AS "courses",
+                (SELECT COUNT(DISTINCT a.course_id) FROM a WHERE a.user_id = u.id) AS "courses",
                 u.id IN (SELECT id FROM users ORDER BY created, id LIMIT 30) AS "og"
             FROM users u
             WHERE u.id IN (:ids)
@@ -96,7 +93,9 @@ public interface CommunityRepository extends Repository<User, UUID> {
             SELECT COUNT(*) FILTER (WHERE u.role = 'ADMIN') AS "admins",
                 COUNT(*) FILTER (WHERE u.role = 'HELPER') AS "helpers",
                 COUNT(*) FILTER (WHERE u.role = 'STUDENT') AS "students",
-                (SELECT COUNT(*) FROM bundles) AS "quizzes",
+                -- site-wide total: old bundles still count as quizzes taken
+                (SELECT COUNT(*) FROM bundles)
+                    + (SELECT COUNT(*) FROM quiz_attempts WHERE finished_at IS NOT NULL) AS "quizzes",
                 (SELECT COUNT(*) FROM questions WHERE is_active = true) AS "questions"
             FROM users u
             WHERE u.active = true
