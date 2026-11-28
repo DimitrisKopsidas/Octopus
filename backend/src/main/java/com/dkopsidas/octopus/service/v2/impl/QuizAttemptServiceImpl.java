@@ -74,10 +74,12 @@ public class QuizAttemptServiceImpl implements QuizAttemptService {
         QuizAttempt saved = attemptRepository.save(attempt);
 
         List<AttemptQuestionDto> questionDtos = questions.stream()
-                .map(q -> new AttemptQuestionDto(q.getId(), q.getTitle(), q.getImageUrl(),
-                        answers.getOrDefault(q.getId(), List.of()).stream()
-                                .map(a -> new AttemptAnswerDto(a.getId(), a.getTitle()))
-                                .toList()))
+                .map(q -> {
+                    List<Answer> options = answers.getOrDefault(q.getId(), List.of());
+                    boolean multiSelect = options.stream().filter(Answer::getIsCorrect).count() > 1;
+                    return new AttemptQuestionDto(q.getId(), q.getTitle(), q.getImageUrl(), multiSelect,
+                            options.stream().map(a -> new AttemptAnswerDto(a.getId(), a.getTitle())).toList());
+                })
                 .toList();
         return new AttemptStartResponseDto(saved.getId(), saved.getCourse().getId(), saved.getExamType(),
                 saved.getSetNum(), saved.getExpiresAt(), questionDtos);

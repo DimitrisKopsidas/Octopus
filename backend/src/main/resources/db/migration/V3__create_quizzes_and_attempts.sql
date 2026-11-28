@@ -43,6 +43,7 @@ CREATE TABLE quiz_attempts (
 );
 CREATE INDEX idx_quiz_attempts_user_id ON quiz_attempts(user_id);
 CREATE INDEX idx_quiz_attempts_course_id ON quiz_attempts(course_id);
+CREATE INDEX idx_quiz_attempts_quiz_id ON quiz_attempts(quiz_id);  -- ON DELETE SET NULL on quiz replace/delete
 
 -- Every question served in an attempt, answered or not
 CREATE TABLE attempt_questions (
@@ -72,6 +73,8 @@ ALTER TABLE questions
     ADD COLUMN exam_type varchar(16) NOT NULL DEFAULT 'EXAM',
     ADD CONSTRAINT ck_questions_exam_type CHECK (exam_type IN ('EXAM', 'MIDTERM'));
 CREATE INDEX idx_questions_course_exam_type ON questions (course_id, exam_type);
+
+CREATE INDEX idx_answers_question_id ON answers(question_id);
 
 -- V1 left is_active nullable; queries already count only is_active = true, so null means inactive
 UPDATE questions SET is_active = false WHERE is_active IS NULL;

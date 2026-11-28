@@ -36,8 +36,7 @@ public class Question {
     @JsonManagedReference
     @OneToMany(
             mappedBy = "question",//field not column
-            cascade = CascadeType.ALL,//Saving a Question also saves its Answers
-            orphanRemoval = true//Removing an answer from the list deletes it from DB
+            cascade = CascadeType.ALL//Saving a Question also saves its Answers; no orphanRemoval: answers are soft-deleted (FKs from attempt_answers, bundle_answers)
     )
     @OrderBy("id ASC")// σταθερή σειρά από τη βάση· το quiz τις ανακατεύει στο frontend
     private List<Answer> answers = new ArrayList<>();
